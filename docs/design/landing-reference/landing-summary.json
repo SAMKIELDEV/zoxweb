@@ -1,0 +1,582 @@
+{
+  "steps": [
+    {
+      "at": "open",
+      "text": "Zox Logo lab Sign in Get started Now available on WhatsApp Your WhatsApp, actually useful now. Search the web, summarize PDFs, chat through "
+    }
+  ],
+  "docHeight": 2810,
+  "text": "Zox\nLogo lab\nSign in\nGet started\nNow available on WhatsApp\nYour WhatsApp,\nactually useful now.\n\nSearch the web, summarize PDFs, chat through ideas — all from a message. No downloads. No new apps. Just send a message.\n\nChat with Zox on WhatsApp\nExplore the logo lab\n\nFree to start · No credit card required\n\nSummarise this 40-page PDF for me 📄\n\n10:32 AM\n\nHere are the 5 key takeaways from your document ✨\n\n10:32 AM\n\nWhat's this research paper about?\n\nYesterday\n\nIt covers quantum entanglement in layman's terms. Want a breakdown?\n\nYesterday\n\nWHAT ZOX DOES\n\nOne chat.\nEverything you need done.\nAI Chat\n\nTalk through anything. Get smart, contextual answers back — not search results.\n\nWeb Search\n\nAsk Zox to look something up. It searches, reads, and comes back with the answer.\n\nPDF Summaries\n\nDrop a PDF in the chat. Zox reads the whole thing and sends back the key points.\n\nYouTube Summaries\n\nSend a video link. Get the gist — without sitting through the whole thing.\n\nImage Understanding\n\nShare a photo, diagram, or screenshot — Zox tells you what it sees.\n\nWHY ZOX\n\nNot another chatbot.\nActually different.\n\n01\n\nNo app to download.\n\nYou already have WhatsApp. Zox lives there — no new habit, no onboarding maze, no \"download our app\" moment.\n\n02\n\nPersonality first.\n\nZox isn't a command-line bot wearing a chat interface. It's direct, warm, and genuinely useful — built to feel like a smart friend, not a search engine.\n\n03\n\nPay only for what you use.\n\nSimple credit system. No monthly subscription trap, no surprise bills. Top up when you need to.\n\nPRICING\n\nFree to try.\nPay only for what you use.\n\nZox runs on a simple credit system — buy a pack when you need it, use credits across everything Zox does. No monthly bills. No expiry.\n\nSTARTER\n\n20\n\ncredits\n\n$1\n\nSTANDARD\n\n100\n\ncredits\n\n$5\n\nPOWER\n\n500\n\ncredits\n\n$25\n\nStart for free\nZox\n\nA product of SAMKIEL Studio\n\nGuide\nPrivacy\nTerms\n\n© 2026 SAMKIEL Studio. Zox is a WhatsApp-native product. Not affiliated with Meta Platforms, Inc.",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "text": "Logo lab",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "",
+      "href": null,
+      "aria": "Toggle theme"
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Sign in",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Get started",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Chat with Zox on WhatsApp",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Explore the logo lab",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Start for free",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Guide",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Privacy",
+      "href": null,
+      "aria": null
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Terms",
+      "href": null,
+      "aria": null
+    }
+  ],
+  "headings": [
+    {
+      "tag": "H1",
+      "text": "Your WhatsApp, actually useful now.",
+      "font": "Fraunces",
+      "size": "60.8px",
+      "weight": "600",
+      "lh": "65.664px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H2",
+      "text": "One chat. Everything you need done.",
+      "font": "Fraunces",
+      "size": "38.4px",
+      "weight": "600",
+      "lh": "44.16px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "AI Chat",
+      "font": "Fraunces",
+      "size": "18px",
+      "weight": "600",
+      "lh": "27px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "Web Search",
+      "font": "Fraunces",
+      "size": "18px",
+      "weight": "600",
+      "lh": "27px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "PDF Summaries",
+      "font": "Fraunces",
+      "size": "18px",
+      "weight": "600",
+      "lh": "27px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "YouTube Summaries",
+      "font": "Fraunces",
+      "size": "18px",
+      "weight": "600",
+      "lh": "27px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "Image Understanding",
+      "font": "Fraunces",
+      "size": "18px",
+      "weight": "600",
+      "lh": "27px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H2",
+      "text": "Not another chatbot. Actually different.",
+      "font": "Fraunces",
+      "size": "38.4px",
+      "weight": "600",
+      "lh": "44.16px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "No app to download.",
+      "font": "Fraunces",
+      "size": "22px",
+      "weight": "600",
+      "lh": "33px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "Personality first.",
+      "font": "Fraunces",
+      "size": "22px",
+      "weight": "600",
+      "lh": "33px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H3",
+      "text": "Pay only for what you use.",
+      "font": "Fraunces",
+      "size": "22px",
+      "weight": "600",
+      "lh": "33px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    },
+    {
+      "tag": "H2",
+      "text": "Free to try. Pay only for what you use.",
+      "font": "Fraunces",
+      "size": "38.4px",
+      "weight": "600",
+      "lh": "44.16px",
+      "ls": "normal",
+      "color": "rgb(42, 36, 32)"
+    }
+  ],
+  "sections": [
+    {
+      "tag": "NAV",
+      "cls": "sticky top-0 z-20 border-b",
+      "top": 0,
+      "h": 65,
+      "bg": "rgb(250, 246, 240)",
+      "firstText": "Zox Logo lab Sign in Get started"
+    },
+    {
+      "tag": "SECTION",
+      "cls": "max-w-6xl mx-auto px-6 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center",
+      "top": 65,
+      "h": 677,
+      "bg": "rgba(0, 0, 0, 0)",
+      "firstText": "Now available on WhatsApp Your WhatsApp, actually useful now. Search the web, su"
+    },
+    {
+      "tag": "SECTION",
+      "cls": "border-t",
+      "top": 742,
+      "h": 709,
+      "bg": "rgba(0, 0, 0, 0)",
+      "firstText": "WHAT ZOX DOES One chat. Everything you need done. AI Chat Talk through anything."
+    },
+    {
+      "tag": "SECTION",
+      "cls": "border-t",
+      "top": 1450,
+      "h": 519,
+      "bg": "rgb(245, 237, 229)",
+      "firstText": "WHY ZOX Not another chatbot. Actually different. 01 No app to download. You alre"
+    },
+    {
+      "tag": "SECTION",
+      "cls": "border-t",
+      "top": 1970,
+      "h": 630,
+      "bg": "rgba(0, 0, 0, 0)",
+      "firstText": "PRICING Free to try. Pay only for what you use. Zox runs on a simple credit syst"
+    },
+    {
+      "tag": "FOOTER",
+      "cls": "border-t",
+      "top": 2600,
+      "h": 211,
+      "bg": "rgb(242, 235, 224)",
+      "firstText": "Zox A product of SAMKIEL Studio Guide Privacy Terms © 2026 SAMKIEL Studio. Zox i"
+    }
+  ],
+  "fontSizes": [
+    [
+      "60.8px / 600 / Fraunces",
+      2
+    ],
+    [
+      "40px / 300 / Fraunces",
+      3
+    ],
+    [
+      "38.4px / 600 / Fraunces",
+      3
+    ],
+    [
+      "32px / 600 / Fraunces",
+      3
+    ],
+    [
+      "22px / 600 / Fraunces",
+      3
+    ],
+    [
+      "20px / 600 / Fraunces",
+      4
+    ],
+    [
+      "18px / 400 / \"DM Sans\"",
+      1
+    ],
+    [
+      "18px / 600 / Fraunces",
+      6
+    ],
+    [
+      "16px / 400 / \"DM Sans\"",
+      1
+    ],
+    [
+      "15px / 500 / \"DM Sans\"",
+      1
+    ],
+    [
+      "15px / 400 / \"DM Sans\"",
+      3
+    ],
+    [
+      "14px / 500 / \"DM Sans\"",
+      5
+    ],
+    [
+      "14px / 400 / \"DM Sans\"",
+      8
+    ],
+    [
+      "13px / 400 / \"DM Sans\"",
+      5
+    ],
+    [
+      "13px / 500 / \"DM Sans\"",
+      1
+    ],
+    [
+      "12px / 500 / \"DM Sans\"",
+      1
+    ],
+    [
+      "12px / 400 / \"DM Sans\"",
+      5
+    ],
+    [
+      "12px / 600 / \"DM Sans\"",
+      3
+    ],
+    [
+      "11px / 400 / \"DM Sans\"",
+      4
+    ],
+    [
+      "11px / 600 / \"DM Sans\"",
+      3
+    ]
+  ],
+  "colors": [
+    [
+      "text rgb(42, 36, 32)",
+      97
+    ],
+    [
+      "text rgb(138, 127, 115)",
+      31
+    ],
+    [
+      "text rgb(196, 112, 63)",
+      25
+    ],
+    [
+      "border rgb(228, 217, 206)",
+      16
+    ],
+    [
+      "bg rgb(255, 255, 255)",
+      10
+    ],
+    [
+      "text rgb(44, 59, 46)",
+      8
+    ],
+    [
+      "bg rgb(245, 237, 229)",
+      7
+    ],
+    [
+      "bg rgb(196, 112, 63)",
+      6
+    ],
+    [
+      "text rgb(255, 255, 255)",
+      6
+    ],
+    [
+      "bg rgb(253, 240, 231)",
+      3
+    ],
+    [
+      "bg rgb(250, 246, 240)",
+      2
+    ],
+    [
+      "bg rgb(232, 240, 233)",
+      2
+    ],
+    [
+      "bg rgb(90, 138, 96)",
+      1
+    ],
+    [
+      "bg rgb(44, 59, 46)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.6)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.9)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.4)",
+      1
+    ],
+    [
+      "bg rgb(242, 235, 224)",
+      1
+    ]
+  ],
+  "gradientsAndEffects": [
+    {
+      "bgImage": "none",
+      "filter": "blur(56px)",
+      "backdrop": "none",
+      "shadow": "none",
+      "radius": "63% 37% 54% 46% / 55% 48% 52% 45%",
+      "tag": "DIV",
+      "text": ""
+    },
+    {
+      "bgImage": "none",
+      "filter": "blur(40px)",
+      "backdrop": "none",
+      "shadow": "none",
+      "radius": "44% 56% 36% 64% / 60% 44% 56% 40%",
+      "tag": "DIV",
+      "text": ""
+    },
+    {
+      "bgImage": "none",
+      "filter": "blur(24px)",
+      "backdrop": "none",
+      "shadow": "none",
+      "radius": "50%",
+      "tag": "DIV",
+      "text": ""
+    },
+    {
+      "bgImage": "linear-gradient(135deg, rgb(196, 112, 63), rgb(168, 92, 48))",
+      "filter": "none",
+      "backdrop": "none",
+      "shadow": "rgba(196, 112, 63, 0.22) 0px 6px 24px 0px",
+      "radius": "16px 4px 16px 16px",
+      "tag": "DIV",
+      "text": "Here are the 5 key takeaways from your d"
+    },
+    {
+      "bgImage": "linear-gradient(135deg, rgb(44, 59, 46), rgb(30, 42, 32))",
+      "filter": "none",
+      "backdrop": "none",
+      "shadow": "rgba(44, 59, 46, 0.18) 0px 6px 24px 0px",
+      "radius": "4px 16px 16px",
+      "tag": "DIV",
+      "text": "It covers quantum entanglement in layman"
+    }
+  ],
+  "radii": [
+    [
+      "16px",
+      8
+    ],
+    [
+      "8px",
+      7
+    ],
+    [
+      "12px",
+      7
+    ],
+    [
+      "3.35544e+07px",
+      3
+    ],
+    [
+      "16px 16px 4px",
+      2
+    ],
+    [
+      "63% 37% 54% 46% / 55% 48% 52% 45%",
+      1
+    ],
+    [
+      "44% 56% 36% 64% / 60% 44% 56% 40%",
+      1
+    ],
+    [
+      "50%",
+      1
+    ],
+    [
+      "16px 4px 16px 16px",
+      1
+    ],
+    [
+      "4px 16px 16px",
+      1
+    ]
+  ],
+  "images": [],
+  "svgs": {
+    "30x30 0 0 48 48": 1,
+    "16x16 0 0 20 20": 1,
+    "18x18 0 0 24 24": 1,
+    "14x14 0 0 16 16": 1,
+    "280x280 0 0 48 48": 1,
+    "22x22 0 0 24 24": 5,
+    "26x26 0 0 48 48": 1,
+    "14x14 0 0 24 24": 3
+  },
+  "animations": [],
+  "logoMarkup": "<svg width=\"30\" height=\"30\" viewBox=\"0 0 48 48\" fill=\"none\" style=\"opacity: 1;\"><path d=\"M24 3L43 14V34L24 45L5 34V14Z\" fill=\"#C4703F\"></path><path d=\"M24 12L35 18.5V31.5L24 38L13 31.5V18.5Z\" fill=\"rgba(255,255,255,0.15)\"></path><path d=\"M17 22.5L21 19.5L24 24L27 19.5L31 22.5L27 27L31 29.5L27 28.5L24 33L21 28.5L17 29.5L21 27Z\" fill=\"white\"></path></svg>",
+  "transitions": [
+    [
+      "all 0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+      18
+    ]
+  ],
+  "darkColors": [
+    [
+      "text rgb(240, 232, 220)",
+      96
+    ],
+    [
+      "text rgb(122, 111, 99)",
+      29
+    ],
+    [
+      "text rgb(196, 112, 63)",
+      25
+    ],
+    [
+      "bg rgb(30, 23, 16)",
+      11
+    ],
+    [
+      "text rgb(44, 59, 46)",
+      8
+    ],
+    [
+      "bg rgb(196, 112, 63)",
+      6
+    ],
+    [
+      "bg rgb(37, 29, 19)",
+      6
+    ],
+    [
+      "text rgb(255, 255, 255)",
+      6
+    ],
+    [
+      "bg rgb(46, 30, 16)",
+      3
+    ],
+    [
+      "bg rgb(20, 16, 9)",
+      2
+    ],
+    [
+      "text rgb(138, 127, 115)",
+      2
+    ],
+    [
+      "bg rgb(28, 42, 30)",
+      2
+    ],
+    [
+      "bg rgb(90, 138, 96)",
+      1
+    ],
+    [
+      "bg rgb(44, 59, 46)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.6)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.9)",
+      1
+    ],
+    [
+      "text rgba(255, 255, 255, 0.4)",
+      1
+    ],
+    [
+      "bg rgb(17, 14, 7)",
+      1
+    ]
+  ]
+}

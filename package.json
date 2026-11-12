@@ -1,0 +1,31 @@
+{
+  "name": "zoxweb",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/server.mjs dev --port 3002",
+    "build": "next build --webpack",
+    "start": "node scripts/server.mjs start --port 3002",
+    "typecheck": "tsc --noEmit",
+    "test:pricing": "node tests/pricing-parity.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "^1.72.0",
+    "motion": "^14.12.0",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "swr": "^2.5.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "playwright": "^1.65.0",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.8.3"
+  },
+  "packageManager": "pnpm@10.26.1"
+}

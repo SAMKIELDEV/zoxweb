@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/* dark: follows the data-theme attribute set in app/layout.tsx. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+  Zox tokens. Source of truth: DESIGN.md section 2.
+  Raw color values live in this file only. Components use the semantic
+  names below (bg-paper, text-ink-2, border-line ...), never hex.
+  The dark theme overrides the same variables, so no component branches
+  on the theme.
+*/
+@theme {
+  /* Wipe Tailwind's defaults so off-system values cannot be written. */
+  --color-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  /* Surfaces */
+  --color-paper: #faf6f0; /* page background */
+  --color-surface: #f5ede5; /* raised surface */
+  --color-sidebar: #f2ebe0;
+  --color-wash: #eee7dd; /* hover and selected fills, skeletons, bar tracks */
+  --color-line: #e4d9ce; /* borders */
+  --color-line-soft: #ede3d8; /* hairlines inside a surface */
+  --color-track: #c8bfb5; /* control outlines: radio marks, input hover */
+
+  /* Text */
+  --color-ink: #2a2420;
+  --color-ink-2: #5e544b; /* secondary text, passes AA */
+  --color-ink-3: #8a7f73; /* hints only, never essential text */
+
+  /* Brand */
+  --color-accent: #c4703f; /* terracotta: marks, rings, large numbers */
+  --color-accent-strong: #a85c30; /* primary button fill */
+  --color-accent-deep: #934e27; /* primary hover and pressed */
+  --color-accent-ink: #a85c30; /* terracotta as small text */
+  --color-on-accent: #faf6f0; /* text on accent-strong */
+  --color-forest: #2c3b2e;
+
+  /* Status: muted, always paired with words */
+  --color-positive: #2c3b2e;
+  --color-danger: #a33a2b;
+  --color-warning: #a8741a;
+
+  /* Type */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-dm-sans), system-ui, sans-serif;
+
+  /* Scale: 12 / 14 / 16 / 20 / 28 / 40 / 64. Nothing in between. */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.35;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1.2;
+  --text-2xl: 2.5rem;
+  --text-2xl--line-height: 1.1;
+  --text-3xl: 4rem;
+  --text-3xl--line-height: 1;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Shadow: warm, soft, low contrast */
+  --shadow-soft: 0 2px 16px rgb(42 36 32 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(42 36 32 / 0.08), 0 16px 40px rgb(42 36 32 / 0.1);
+
+  /* Motion */
+  --ease-zox: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /*
+    Marketing tokens (DESIGN.md section 14). Taken from the landing page
+    design and used by components/marketing only. The dashboard does not
+    use them: its rules (no white surfaces, no gradients) still stand there.
+  */
+  --color-card: #ffffff; /* feature and pricing cards, the person's chat bubbles */
+  --color-band: #f5ede5; /* the tinted "Why Zox" section */
+  --color-accent-tint: #fdf0e7; /* icon squares, terracotta */
+  --color-forest-tint: #e8f0e9; /* icon squares, green */
+  --color-signal: #5a8a60; /* the "available" dot */
+  --color-eyebrow: #934e27; /* small all-caps section labels; passes AA on paper and band */
+  --color-bubble-accent: #c4703f; /* chat mock, Zox's first reply: gradient start */
+  --color-bubble-accent-end: #a85c30;
+  --color-bubble-forest: #2c3b2e; /* chat mock, Zox's second reply: gradient start */
+  --color-bubble-forest-end: #1e2a20;
+  --color-on-bubble: #ffffff; /* text on the two colored bubbles */
+
+  --text-hero: clamp(2.4rem, 5vw, 3.8rem); /* 38 to 61px */
+  --text-hero--line-height: 1.08;
+  --text-title: clamp(1.8rem, 3vw, 2.6rem); /* 29 to 42px */
+  --text-title--line-height: 1.15;
+  --text-figure: 2rem; /* 32px, pricing numbers */
+  --text-figure--line-height: 1;
+  --text-point: 1.375rem; /* 22px */
+  --text-point--line-height: 1.5;
+  --text-lead: 1.125rem; /* 18px */
+  --text-lead--line-height: 1.65;
+  --text-copy: 0.9375rem; /* 15px */
+  --text-copy--line-height: 1.65;
+  --text-note: 0.8125rem; /* 13px */
+  --text-note--line-height: 1.45;
+  --text-micro: 0.6875rem; /* 11px */
+  --text-micro--line-height: 1.4;
+
+  --radius-xs: 4px; /* the tail corner of a chat bubble */
+
+  --shadow-card: 0 2px 20px rgb(42 36 32 / 0.08);
+  --shadow-bubble: 0 6px 24px rgb(42 36 32 / 0.12);
+  --shadow-bubble-accent: 0 6px 24px rgb(196 112 63 / 0.22);
+  --shadow-bubble-forest: 0 6px 24px rgb(44 59 46 / 0.18);
+  --shadow-cta: 0 4px 20px rgb(196 112 63 / 0.3);
+}
+
+:root {
+  /* Keep in step with lib/motion.ts */
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --grain-opacity: 0.03;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --color-paper: #141009;
+  --color-surface: #1e1710;
+  --color-sidebar: #110e07;
+  --color-wash: #2e2519;
+  --color-line: #2e2519;
+  --color-line-soft: #261e13;
+  --color-track: #3a3028;
+
+  --color-ink: #f0e8dc;
+  --color-ink-2: #b3a797;
+  --color-ink-3: #7a6f63;
+
+  --color-accent: #d4845a;
+  --color-accent-ink: #d4845a;
+  --color-forest: #6a9b70;
+
+  --color-positive: #6a9b70;
+  --color-danger: #e0806f;
+  --color-warning: #d6a04a;
+
+  --shadow-soft: 0 2px 16px rgb(8 5 2 / 0.3);
+  --shadow-lift: 0 2px 4px rgb(8 5 2 / 0.3), 0 16px 40px rgb(8 5 2 / 0.4);
+
+  /* Marketing */
+  --color-card: #1e1710;
+  --color-band: #251d13;
+  --color-accent-tint: #2e1e10;
+  --color-forest-tint: #1c2a1e;
+  --color-eyebrow: #d4845a;
+  --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
+  --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
+
+  --grain-opacity: 0.05;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Fraunces is loaded with its optical size axis (app/layout.tsx). Held
+       at 14 here, every size is drawn from the one text cut. That is the
+       cut the dashboard was built and checked with, and measured widths
+       are unchanged. The public pages let the size choose the cut
+       (app/(marketing)/layout.tsx), as their design does. DM Sans has no
+       such axis loaded, so this does nothing to it. */
+    font-variation-settings: "opsz" 14;
+    /* The top bar is sticky and, on phones, the bottom nav is fixed. Without
+       this the browser scrolls a focused control to the viewport edge, which
+       is underneath them, and a keyboard user cannot see what has focus. */
+    scroll-padding-top: 4.5rem;
+  }
+
+  @media (width < 48rem) {
+    html {
+      scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  /* Grain: page background only. It sits behind all content, so opaque
+     surfaces (sidebar, raised blocks) and text are never textured. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--color-wash);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
