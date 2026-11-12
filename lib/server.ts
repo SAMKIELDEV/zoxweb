@@ -222,7 +222,7 @@ export async function endSession(request: NextRequest): Promise<NextResponse> {
 export async function proxyAccount(request: NextRequest, suffix = ""): Promise<NextResponse> {
   if (request.method !== "GET" && !validOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   const paymentGet = suffix === "/payments/packages" || /^\/payments\/transactions\/[A-Za-z0-9_-]{1,64}$/.test(suffix);
-  if (!(request.method === "GET" && (suffix === "" || paymentGet)) && !(request.method === "POST" && ["/link-code", "/payments/checkout"].includes(suffix))) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!(request.method === "GET" && (suffix === "" || paymentGet)) && !(request.method === "POST" && ["/link-code", "/unlink", "/payments/checkout"].includes(suffix))) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const unauthorized = () => NextResponse.json({ error: "Please sign in again" }, { status: 401, headers: { "Cache-Control": "no-store" } });
   const accessToken = readCookie(request, ACCESS_COOKIE);
   if (!accessToken) return unauthorized();

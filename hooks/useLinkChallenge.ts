@@ -75,7 +75,7 @@ interface UseLinkChallengeOptions {
 }
 
 /**
- * Asks for a ZOX- link code and tracks its ten-minute life.
+ * Asks for a four-letter link code and tracks its ten-minute life.
  * It does not poll for the link itself: the caller does that by reading
  * the account snapshot on an interval while `challenge` is set.
  */

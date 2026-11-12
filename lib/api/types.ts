@@ -100,7 +100,7 @@ export interface LinkedSnapshot {
 export type Snapshot = UnlinkedSnapshot | LinkedSnapshot;
 
 export interface LinkChallenge {
-  /** ZOX- followed by 12 hex characters. Valid for 10 minutes. */
+  /** Four capital letters (no I or O). Valid for 10 minutes, works once. */
   code: string;
   expiresAt: string;
   whatsappUrl: string;

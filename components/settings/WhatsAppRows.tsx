@@ -3,6 +3,7 @@ import { TextLink } from "@/components/ui/TextLink";
 import type { Account, Tier } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { formatMonthYear, formatPhone, tierLabel } from "@/lib/format";
+import { UnlinkWhatsApp } from "./UnlinkWhatsApp";
 
 /**
  * The line under the rows: how a plan changes, and the way to Billing.
@@ -20,13 +21,13 @@ function PlanNote({ tier, className }: { tier?: Tier; className?: string }) {
 }
 
 /**
- * The linked WhatsApp number, the plan, and when the account began.
- * Read-only: a number cannot be unlinked here, and the plan only changes
- * through a purchase, so the line under the rows points to Billing.
+ * The linked WhatsApp number, the plan, and when the account began, then
+ * the way to unlink the number. The plan only changes through a purchase,
+ * so the line under the rows points to Billing.
  * A row with nothing to show is left out. Rendered only for a linked
  * account; until then LinkWhatsApp takes this block's place.
  */
-export function WhatsAppRows({ account }: { account: Account }) {
+export function WhatsAppRows({ account, onUnlinked }: { account: Account; onUnlinked: () => void }) {
   const rows = [
     { label: "Number", value: formatPhone(account.whatsapp_number) },
     { label: "Plan", value: tierLabel(account.tier) },
@@ -47,6 +48,7 @@ export function WhatsAppRows({ account }: { account: Account }) {
         ))}
       </dl>
       <PlanNote tier={account.tier} />
+      <UnlinkWhatsApp phone={formatPhone(account.whatsapp_number) || "this number"} onUnlinked={onUnlinked} />
     </section>
   );
 }
@@ -70,6 +72,11 @@ export function WhatsAppRowsSkeleton() {
         ))}
       </ul>
       <PlanNote className="invisible" />
+      {/* The unlink row: one line of text and a 44px button, as in UnlinkWhatsApp. */}
+      <div className="mt-8 flex flex-col gap-4 border-y border-line py-4 sm:flex-row sm:items-center sm:justify-between">
+        <Skeleton className="h-lh w-64 max-w-full text-base" />
+        <Skeleton className="h-11 w-full rounded-md sm:w-36" />
+      </div>
     </div>
   );
 }

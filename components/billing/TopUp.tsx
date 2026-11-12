@@ -33,7 +33,7 @@ function failureFor(error: unknown): Failure {
   return "unavailable";
 }
 
-function failureCopy(failure: Failure, currency: Currency | null, usdOpen: boolean): string {
+function failureCopy(failure: Failure, currency: Currency | null, usdOpen: boolean, ngnOpen: boolean): string {
   switch (failure) {
     case "email":
       return "Couldn't start checkout. Check that your SAMKIEL ID has a valid email, then try again.";
@@ -48,9 +48,9 @@ function failureCopy(failure: Failure, currency: Currency | null, usdOpen: boole
     case "bad-address":
       return "Checkout sent back an address we can't open. Try again.";
     case "unavailable":
-      return currency === "NGN" && usdOpen
-        ? "Naira checkout isn't available right now. Try again shortly, or pay in US dollars."
-        : "Checkout isn't available right now. Try again shortly.";
+      if (currency === "NGN" && usdOpen) return "Naira checkout isn't available right now. Try again shortly, or pay in US dollars.";
+      if (currency === "USD" && ngnOpen) return "Dollar checkout isn't available right now. Try again shortly, or pay in naira.";
+      return "Checkout isn't available right now. Try again shortly.";
   }
 }
 
@@ -271,7 +271,7 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
 
         {failure ? (
           <p ref={alert} role="alert" tabIndex={-1} className="max-w-[52ch] text-sm text-danger">
-            {failureCopy(failure, currency, canPayIn("USD"))}
+            {failureCopy(failure, currency, canPayIn("USD"), canPayIn("NGN"))}
           </p>
         ) : null}
         {!currency ? (

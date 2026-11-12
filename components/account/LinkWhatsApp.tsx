@@ -21,12 +21,11 @@ const FAILURE_COPY: Record<Exclude<LinkCodeFailure, "already-linked">, string> =
 /** The backend builds this link. Only a real WhatsApp address is ever opened. */
 const isWhatsAppUrl = (url: string) => url.startsWith("https://wa.me/");
 
-/** ZOX-A1B2C3D4E5F6 shown as ZOX-A1B2 C3D4 E5F6. The gaps are spacing, not characters. */
-function codeGroups(code: string): string[] {
-  const [prefix, rest = ""] = code.split("-");
-  const groups = rest.match(/.{1,4}/g) ?? [];
-  return groups.length ? [`${prefix}-${groups[0]}`, ...groups.slice(1)] : [code];
-}
+/**
+ * The code read letter by letter ("K, M, T, R"), so a screen reader never
+ * says it as a word. The page shows it as one word, which is what to type.
+ */
+const spelled = (code: string) => code.split("").join(", ");
 
 type View = "intro" | "code" | "expired";
 
@@ -102,16 +101,13 @@ export function LinkWhatsApp({ identityId }: { identityId: string }) {
             updates by itself.
           </p>
 
+          {/* Four capital letters, large: easy to read across a room and to type. */}
           <p
             data-testid="link-code"
-            aria-label={`Your code: ${challenge.code}`}
-            className="mt-10 select-all text-xl font-medium tabular-nums tracking-wide text-ink md:text-2xl"
+            aria-label={`Your code: ${spelled(challenge.code)}`}
+            className="mt-10 select-all font-display text-3xl font-semibold tracking-[0.2em] text-ink"
           >
-            {codeGroups(challenge.code).map((group, index) => (
-              <span key={index} className={index > 0 ? "ml-[0.3em]" : undefined}>
-                {group}
-              </span>
-            ))}
+            {challenge.code}
           </p>
 
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">

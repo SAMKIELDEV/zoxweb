@@ -36,15 +36,19 @@ function Column({ children }: { children?: ReactNode }) {
  *   link lands during this visit, one line above them confirms it
  * A closed account (403) renders none of these; the shell already says why.
  * Sign out follows in every state, that one included.
- * The details shown are read-only: the backend has nothing to change them with.
+ * The details shown are read-only. The one change made here is unlinking
+ * the WhatsApp number, after which the link flow takes its place.
  */
 export function SettingsContent() {
   const { snapshot, error, isValidating, refresh } = useAccount();
 
   // Remember if this visit started unlinked, to confirm the link when it lands.
   const [startedUnlinked, setStartedUnlinked] = useState(false);
+  // Set when the number is unlinked here, to say so above the link flow.
+  const [justUnlinked, setJustUnlinked] = useState(false);
   useEffect(() => {
     if (snapshot && !snapshot.linked) setStartedUnlinked(true);
+    if (snapshot?.linked) setJustUnlinked(false);
   }, [snapshot]);
 
   if (!snapshot) {
@@ -74,6 +78,11 @@ export function SettingsContent() {
   if (!snapshot.linked) {
     return (
       <Column>
+        {justUnlinked ? (
+          <p role="status" className="text-sm text-ink">
+            WhatsApp is unlinked. Your credits and chats stay with the number.
+          </p>
+        ) : null}
         <LinkWhatsApp identityId={snapshot.identity.id} />
         <IdentityRows identity={snapshot.identity} />
       </Column>
@@ -90,7 +99,13 @@ export function SettingsContent() {
         ) : null}
         <IdentityRows identity={snapshot.identity} />
       </div>
-      <WhatsAppRows account={snapshot.account} />
+      <WhatsAppRows
+        account={snapshot.account}
+        onUnlinked={() => {
+          setJustUnlinked(true);
+          void refresh();
+        }}
+      />
     </Column>
   );
 }
