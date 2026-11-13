@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/Button";
 import { RadioInput, radioLabelFocus } from "@/components/ui/RadioInput";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState, ErrorState } from "@/components/ui/States";
+import { TextLink } from "@/components/ui/TextLink";
 import { usePackages } from "@/hooks/usePackages";
 import { ACCOUNT_KEY } from "@/lib/api/account";
 import { isApiError } from "@/lib/api/client";
 import { createCheckout } from "@/lib/api/payments";
 import type { CreditPackage, Currency, PackageId, Tier } from "@/lib/api/types";
+import { openCheckoutOverlay } from "@/lib/checkoutOverlay";
 import { cn } from "@/lib/cn";
 import { formatCount, formatMoney, isHigherTier, tierLabel } from "@/lib/format";
 import { paymentStatusPath } from "@/lib/paths";
@@ -74,13 +76,17 @@ function httpsUrl(value: string): string | null {
 const legend = "mb-3 text-sm font-medium text-ink";
 
 /**
- * Buying credits: pick a package, pick a currency, go to the payment
- * provider. Nothing is charged on this page.
+ * Buying credits: pick a package, pick a currency, pay in the provider's
+ * checkout, which opens as a modal over this page (Paystack's popup for
+ * naira, Bachs' overlay for dollars). If the modal can't open, for
+ * example because a browser shield blocked the provider's script, the
+ * page goes to the provider's checkout instead.
  *
  * Prices come from the backend, including a live naira price that the
  * backend re-quotes at checkout. Each package and currency choice gets
- * its own checkout key, so pressing the button twice, or coming back and
- * pressing it again, resumes the same purchase and never starts a second.
+ * its own checkout key, so pressing the button twice, or closing the
+ * modal and pressing it again, resumes the same purchase and never
+ * starts a second.
  */
 export function TopUp({ currentTier }: { currentTier: Tier }) {
   const router = useRouter();
@@ -91,12 +97,15 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
   const [pickedCurrency, setPickedCurrency] = useState<Currency | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<Failure | null>(null);
+  /** The purchase whose checkout modal was just closed without paying. */
+  const [closedId, setClosedId] = useState<string | null>(null);
   const checkoutKey = useRef({ selection: "", value: "" });
   const alert = useRef<HTMLParagraphElement>(null);
 
-  // The button stays busy while the browser leaves for the provider. If
-  // the person comes straight back, the browser may restore this page as
-  // it was, so release the button then.
+  // The button stays busy while the browser leaves for the provider (the
+  // full-page fallback when the modal can't open). If the person comes
+  // straight back, the browser may restore this page as it was, so release
+  // the button then.
   useEffect(() => {
     const release = (event: PageTransitionEvent) => {
       if (event.persisted) setBusy(false);
@@ -146,6 +155,7 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
 
     setBusy(true);
     setFailure(null);
+    setClosedId(null);
     try {
       const result = await createCheckout({ packageId: pack.id, currency, checkoutKey: checkoutKey.current.value });
       // A resumed purchase that is no longer waiting for payment, or one
@@ -156,7 +166,23 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
       }
       const url = httpsUrl(result.checkoutUrl);
       if (!url) throw new Error("Checkout address was not https");
-      window.location.assign(url);
+
+      let outcome;
+      try {
+        outcome = await openCheckoutOverlay(url);
+      } catch {
+        // No modal for this checkout: go to the provider's page instead.
+        window.location.assign(url);
+        return;
+      }
+      if (outcome === "paid") {
+        router.push(paymentStatusPath(result.transactionId));
+        return;
+      }
+      // Closed without paying. The checkout key is kept, so pressing the
+      // button again reopens this same purchase.
+      setClosedId(result.transactionId);
+      setBusy(false);
     } catch (caught) {
       // The purchase exists but its checkout is uncertain: follow it.
       if (isApiError(caught) && caught.transactionId) {
@@ -192,6 +218,7 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
                 onChange={() => {
                   setPackageId(item.id);
                   setFailure(null);
+                  setClosedId(null);
                 }}
               />
               <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
@@ -230,6 +257,7 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
                   onChange={() => {
                     setPickedCurrency(code);
                     setFailure(null);
+                    setClosedId(null);
                   }}
                 />
                 <span className={cn("text-base", usable ? "text-ink" : "text-ink-3")}>{label}</span>
@@ -277,13 +305,20 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
         {!currency ? (
           <p className="max-w-[52ch] text-sm text-ink-2">This package can&apos;t be paid for right now.</p>
         ) : null}
+        {closedId && !failure ? (
+          <p role="status" className="max-w-[52ch] text-sm text-ink-2">
+            Checkout closed. Continue to pick up where you left off. Already paid?{" "}
+            <TextLink href={paymentStatusPath(closedId)}>Check this purchase</TextLink>.
+          </p>
+        ) : null}
 
         <div>
           <Button type="submit" variant="primary" busy={busy} disabled={!currency} className="w-full sm:w-auto">
             {busy ? "Opening checkout" : "Continue to payment"}
           </Button>
           <p className="mt-3 max-w-[52ch] text-sm text-ink-2">
-            You pay on the next page. Credits arrive once the payment is confirmed.
+            You pay in a {currency === "USD" ? "Bachs" : "Paystack"} window over this page. Credits arrive
+            once the payment is confirmed.
           </p>
         </div>
       </div>
