@@ -97,6 +97,27 @@
   --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
   --color-night-line: #3d342c; /* hairlines and chips on night */
 
+  /* The hero phone (components/marketing/PhoneDemo.tsx): a generic
+     handset and a WhatsApp-style chat screen, so the picture reads as the
+     place Zox lives. The device is dark in both themes; the chat follows
+     the page theme the way WhatsApp's own light and dark themes do. */
+  --color-device: #1d1a18;
+  --color-device-edge: #36312d;
+  --color-wa-bg: #efeae2; /* chat wallpaper */
+  --color-wa-doodle: #e7e0d5; /* the wallpaper's pattern */
+  --color-wa-bar: #ffffff; /* status bar and chat header */
+  --color-wa-in: #ffffff; /* Zox's bubbles, the composer, the chips */
+  --color-wa-out: #d9fdd3; /* the person's bubbles */
+  --color-wa-ink: #111b21;
+  --color-wa-meta: #667781; /* times, "online", placeholder */
+  --color-wa-icon: #54656f;
+  --color-wa-tick: #53bdeb; /* read ticks */
+  --color-wa-green: #1daa61; /* the send button */
+  --color-wa-on-green: #ffffff;
+  --color-wa-date: #ffffff; /* the "Today" chip */
+  --color-wa-doc: #c9efc2; /* a document card inside the person's bubble */
+  --color-wa-pdf: #e2574c; /* the PDF badge on a document card */
+
   /* 38 to 61px, and smaller on phones: the longer headline line is about
      9.7 times the font size wide, so under 432px the size follows the
      content column (viewport less 48px of padding) to keep two lines. */
@@ -124,6 +145,8 @@
   --shadow-bubble-accent: 0 6px 24px rgb(196 112 63 / 0.22);
   --shadow-bubble-forest: 0 6px 24px rgb(44 59 46 / 0.18);
   --shadow-cta: 0 4px 20px rgb(196 112 63 / 0.3);
+  --shadow-wa: 0 1px 0.5px rgb(11 20 26 / 0.13); /* chat bubbles in the phone */
+  --shadow-device: 0 2px 4px rgb(42 36 32 / 0.12), 0 30px 60px rgb(42 36 32 / 0.18);
 }
 
 :root {
@@ -172,6 +195,19 @@
   --color-night-line: #2e2519;
   --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
+  --shadow-device: 0 2px 4px rgb(8 5 2 / 0.4), 0 30px 60px rgb(8 5 2 / 0.5);
+  --color-wa-bg: #0b141a;
+  --color-wa-doodle: #131d24;
+  --color-wa-bar: #1f2c34;
+  --color-wa-in: #202c33;
+  --color-wa-out: #144d37;
+  --color-wa-ink: #e9edef;
+  --color-wa-meta: #8696a0;
+  --color-wa-icon: #aebac1;
+  --color-wa-green: #21c063;
+  --color-wa-on-green: #0b141a;
+  --color-wa-date: #182229;
+  --color-wa-doc: #0e3b2a;
 
   --grain-opacity: 0.05;
   --drop-soft: 0 2px 16px rgb(8 5 2 / 0.3);
@@ -263,6 +299,34 @@
   @media print {
     body::before {
       display: none;
+    }
+  }
+
+  /* The hero phone's chat wallpaper: a quiet pattern of small doodles of
+     our own, tinted with --color-wa-doodle through a mask. */
+  .wa-wallpaper {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--color-wa-bg);
+  }
+  .wa-wallpaper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--color-wa-doodle);
+    --wa-doodles: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='18' cy='20' r='7'/%3E%3Cpath d='M52 12l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3Cpath d='M86 18c4-6 10-6 14 0'/%3E%3Cpath d='M92 26h4'/%3E%3Crect x='10' y='56' width='16' height='12' rx='3'/%3E%3Cpath d='M14 56v-3a4 4 0 018 0v3'/%3E%3Cpath d='M48 62c6-8 12 8 18 0s12 8 18 0'/%3E%3Cpath d='M100 52l8 14h-16z'/%3E%3Cpath d='M20 98c0-6 8-6 8 0 0-6 8-6 8 0 0 6-8 10-8 12-0-2-8-6-8-12z'/%3E%3Ccircle cx='66' cy='100' r='3'/%3E%3Cpath d='M60 94l12 12M72 94l-12 12' opacity='0'/%3E%3Cpath d='M94 92h16M102 84v16'/%3E%3C/svg%3E");
+    -webkit-mask: var(--wa-doodles) 0 0 / 132px 132px repeat;
+    mask: var(--wa-doodles) 0 0 / 132px 132px repeat;
+  }
+
+  /* The hero phone renders its bubbles hidden and reveals them in script.
+     With reduced motion they are simply there, from the first paint. */
+  @media (prefers-reduced-motion: reduce) {
+    [data-chat-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 

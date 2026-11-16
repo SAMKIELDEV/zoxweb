@@ -52,23 +52,7 @@ export const COMPOSER = {
   fallback: "Open WhatsApp",
 } as const;
 
-export interface ChatMessage {
-  from: "person" | "zox";
-  text: string;
-}
-
-/**
- * The exchange in the hero phone.
- * OPEN ITEM (brief, 00-README #1): replace with a real, trimmed Zox
- * conversation before launch. Until then this is the brief's sample.
- */
-export const HERO_EXCHANGE: readonly ChatMessage[] = [
-  { from: "person", text: "can you explain what a mutex is, like i'm 12" },
-  {
-    from: "zox",
-    text: "A mutex is a lock on a shared thing. Only one person can hold it at a time. Think of one bathroom key: if someone has it, you wait. That's all it is.",
-  },
-];
+// The hero phone's conversation is data of its own: content/chat-script.ts.
 
 // ---------------------------------------------------------------------------
 // 03 Trust

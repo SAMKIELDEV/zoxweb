@@ -71,15 +71,34 @@ export const START_CHAT = WHATSAPP_URL
   ? ({ href: WHATSAPP_URL, external: true } as const)
   : ({ href: "/login", external: false } as const);
 
+// A production build with no number still works (the buttons go to
+// sign-in), but someone should know. Logged once, in the browser only.
+if (!WHATSAPP_URL && process.env.NODE_ENV === "production" && typeof window !== "undefined") {
+  console.error("Zox: NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER is missing, so chat buttons go to sign-in.");
+}
+
+/** The longest message the composer passes on to WhatsApp. */
+export const CHAT_MESSAGE_MAX = 300;
+
+/**
+ * A visitor's message, made safe to hand on: control characters removed,
+ * trimmed, and cut to CHAT_MESSAGE_MAX characters (counted by code point,
+ * so an emoji is never split in half).
+ */
+export function cleanChatMessage(text: string): string {
+  const stripped = text.replace(/\p{Cc}/gu, " ").trim();
+  return Array.from(stripped).slice(0, CHAT_MESSAGE_MAX).join("").trim();
+}
+
 /**
  * The chat link with a message ready to send, for the landing page's
- * composer. WhatsApp fills the text in; the person still presses send.
- * Null when no number is configured.
+ * composer. WhatsApp fills the text in; the person still presses send. An
+ * empty message opens the plain chat. Null when no number is configured.
  */
 export function whatsAppLinkWithText(text: string): string | null {
   if (!WHATSAPP_URL) return null;
-  const trimmed = text.trim();
-  return trimmed ? `${WHATSAPP_URL}?text=${encodeURIComponent(trimmed)}` : WHATSAPP_URL;
+  const message = cleanChatMessage(text);
+  return message ? `${WHATSAPP_URL}?text=${encodeURIComponent(message)}` : WHATSAPP_URL;
 }
 
 /** Optional profile links for the footer. One with no address is not shown. */

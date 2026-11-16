@@ -184,6 +184,7 @@ The owner's decision for these pages (November 12, 2026): **build them as design
 | A numbered row of three | Why Zox | No symmetric three-column rows |
 | A centered section | Pricing | No centered-everything layouts |
 | Emoji | Inside the chat illustration, as part of the messages | No emoji in UI chrome |
+| A drawn phone with a WhatsApp-style chat on it | Hero (owner's request, November 16, 2026) | Tokens only for brand colors; the picture uses its own `wa-*` and `device` tokens |
 | More than one filled button | Navigation, hero, pricing. All three start the same chat. | One primary button per view |
 | Three weights of DM Sans, and sizes off the scale | Throughout | Two weights per family; the seven-step scale |
 
@@ -236,6 +237,20 @@ Used by `components/marketing` only, with one exception noted below. They sit in
 
 `shadow-card` and `shadow-bubble` have darker values in the dark theme, set in `globals.css`.
 
+### The hero phone
+
+The hero shows a generic phone in the proportions of a current tall Android flagship (a 19.5:9 screen, thin even bezels, buttons on the right, a punch-hole camera; owner's request, November 16, 2026), drawn in CSS with no logos or copied details, with a WhatsApp-style chat with Zox on it: Zox's header with "online" or "typing…", the back arrow, call icons and the three-dot menu, a patterned wallpaper, bubbles with tails, times and read ticks, and the composer with its round green button (a microphone when empty, send when not). It follows the page theme the way WhatsApp's light and dark themes do. Limits: no real device is copied, the wallpaper pattern is our own (not WhatsApp's doodles), the header carries Zox's own logo and name, and the visitor's own message shows a "sending" clock, never ticks or a reply, because nothing has been sent yet. Bubble times and the status bar clock are the visitor's own time. The script lives in `content/chat-script.ts`.
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `device`, `device-edge` | `#1D1A18`, `#36312D` | same | The handset |
+| `wa-bg`, `wa-doodle` | `#EFEAE2`, `#E7E0D5` | `#0B141A`, `#131D24` | Chat wallpaper and its pattern |
+| `wa-bar` | `#FFFFFF` | `#1F2C34` | Status bar, chat header |
+| `wa-in`, `wa-out` | `#FFFFFF`, `#D9FDD3` | `#202C33`, `#144D37` | Zox's bubbles (and the composer, chips), the person's bubbles |
+| `wa-ink`, `wa-meta`, `wa-icon` | `#111B21`, `#667781`, `#54656F` | `#E9EDEF`, `#8696A0`, `#AEBAC1` | Text, times and "online", icons |
+| `wa-tick`, `wa-green`, `wa-on-green`, `wa-date` | `#53BDEB`, `#1DAA61`, `#FFFFFF`, `#FFFFFF` | `#53BDEB`, `#21C063`, `#0B141A`, `#182229` | Read ticks, the send button and its icon, the "Today" chip |
+| `shadow-wa`, `shadow-device` | small bubble shadow; the handset's lift | darker in dark | |
+
 ### Type on the marketing pages
 
 - Fraunces is drawn at its optical sizes: finer and narrower as it gets larger. The design relies on this for the headline. The marketing layout turns it on; the rest of the app holds the font at one cut (`font-variation-settings` in `globals.css`), so the dashboard's type is unchanged.
@@ -267,7 +282,7 @@ The landing page has a fixed motion budget. Section 9's vocabulary still holds f
 | # | Effect | What moves | Timing | Built with |
 |---|---|---|---|---|
 | 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. | `--dur-slow` (420ms), `ease-zox` | CSS transitions |
-| 2 | Hero phone demo | Typing indicator, bubbles rising 8px as they fade in, Zox's reply word by word. Plays once. | `--dur-base` per bubble, about 60ms per word | Motion (`m`, `LazyMotion` + `domAnimation`) |
+| 2 | Hero phone demo | The person's message, "typing…" under Zox's name, then Zox's reply arriving whole (as WhatsApp does; owner's choice, November 16, 2026, over word-by-word). Bubbles rise 8px as they fade in. Plays once. The status bar is live too (owner's request, November 16, 2026): the visitor's real time, and Wi-Fi and signal that drift every few seconds and a battery that drains a percent at a time, only while the phone is on screen. | `--dur-base` per bubble and icon change | Motion (`m`, `LazyMotion` + `domAnimation`); CSS for the status bar |
 | 3 | Button icon slide | The icon inside a button nudges 2px toward the action on hover. | `--dur-fast` | CSS |
 | 4 | Bento illustration | The small drawing in a card shifts a few px on card hover. The card itself does not move, scale or gain a shadow. | `--dur-base` | CSS |
 | 5 | FAQ open and close | The answer's height and opacity. | `--dur-base` | CSS (`interpolate-size`, `::details-content`) |

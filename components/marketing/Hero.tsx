@@ -1,10 +1,9 @@
-import { LogoMark } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { START_CHAT } from "@/lib/site";
 import { WhatsAppIcon } from "./BrandIcons";
-import { Composer } from "./Composer";
-import { HERO, HERO_EXCHANGE, HOW_IT_WORKS_ID } from "./content";
+import { HERO, HOW_IT_WORKS_ID } from "./content";
+import { PhoneDemo } from "./PhoneDemo";
 import { container, headingTracking } from "./Section";
 
 /**
@@ -24,61 +23,23 @@ export function Glow({ className }: { className?: string }) {
 }
 
 /**
- * The hero's phone: a short exchange with Zox and a working composer under
- * it. The messages are real text, so they are read in order.
+ * The hero's phone, with the glow behind it. The handset, the chat screen
+ * and the demo are PhoneDemo; they render with the page, and only the demo
+ * waits for script.
  */
 function Phone() {
   return (
-    <div className="relative mx-auto w-full max-w-95">
+    <div className="relative mx-auto w-full max-w-80">
       <Glow className="-inset-x-10 -inset-y-8" />
-      <div className="relative rounded-[2.5rem] border border-line bg-card p-2.5 shadow-card">
-        <div className="rounded-[2rem] bg-surface">
-          {/* Chat header */}
-          <div className="flex items-center gap-3 border-b border-line-soft px-5 pt-5 pb-3.5">
-            <span className="flex size-9 items-center justify-center rounded-full bg-card">
-              <LogoMark alt="" className="size-5" />
-            </span>
-            <div className="leading-tight">
-              <p className="text-sm font-semibold text-ink">Zox</p>
-              <p className="flex items-center gap-1.5 text-micro text-ink-2">
-                <span
-                  aria-hidden="true"
-                  className="size-1.5 rounded-full bg-signal"
-                />
-                on WhatsApp
-              </p>
-            </div>
-          </div>
-
-          <ol
-            role="list"
-            aria-label="A chat with Zox"
-            className="flex flex-col gap-3 px-4 py-5"
-          >
-            {HERO_EXCHANGE.map((message) =>
-              message.from === "person" ? (
-                <li
-                  key={message.text}
-                  className="ml-auto max-w-[85%] rounded-lg rounded-br-xs border border-line bg-card px-4 py-2.5 text-note text-ink shadow-bubble"
-                >
-                  <span className="sr-only">You: </span>
-                  {message.text}
-                </li>
-              ) : (
-                <li
-                  key={message.text}
-                  className="mr-auto max-w-[88%] rounded-lg rounded-tl-xs bg-linear-to-br from-bubble-accent to-bubble-accent-end px-4 py-2.5 text-note text-on-bubble shadow-bubble-accent"
-                >
-                  <span className="sr-only">Zox: </span>
-                  {message.text}
-                </li>
-              ),
-            )}
-          </ol>
-
-          <Composer suggestions className="px-4 pb-5" />
-        </div>
+      <div className="relative">
+        <PhoneDemo />
       </div>
+      {/* Without script the demo cannot play: show the conversation as it ends. */}
+      <noscript
+        dangerouslySetInnerHTML={{
+          __html: "<style>[data-chat-reveal]{opacity:1!important;transform:none!important}</style>",
+        }}
+      />
     </div>
   );
 }
@@ -99,10 +60,10 @@ export function Hero() {
       <div
         className={cn(
           container,
-          "grid items-center gap-14 pt-14 pb-20 lg:grid-cols-[1.4fr_1fr] lg:pt-20 lg:pb-28",
+          "grid items-center gap-12 pt-6 pb-16 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:pt-4 lg:pb-20",
         )}
       >
-        <div>
+        <div className="lg:pt-20">
           <h1
             id="hero-heading"
             className={cn(
