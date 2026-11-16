@@ -64,26 +64,36 @@ function SignalIcon({ level }: { level: number }) {
   );
 }
 
-/** Battery: the outline, a fill for `level` percent, and the number beside it. */
+/**
+ * Battery, as Samsung's One UI draws it: a rounded bar with the charge as
+ * its fill and the percentage written inside. The number is drawn twice,
+ * dark over the empty part and light over the fill (clipped to it), so it
+ * reads over both. The fill moves by transform and clip-path only.
+ */
 function BatteryIcon({ level }: { level: number }) {
+  const empty = `${100 - level}%`;
+  const move = "transition-[transform,clip-path] duration-(--dur-slow) ease-zox";
   return (
-    <span className="flex items-center gap-0.5">
-      <span className="tabular-nums">{level}%</span>
-      <svg aria-hidden="true" viewBox="0 0 26 14" className="h-3.5 w-6.5">
-        <rect x="0.75" y="0.75" width="21.5" height="12.5" rx="3.2" fill="none" stroke="currentColor" strokeWidth="1.3" opacity="0.5" />
-        <rect x="23.4" y="4.6" width="1.9" height="4.8" rx="0.9" fill="currentColor" opacity="0.5" />
-        {/* The fill shrinks from its left edge (a transform), so nothing is laid out again. */}
-        <rect
-          x="2.4"
-          y="2.4"
-          width="18.2"
-          height="9.2"
-          rx="1.8"
-          fill="currentColor"
-          className="origin-left transition-transform duration-(--dur-slow) [transform-box:fill-box]"
+    <span className="flex items-center">
+      <span className="relative h-3.5 w-7 overflow-hidden rounded-[0.3rem] bg-wa-ink/25">
+        <span
+          className={cn("absolute inset-0 origin-left bg-wa-ink", move)}
           style={{ transform: `scaleX(${level / 100})` }}
         />
-      </svg>
+        <span className="absolute inset-0 flex items-center justify-center text-[0.5625rem] leading-none font-bold tabular-nums text-wa-ink">
+          {level}
+        </span>
+        <span
+          className={cn(
+            "absolute inset-0 flex items-center justify-center text-[0.5625rem] leading-none font-bold tabular-nums text-wa-bar",
+            move,
+          )}
+          style={{ clipPath: `inset(0 ${empty} 0 0)` }}
+        >
+          {level}
+        </span>
+      </span>
+      <span className="ml-px h-1.5 w-0.5 rounded-r-full bg-wa-ink/25" />
     </span>
   );
 }
