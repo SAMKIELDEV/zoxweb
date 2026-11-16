@@ -5,7 +5,7 @@
  *
  * These mirror the backend, which lives in its own repository: the
  * packages in its src/payments/pricing.ts and the grant in its
- * src/billing/credits.ts (INITIAL_FREE_CREDITS). The backend stays the
+ * src/billing/constants.ts (INITIAL_FREE_CREDITS). The backend stays the
  * source of truth. Billing still reads live packages and prices from the
  * API and charges nothing from this file; it shares only the package ids
  * defined here. `pnpm run test:pricing` compares this file with a backend

@@ -16,7 +16,7 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const backendDir = path.resolve(process.env.ZOX_BACKEND_DIR || path.join(here, "..", "..", "zox"));
 const BACKEND_PRICING = "src/payments/pricing.ts";
-const BACKEND_CREDITS = "src/billing/credits.ts";
+const BACKEND_CREDITS = "src/billing/constants.ts";
 
 if (!existsSync(path.join(backendDir, BACKEND_PRICING)) || !existsSync(path.join(backendDir, BACKEND_CREDITS))) {
   console.log("pricing parity: SKIPPED. No backend source at " + backendDir + ". Set ZOX_BACKEND_DIR to check against it.");
