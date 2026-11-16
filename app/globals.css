@@ -92,6 +92,10 @@
   --color-bubble-forest: #2c3b2e; /* chat mock, Zox's second reply: gradient start */
   --color-bubble-forest-end: #1e2a20;
   --color-on-bubble: #ffffff; /* text on the two colored bubbles */
+  --color-night: #2a2420; /* the footer's dark card */
+  --color-on-night: #f0e8dc; /* text on night */
+  --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
+  --color-night-line: #3d342c; /* hairlines and chips on night */
 
   --text-hero: clamp(2.4rem, 5vw, 3.8rem); /* 38 to 61px */
   --text-hero--line-height: 1.08;
@@ -158,6 +162,8 @@
   --color-accent-tint: #2e1e10;
   --color-forest-tint: #1c2a1e;
   --color-eyebrow: #d4845a;
+  --color-night: #0c0905;
+  --color-night-line: #2e2519;
   --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
 

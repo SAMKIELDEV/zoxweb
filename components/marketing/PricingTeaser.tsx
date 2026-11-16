@@ -1,41 +1,29 @@
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { formatCount } from "@/lib/format";
-import { CREDIT_PACKAGES, formatUsdShort } from "@/lib/pricing";
-import { START_CHAT } from "@/lib/site";
-import { Eyebrow, SectionTitle, container } from "./Section";
+import { FREE_DAILY_CREDITS } from "@/lib/pricing";
+import { PRICING_TEASER } from "./content";
+import { SectionTitle, container } from "./Section";
+
+/** What a plain chat costs at least, in credits (lib/costs.ts: "From 1 credit"). */
+const CHAT_CREDITS = 1;
 
 /**
- * A short look at what credits cost. Every name, credit count and price
- * comes from lib/pricing.ts, the constants shared with Billing and checked
- * against the backend. Nothing here is typed in by hand.
+ * Brief 06: free to start, then credits. No prices here: they live on the
+ * Pricing page, which picks the currency. The allowance is worked out from
+ * FREE_DAILY_CREDITS, so it follows the backend.
  */
 export function PricingTeaser() {
+  const chats = Math.floor(FREE_DAILY_CREDITS / CHAT_CREDITS);
+
   return (
-    <section id="pricing" aria-labelledby="pricing-heading" className="border-t border-line">
-      <div className={cn(container, "py-20 text-center")}>
-        <Eyebrow>Pricing</Eyebrow>
-        <SectionTitle id="pricing-heading" lines={["Free to try.", "Pay only for what you use."]} className="mb-4" />
-        <p className="mx-auto mb-9 max-w-115 text-base text-ink-2">
-          Zox runs on a simple credit system — buy a pack when you need it, use credits across everything Zox does. No
-          monthly bills. No expiry.
-        </p>
-
-        <ul role="list" className="mb-8 inline-flex flex-wrap justify-center gap-4">
-          {CREDIT_PACKAGES.map((pack) => (
-            <li key={pack.id} className="min-w-30 rounded-lg border border-line bg-card px-6 py-5 shadow-card">
-              <p className="mb-1.5 text-micro font-semibold tracking-widest text-ink-2 uppercase">{pack.name}</p>
-              <p className="font-display text-figure font-semibold tabular-nums text-ink">{formatCount(pack.credits)}</p>
-              <p className="mb-2 text-xs text-ink-2">credits</p>
-              {/* accent-ink, not accent: at this size the lighter terracotta fails contrast on a white card. */}
-              <p className="font-display text-lg leading-normal font-semibold text-accent-ink">{formatUsdShort(pack.amountUsd)}</p>
-            </li>
-          ))}
-        </ul>
-
-        <div>
-          <ButtonLink href={START_CHAT.href} external={START_CHAT.external} variant="primary">
-            Start for free
+    <section aria-labelledby="pricing-heading">
+      <div className={cn(container, "grid gap-8 py-20 lg:grid-cols-[1fr_1.2fr] lg:gap-16 lg:py-28")}>
+        <SectionTitle id="pricing-heading" lines={[PRICING_TEASER.heading]} />
+        <div className="max-w-140">
+          <p className="mb-4 text-lead text-ink">{PRICING_TEASER.allowance(chats)}</p>
+          <p className="mb-8 text-lead text-ink-2">{PRICING_TEASER.more}</p>
+          <ButtonLink href="/pricing" variant="secondary" size="lg" shape="pill">
+            {PRICING_TEASER.button}
           </ButtonLink>
         </div>
       </div>

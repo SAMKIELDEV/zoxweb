@@ -6,7 +6,7 @@ export type ButtonVariant = "primary" | "secondary" | "soft" | "quiet" | "danger
 export type ButtonSize = "lg" | "md" | "sm";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap " +
+  "inline-flex items-center justify-center gap-2 font-medium whitespace-nowrap " +
   "transition-[background-color,border-color,color,transform] duration-(--dur-fast) ease-zox " +
   "active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 " +
   "aria-disabled:pointer-events-none aria-disabled:opacity-50";
@@ -31,8 +31,16 @@ const sizes: Record<ButtonSize, string> = {
   sm: "h-9 px-4 text-sm",
 };
 
-export function buttonClass(variant: ButtonVariant = "secondary", size: ButtonSize = "md", className?: string): string {
-  return cn(base, variants[variant], sizes[size], className);
+/** "pill" is fully rounded, for the public pages' floating header and composer. */
+export type ButtonShape = "default" | "pill";
+
+export function buttonClass(
+  variant: ButtonVariant = "secondary",
+  size: ButtonSize = "md",
+  className?: string,
+  shape: ButtonShape = "default",
+): string {
+  return cn(base, shape === "pill" ? "rounded-full" : "rounded-md", variants[variant], sizes[size], className);
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -73,11 +81,12 @@ interface ButtonLinkProps {
   children: ReactNode;
   /** Opens in a new tab and skips the client router. */
   external?: boolean;
+  shape?: ButtonShape;
 }
 
 /** A link that looks like a button, for actions that navigate. */
-export function ButtonLink({ href, variant, size, className, children, external }: ButtonLinkProps) {
-  const classes = buttonClass(variant, size, className);
+export function ButtonLink({ href, variant, size, className, children, external, shape }: ButtonLinkProps) {
+  const classes = buttonClass(variant, size, className, shape);
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noreferrer">

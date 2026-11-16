@@ -71,6 +71,17 @@ export const START_CHAT = WHATSAPP_URL
   ? ({ href: WHATSAPP_URL, external: true } as const)
   : ({ href: "/login", external: false } as const);
 
+/**
+ * The chat link with a message ready to send, for the landing page's
+ * composer. WhatsApp fills the text in; the person still presses send.
+ * Null when no number is configured.
+ */
+export function whatsAppLinkWithText(text: string): string | null {
+  if (!WHATSAPP_URL) return null;
+  const trimmed = text.trim();
+  return trimmed ? `${WHATSAPP_URL}?text=${encodeURIComponent(trimmed)}` : WHATSAPP_URL;
+}
+
 /** Optional profile links for the footer. One with no address is not shown. */
 export const X_URL = httpsUrl(process.env.NEXT_PUBLIC_ZOX_X_URL);
 export const INSTAGRAM_URL = httpsUrl(process.env.NEXT_PUBLIC_ZOX_INSTAGRAM_URL);

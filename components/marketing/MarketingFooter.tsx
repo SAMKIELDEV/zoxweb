@@ -4,7 +4,7 @@ import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
 import { INSTAGRAM_URL, WHATSAPP_URL, X_URL } from "@/lib/site";
 import { InstagramIcon, WhatsAppIcon, XIcon } from "./BrandIcons";
-import { FOOTER_LINKS } from "./content";
+import { FOOTER_COLUMNS, FOOTER_LEGAL_LINE, FOOTER_TAGLINE } from "./content";
 import { container } from "./Section";
 
 interface SocialLink {
@@ -13,7 +13,7 @@ interface SocialLink {
   icon: ReactNode;
 }
 
-/** The profile links that have an address. One without is left out, not shown dead. */
+/** Only the accounts that exist (brief 09): one with no address is left out. */
 function socialLinks(): SocialLink[] {
   const all: { label: string; href: string | null; icon: ReactNode }[] = [
     { label: "Zox on X", href: X_URL, icon: <XIcon /> },
@@ -23,64 +23,74 @@ function socialLinks(): SocialLink[] {
   return all.flatMap((link) => (link.href ? [{ ...link, href: link.href }] : []));
 }
 
+const linkClass =
+  "inline-flex min-h-11 items-center text-sm text-on-night-2 transition-colors duration-(--dur-fast) ease-zox " +
+  "hover:text-on-night md:min-h-8";
+
 /**
- * The foot of the public pages: who makes Zox, the legal and help links,
- * and the profile links. On phones every link is at least 44px tall.
+ * Brief 09: the logo and tagline on a dark card, four plain link columns,
+ * the company line, and a large faded wordmark along the bottom. The card
+ * is dark in both themes.
  */
 export function MarketingFooter() {
   const socials = socialLinks();
 
   return (
-    <footer className="border-t border-line bg-sidebar">
-      <div className={cn(container, "py-10")}>
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+    <footer className={cn(container, "pb-6 print:hidden")}>
+      <div className="relative overflow-hidden rounded-lg bg-night px-6 pt-12 pb-6 md:px-10">
+        <div className="relative grid gap-10 lg:grid-cols-[1fr_2fr]">
           <div>
-            <Logo className="mb-2 h-6" />
-            <p className="text-note text-ink-2">
-              A product of <span className="font-medium text-ink">SAMKIEL Studio</span>
-            </p>
+            <Logo className="mb-3 h-7" />
+            <p className="mb-5 text-copy text-on-night-2">{FOOTER_TAGLINE}</p>
+            {socials.length > 0 ? (
+              <ul role="list" className="flex items-center gap-2">
+                {socials.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={link.label}
+                      className="flex size-11 items-center justify-center rounded-full border border-night-line text-on-night-2 transition-colors duration-(--dur-fast) ease-zox hover:text-on-night md:size-9"
+                    >
+                      {link.icon}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
-          <nav aria-label="Footer">
-            <ul role="list" className="flex flex-wrap gap-x-6 gap-y-2">
-              {FOOTER_LINKS.map((link) => (
-                <li key={link.href}>
-                  {/* prefetch is off: these pages do not exist yet. */}
-                  <Link
-                    href={link.href}
-                    prefetch={false}
-                    className="inline-flex min-h-11 items-center text-sm text-ink-2 transition-colors duration-(--dur-fast) ease-zox hover:text-ink md:min-h-0"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {FOOTER_COLUMNS.map((column) => (
+              <div key={column.title}>
+                <h2 className="mb-3 font-sans text-note font-semibold tracking-normal text-on-night">{column.title}</h2>
+                <ul role="list">
+                  {column.links.map((link) => (
+                    <li key={link.href}>
+                      {link.external ? (
+                        <a href={link.href} target="_blank" rel="noreferrer" className={linkClass}>
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link href={link.href} className={linkClass}>
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </nav>
-
-          {socials.length > 0 ? (
-            <ul role="list" className="flex items-center gap-3">
-              {socials.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={link.label}
-                    className="flex size-11 items-center justify-center rounded-sm bg-surface text-ink-2 transition-colors duration-(--dur-fast) ease-zox hover:bg-wash hover:text-ink md:size-8"
-                  >
-                    {link.icon}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </div>
 
-        <p className="mt-8 border-t border-line pt-6 text-xs text-ink-2">
-          © {new Date().getFullYear()} SAMKIEL Studio. Zox is a WhatsApp-native product. Not affiliated with Meta
-          Platforms, Inc.
-        </p>
+        <p className="relative mt-12 border-t border-night-line pt-6 text-note text-on-night-2">{FOOTER_LEGAL_LINE}</p>
+
+        {/* The large faded wordmark: decoration, cut off by the card's lower edge. */}
+        <div aria-hidden="true" className="pointer-events-none mt-8 -mb-[13%] select-none">
+          <Logo alt="" className="h-auto w-full opacity-[0.07]" />
+        </div>
       </div>
     </footer>
   );
