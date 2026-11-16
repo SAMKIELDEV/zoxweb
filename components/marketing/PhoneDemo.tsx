@@ -270,8 +270,8 @@ export function PhoneDemo() {
         <span aria-hidden="true" className="absolute top-32 -right-0.75 h-20 w-0.75 rounded-r-sm bg-device-edge" />
         <span aria-hidden="true" className="absolute top-56 -right-0.75 h-12 w-0.75 rounded-r-sm bg-device-edge" />
 
-        {/* On wide screens the phone fits the window's height: shorter on a short window, never taller than 19.5:9. */}
-        <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.15rem] bg-wa-bg lg:aspect-auto lg:h-[clamp(26rem,calc(100dvh-12rem),41rem)]">
+        {/* On wide screens the whole frame fits the window (the line under it may fall below): shorter on a short window, never taller than 19.5:9. */}
+        <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.15rem] bg-wa-bg lg:aspect-auto lg:h-[clamp(28rem,calc(100dvh-8.5rem),41rem)]">
           <PhoneStatusBar live={onScreen && !reduced} className="shrink-0 bg-wa-bar" />
 
           {/* Chat header: Zox, then "online", "typing…" or "recording audio…". */}
