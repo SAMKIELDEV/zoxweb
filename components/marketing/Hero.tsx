@@ -111,8 +111,8 @@ export function Hero() {
             )}
           >
             <span className="block">{first} </span>
-            {/* Two lines from 1024px, as the brief asks; a phone is too narrow for that. */}
-            <span className="block lg:whitespace-nowrap">
+            {/* Two lines at every width, as the brief asks: text-hero shrinks on phones so this fits. */}
+            <span className="block whitespace-nowrap">
               {second.slice(0, lastSpace + 1)}
               <em className="text-accent italic">
                 {second.slice(lastSpace + 1)}

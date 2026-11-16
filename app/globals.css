@@ -97,7 +97,10 @@
   --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
   --color-night-line: #3d342c; /* hairlines and chips on night */
 
-  --text-hero: clamp(2.4rem, 5vw, 3.8rem); /* 38 to 61px */
+  /* 38 to 61px, and smaller on phones: the longer headline line is about
+     9.7 times the font size wide, so under 432px the size follows the
+     content column (viewport less 48px of padding) to keep two lines. */
+  --text-hero: clamp(1.6rem, min(calc((100vw - 3rem) / 10), max(2.4rem, 5vw)), 3.8rem);
   --text-hero--line-height: 1.08;
   --text-title: clamp(1.8rem, 3vw, 2.6rem); /* 29 to 42px */
   --text-title--line-height: 1.15;

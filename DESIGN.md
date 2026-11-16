@@ -217,7 +217,7 @@ Used by `components/marketing` only, with one exception noted below. They sit in
 
 | Type token | Size / line height | Use |
 |---|---|---|
-| `text-hero` | 38 to 61px, fluid / 1.08 | The page headline |
+| `text-hero` | 38 to 61px, fluid / 1.08; smaller on phones (to 26px) so the headline keeps two lines | The page headline |
 | `text-title` | 29 to 42px, fluid / 1.15 | Section titles |
 | `text-figure` | 32px / 1 | Credit counts in the pricing packs |
 | `text-point` | 22px / 1.5 | "Why Zox" headings |
