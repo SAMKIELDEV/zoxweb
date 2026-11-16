@@ -211,6 +211,9 @@ export const FOOTER_TAGLINE = "Zox gets to the point.";
 
 export const FOOTER_LEGAL_LINE = "© 2026 SAMKIEL Technologies Limited. RC 9540139.";
 
+/** Small print after the company line. Kept from the earlier footer at the owner's request. */
+export const FOOTER_DISCLAIMER = "Not affiliated with Meta Platforms, Inc.";
+
 export interface FooterColumn {
   title: string;
   links: readonly (NavLink & { external?: boolean })[];
@@ -221,6 +224,8 @@ export const FOOTER_COLUMNS: readonly FooterColumn[] = [
     title: "Product",
     links: [
       { label: "How it works", href: `/#${HOW_IT_WORKS_ID}` },
+      // Not in the brief's footer; added 2026-11-16 so the Guide page is reachable from every page.
+      { label: "Guide", href: "/guide" },
       { label: "Pricing", href: "/pricing" },
       { label: "Blog", href: "/blog" },
     ],

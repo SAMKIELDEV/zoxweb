@@ -4,7 +4,7 @@ import { Logo } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
 import { INSTAGRAM_URL, WHATSAPP_URL, X_URL } from "@/lib/site";
 import { InstagramIcon, WhatsAppIcon, XIcon } from "./BrandIcons";
-import { FOOTER_COLUMNS, FOOTER_LEGAL_LINE, FOOTER_TAGLINE } from "./content";
+import { FOOTER_COLUMNS, FOOTER_DISCLAIMER, FOOTER_LEGAL_LINE, FOOTER_TAGLINE } from "./content";
 import { container } from "./Section";
 
 interface SocialLink {
@@ -85,7 +85,10 @@ export function MarketingFooter() {
           </nav>
         </div>
 
-        <p className="relative mt-12 border-t border-night-line pt-6 text-note text-on-night-2">{FOOTER_LEGAL_LINE}</p>
+        <p className="relative mt-12 flex flex-col gap-1 border-t border-night-line pt-6 text-note text-on-night-2 sm:flex-row sm:flex-wrap sm:gap-x-3">
+          <span>{FOOTER_LEGAL_LINE}</span>
+          <small className="text-xs">{FOOTER_DISCLAIMER}</small>
+        </p>
 
         {/* The large faded wordmark: decoration, cut off by the card's lower edge. */}
         <div aria-hidden="true" className="pointer-events-none mt-8 -mb-[13%] select-none">
