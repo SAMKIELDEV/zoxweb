@@ -82,7 +82,8 @@ export const HERO_EXCHANGE: readonly ChatMessage[] = [
 export const TRUST = {
   count: "467+",
   line: "people already text Zox.",
-  maker: "Made by SAMKIEL in Ile-Ife, Nigeria.",
+  // Owner's change, 2026-11-16: the brief's "Made by SAMKIEL in Ile-Ife, Nigeria." became this.
+  maker: "A product of SAMKIEL Studio.",
 } as const;
 
 // ---------------------------------------------------------------------------
