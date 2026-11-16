@@ -10,6 +10,9 @@ import { BalanceHero, BalanceHeroSkeleton } from "./BalanceHero";
 import { HomeDetails, HomeDetailsSkeleton } from "./HomeDetails";
 import { RecentActivity, RecentActivitySkeleton } from "./RecentActivity";
 
+/** How often Home refetches the balance while the tab is visible. */
+const LIVE_BALANCE_MS = 5000;
+
 /**
  * Home, in each of its states:
  * - loading: skeletons laid out exactly like the real page
@@ -19,7 +22,10 @@ import { RecentActivity, RecentActivitySkeleton } from "./RecentActivity";
  * A closed account (403) renders nothing here; the shell already says why.
  */
 export function HomeContent() {
-  const { snapshot, error, isValidating, refresh } = useAccount();
+  // Chats on WhatsApp spend credits while this page sits open, often with
+  // the phone in hand and this tab never losing focus. So poll while the
+  // tab is visible, and the balance flips down as credits are spent.
+  const { snapshot, error, isValidating, refresh } = useAccount({ refreshInterval: LIVE_BALANCE_MS });
 
   // Remember if this visit started unlinked, to confirm the link when it lands.
   const [startedUnlinked, setStartedUnlinked] = useState(false);

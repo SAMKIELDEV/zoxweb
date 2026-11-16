@@ -117,10 +117,11 @@ Examples:
 
 ## 9. Motion
 
-- Framer Motion (the `motion` package) for page enter, list stagger and number counting. Hover and press feedback are plain CSS transitions. Both use the tokens in section 2 for duration and easing.
-- Purposeful motion: page enter (fade + 8px rise), list stagger (40 to 60ms), number count on balance change, press feedback on buttons. That is the whole vocabulary.
+- Framer Motion (the `motion` package) for page enter, list stagger and the balance flip. Hover and press feedback are plain CSS transitions. Both use the tokens in section 2 for duration and easing.
+- Purposeful motion: page enter (fade + 8px rise), list stagger (40 to 60ms), digit flip on balance change (only the digits that changed, right to left, upward when credits arrive and downward when they are spent; owner's choice, November 13, 2026), press feedback on buttons. That is the whole vocabulary.
 - No parallax, no bouncing, no looping decorative animation, no hover-scale on everything.
-- Respect `prefers-reduced-motion`: disable transforms and counting, keep opacity fades under 100ms.
+- Respect `prefers-reduced-motion`: disable transforms and the flip, keep opacity fades under 100ms.
+- Home keeps the balance live: it refetches the account every 5 seconds while the tab is visible, so credits spent on WhatsApp flip down without a reload.
 
 ## 10. Banned list (reject on sight)
 

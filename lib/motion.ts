@@ -26,3 +26,12 @@ export const listStagger = 0.05;
  * enough (under 100ms) that it reads as instant.
  */
 export const reducedFade = { duration: 0.08 } as const;
+
+/**
+ * The balance flip: each changed digit turns over in `transition`, the
+ * next digit to the left starting `stagger` seconds later.
+ */
+export const flip = {
+  transition: { duration: duration.slow, ease },
+  stagger: 0.06,
+} as const;

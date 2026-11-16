@@ -6,7 +6,10 @@ import { isApiError, type ApiError } from "@/lib/api/client";
 import type { Snapshot } from "@/lib/api/types";
 
 export interface UseAccountOptions {
-  /** Poll interval in ms. Used only while a WhatsApp link code is live. */
+  /**
+   * Poll interval in ms: while a WhatsApp link code is live, and on Home
+   * so the balance follows chats. Polling pauses while the tab is hidden.
+   */
   refreshInterval?: number;
 }
 
