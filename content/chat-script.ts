@@ -30,7 +30,7 @@ export type ChatContent =
   /** A voice note. `transcript` is what screen readers get. */
   | { kind: "voice"; seconds: number; transcript: string }
   /** A picture: a photo the person took, an image Zox made, or a video Zox fetched. */
-  | { kind: "image"; art: "worksheet" | "poster" | "reel"; caption?: string; video?: boolean };
+  | { kind: "image"; art: "worksheet" | "poster" | "post"; caption?: string; video?: boolean };
 
 /** One bubble arriving. */
 export interface SendStep {
@@ -62,12 +62,12 @@ const typing = (duration = 1400): WaitStep => ({ type: "wait", status: "typing",
 const recording = (duration = 2000): WaitStep => ({ type: "wait", status: "recording", delay: 450, duration });
 
 /**
- * A reel or post from the SAMKIEL Instagram (instagram.com/samkiel_), for
- * the download scenario. Instagram does not list posts without signing
- * in, so this needs pasting by hand. While it is empty that scenario is
- * left out of the rotation.
+ * A post from the SAMKIEL Instagram (instagram.com/samkiel_), for the
+ * download scenario: a single photo, captioned "We are SAMKIEL." Stored
+ * without the share link's tracking parameter. Set it to "" to leave the
+ * scenario out of the rotation.
  */
-export const SAMKIEL_INSTAGRAM_POST = "";
+export const SAMKIEL_INSTAGRAM_POST: string = "https://www.instagram.com/p/DYiCFFggOig/";
 
 /**
  * OPEN ITEM (landing brief, 00-README #1): the exchanges below are
@@ -175,11 +175,11 @@ export const HERO_SCENARIOS: ChatScenario[] = [
       ask({
         kind: "link",
         url: SAMKIEL_INSTAGRAM_POST,
-        preview: { site: "instagram", title: "SAMKIEL (@samkiel_) on Instagram", byline: "instagram.com" },
+        preview: { site: "instagram", title: 'SAMKIEL on Instagram: "We are SAMKIEL."', byline: "@samkiel_" },
         text: "download this",
       }),
       typing(1500),
-      answer({ kind: "image", art: "reel", video: true, caption: "Here's the video." }),
+      answer({ kind: "image", art: "post", caption: "Here's the photo, full size." }),
     ],
   },
 ];

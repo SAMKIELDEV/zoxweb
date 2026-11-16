@@ -45,3 +45,22 @@ export function InstagramIcon({ size = 14, className }: IconProps) {
     </svg>
   );
 }
+
+/** Binance's mark, for the phone's notification icons. Path from Simple Icons (CC0). */
+export function BinanceIcon({ size = 12, className }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M16.624 13.92l2.718 2.716-7.353 7.353-7.353-7.352 2.717-2.717 4.636 4.66 4.635-4.66zm4.637-4.636L24 12l-2.715 2.716L18.568 12l2.693-2.716zm-9.272.001l2.716 2.691-2.716 2.718L9.272 12l2.717-2.715zm-9.273-.001L5.41 12l-2.692 2.692L0 12l2.716-2.716zM11.989.012l7.353 7.329-2.717 2.715-4.636-4.635-4.635 4.66-2.718-2.716L11.989.012z" />
+    </svg>
+  );
+}
+
+/** Telegram's paper plane, as Android shows it in the status bar. */
+export function TelegramIcon({ size = 12, className }: IconProps) {
+  return (
+    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M21.9 3.3c.3-1.2-.9-2.2-2-1.7L2.3 8.4c-1.2.5-1.2 2.2.1 2.6l4.4 1.4 1.7 5.4c.3.9 1.4 1.2 2.1.6l2.5-2.2 4.6 3.4c.9.6 2.1.2 2.4-.9L21.9 3.3zM9.4 14.2l-.6 3.4-1.1-4 9.9-7.4-8.2 8z" />
+    </svg>
+  );
+}
+

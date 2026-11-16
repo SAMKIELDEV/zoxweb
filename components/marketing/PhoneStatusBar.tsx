@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { BinanceIcon, TelegramIcon, WhatsAppIcon } from "./BrandIcons";
 
 /** The visitor's own clock, read after mount (the server's time would be wrong), then on each new minute. */
 export function useNow(): Date | null {
@@ -99,7 +100,8 @@ function BatteryIcon({ level }: { level: number }) {
 }
 
 /**
- * The phone's status bar: the visitor's real time, and Wi-Fi, signal and
+ * The phone's status bar: the visitor's real time, a few notification
+ * icons (WhatsApp, Binance, Telegram), and Wi-Fi, signal and
  * battery that change the way a real phone's do. While `live`, the Wi-Fi
  * and signal strength drift every few seconds and the battery drains a
  * percent now and then; otherwise they hold still (off screen, hidden tab,
@@ -136,7 +138,13 @@ export function PhoneStatusBar({ live, className }: { live: boolean; className?:
       className={cn("relative flex h-8 items-center justify-between px-6 text-xs font-medium text-wa-ink", className)}
     >
       {/* Space is held before the time arrives, so nothing moves. */}
-      <span className="min-w-9 tabular-nums">{now ? statusTime(now) : ""}</span>
+      <span className="flex items-center gap-1.5">
+        <span className="min-w-8 tabular-nums">{now ? statusTime(now) : ""}</span>
+        {/* Notification icons, as Android shows them beside the clock. */}
+        <WhatsAppIcon size={11} />
+        <BinanceIcon size={11} />
+        <TelegramIcon size={11} />
+      </span>
       <span className="absolute top-2.5 left-1/2 size-3 -translate-x-1/2 rounded-full bg-device" />
       <span className="flex items-center gap-1.5">
         <WifiIcon level={wifi} />

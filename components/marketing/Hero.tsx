@@ -29,7 +29,7 @@ export function Glow({ className }: { className?: string }) {
  */
 function Phone() {
   return (
-    <div className="relative mx-auto w-full max-w-80">
+    <div className="relative mx-auto w-full max-w-80 lg:-mt-6">
       <Glow className="-inset-x-10 -inset-y-8" />
       <div className="relative">
         <PhoneDemo />

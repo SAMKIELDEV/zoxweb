@@ -32,7 +32,9 @@ export function spokenContent(content: ChatContent): string {
           ? "A photo of a worksheet: 2x + 3 = 11"
           : content.art === "poster"
             ? "A poster: Study group, Thursday 6pm"
-            : "A video";
+            : content.video
+              ? "A video"
+              : "A photo from Instagram";
       return `${what}. ${content.caption ?? ""}`;
     }
   }
@@ -96,8 +98,8 @@ function VoiceNote({ from, seconds }: { from: ChatActor; seconds: number }) {
   );
 }
 
-/** The pictures: a photographed worksheet, a generated poster, a fetched video. */
-function Picture({ art, video }: { art: "worksheet" | "poster" | "reel"; video?: boolean }) {
+/** The pictures: a photographed worksheet, a generated poster, a fetched post (a stand-in drawing, not the real photo). */
+function Picture({ art, video }: { art: "worksheet" | "poster" | "post"; video?: boolean }) {
   return (
     <span className="relative block overflow-hidden rounded-sm">
       {art === "worksheet" ? (
@@ -135,7 +137,7 @@ function Picture({ art, video }: { art: "worksheet" | "poster" | "reel"; video?:
           </text>
         </svg>
       ) : null}
-      {art === "reel" ? (
+      {art === "post" ? (
         <svg viewBox="0 0 240 300" className="block h-auto w-full">
           <rect width="240" height="300" className="fill-forest" />
           <circle cx="60" cy="70" r="90" className="fill-bubble-forest-end" />
