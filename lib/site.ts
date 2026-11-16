@@ -54,32 +54,17 @@ function httpsUrl(value: string | undefined): string | null {
  * The chat link for Zox's WhatsApp number, or null when
  * NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER is not set. The number is never written
  * in code. wa.me wants digits only, country code first, 8 to 15 long.
- *
- * In development a missing or unreadable number throws, so it is noticed
- * at once instead of every chat button quietly pointing at sign-in. A
- * production build keeps the sign-in fallback.
  */
 function resolveWhatsAppUrl(): string | null {
-  const raw = process.env.NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER ?? "";
-  const digits = raw.replace(/\D/g, "");
-  if (/^\d{8,15}$/.test(digits)) return `https://wa.me/${digits}`;
-  if (process.env.NODE_ENV === "development") {
-    throw new Error(
-      raw
-        ? `NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER is "${raw}", which is not a phone number. ` +
-            "Use the country code and number, 8 to 15 digits, for example +2348012345678."
-        : "NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER is not set, so every chat button on the public pages would go to sign-in. " +
-            "Add it to .env.local (country code first, see .env.example) and restart pnpm dev.",
-    );
-  }
-  return null;
+  const digits = (process.env.NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
+  return /^\d{8,15}$/.test(digits) ? `https://wa.me/${digits}` : null;
 }
 
 export const WHATSAPP_URL = resolveWhatsAppUrl();
 
 /**
  * Where "start chatting" buttons lead. With no WhatsApp number configured
- * (a production build only; development throws above) they go to sign-in, where the dashboard's own link flow hands over the
+ * they go to sign-in, where the dashboard's own link flow hands over the
  * real chat link, so the buttons are never dead.
  */
 export const START_CHAT = WHATSAPP_URL
