@@ -1,170 +1,154 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Camera,
-  CheckCheck,
-  Clock3,
-  EllipsisVertical,
-  Mic,
-  Paperclip,
-  Phone,
-  SendHorizontal,
-  Smile,
-  Video,
-} from "lucide-react";
-import { LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
-import { useCallback, useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { ArrowLeft, Camera, EllipsisVertical, Mic, Paperclip, Phone, SendHorizontal, Smile, Video } from "lucide-react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { LogoMark } from "@/components/ui/Logo";
 import {
-  HERO_CHAT,
-  type ChatAttachment,
-  type ChatScript,
+  HERO_HISTORY_IDS,
+  HERO_SCENARIOS,
+  playableScenarios,
+  type ChatActor,
+  type ChatContent,
+  type ChatScenario,
   type ChatStep,
-  type MessageStep,
-  type ReplyStep,
 } from "@/content/chat-script";
 import { cn } from "@/lib/cn";
-import { duration, ease } from "@/lib/motion";
 import { CHAT_MESSAGE_MAX } from "@/lib/site";
+import { ChatBubble, type Receipt } from "./ChatBubble";
 import { HandoffNote, useHandoff, useKeepInView } from "./Composer";
 import { COMPOSER } from "./content";
 import { PhoneStatusBar, chatTime, useNow } from "./PhoneStatusBar";
 
 /**
- * - idle: nothing playing. Before the demo starts, and after it ends.
- * - demo: the script is playing.
- * - typing: the visitor is using the composer; the conversation is complete.
+ * - idle: nothing playing yet (before hydration, or with reduced motion).
+ * - demo: scenarios are playing, one after another.
+ * - typing: the visitor is using the composer; the demo has stopped.
  * - handoff: the visitor sent a message and the page is leaving for WhatsApp.
  */
 export type PhonePhase = "idle" | "demo" | "typing" | "handoff";
 
+interface ChatMessage {
+  key: string;
+  from: ChatActor;
+  content: ChatContent;
+  receipt?: Receipt;
+  /** Added after the page loaded, so it fades in. */
+  fresh?: boolean;
+}
+
 /** How long after hydration, at most, to wait for idle time before playing. */
 const START_TIMEOUT = 1200;
+/** The pause between one scenario's last bubble and the next one's first. */
+const SCENARIO_GAP = 2600;
+/** Older bubbles beyond this are dropped; they are long out of view. */
+const KEEP = 12;
+/** The gap between bubbles (gap-1.5), for the scroll. */
+const BUBBLE_GAP = 6;
 
-const isBubble = (step: ChatStep): step is MessageStep | ReplyStep => step.type !== "typing";
+type SendStep = Extract<ChatStep, { type: "send" }>;
+const sends = (scenario: ChatScenario) => scenario.steps.filter((step): step is SendStep => step.type === "send");
 
-/** A WhatsApp-style bubble: tail on the first corner, time (and ticks) tucked bottom-right. */
-function Bubble({
-  from,
-  text,
-  attachment,
-  time,
-  receipt,
-}: {
-  from: "person" | "zox";
-  text: string;
-  attachment?: ChatAttachment;
-  time: string;
-  /** read: the two blue ticks. pending: a clock, for a message not yet sent. */
-  receipt?: "read" | "pending";
-}) {
-  const person = from === "person";
-  return (
-    <div
-      className={cn(
-        "relative rounded-md px-2.5 pt-1.5 pb-2 text-sm leading-snug text-wa-ink shadow-wa",
-        person ? "rounded-tr-none bg-wa-out" : "rounded-tl-none bg-wa-in",
-      )}
-    >
-      {/* The tail. */}
-      <span
-        aria-hidden="true"
-        className={cn(
-          "absolute top-0 h-3 w-2",
-          person
-            ? "-right-2 bg-wa-out [clip-path:polygon(0_0,100%_0,0_100%)]"
-            : "-left-2 bg-wa-in [clip-path:polygon(0_0,100%_0,100%_100%)]",
-        )}
-      />
-      <span className="sr-only">{person ? "You: " : "Zox: "}</span>
-      {attachment ? (
-        <span className="-mx-1 mb-1.5 flex items-center gap-2.5 rounded-sm bg-wa-doc px-2.5 py-2">
-          <span
-            aria-hidden="true"
-            className="flex h-8 w-6.5 shrink-0 items-end justify-center rounded-xs bg-wa-pdf pb-1 text-[0.5rem] font-bold text-on-bubble"
-          >
-            PDF
-          </span>
-          <span className="min-w-0 leading-tight">
-            <span className="block truncate font-medium">{attachment.name}</span>
-            <span className="block text-micro text-wa-meta">{attachment.detail}</span>
-          </span>
-        </span>
-      ) : null}
-      <span className="break-words">{text}</span>
-      {/* Room at the end of the last line for the time, as WhatsApp leaves it. */}
-      <span aria-hidden="true" className={cn("inline-block", receipt ? "w-17" : "w-12")} />
-      <span aria-hidden="true" className="absolute right-2 bottom-1 flex items-center gap-0.5 text-micro text-wa-meta">
-        {time}
-        {receipt === "read" ? <CheckCheck size={15} strokeWidth={2} className="text-wa-tick" /> : null}
-        {receipt === "pending" ? <Clock3 size={11} strokeWidth={2} /> : null}
-      </span>
-    </div>
-  );
+const toMessage = (step: SendStep, key: string, fresh: boolean): ChatMessage => ({
+  key,
+  from: step.from,
+  content: step.content,
+  receipt: step.from === "person" ? "read" : undefined,
+  fresh,
+});
+
+/** What is already in the chat when the page loads. The same on the server and in the browser. */
+const HISTORY: ChatMessage[] = HERO_HISTORY_IDS.flatMap((id) => {
+  const scenario = HERO_SCENARIOS.find((item) => item.id === id);
+  return scenario ? sends(scenario).map((step, index) => toMessage(step, `history-${id}-${index}`, false)) : [];
+});
+
+/** A shuffled round of scenario ids, never starting with the one that just played. */
+function shuffledRound(ids: string[], last?: string): string[] {
+  const round = [...ids];
+  for (let i = round.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [round[i], round[j]] = [round[j], round[i]];
+  }
+  if (round.length > 1 && round[0] === last) [round[0], round[1]] = [round[1], round[0]];
+  return round;
 }
 
 /**
- * The hero phone (DESIGN.md, "Marketing motion", effect 2): a generic
- * handset drawn in CSS, with a WhatsApp-style chat with Zox on its screen,
+ * The hero phone (DESIGN.md, "Marketing motion", effect 2): a tall,
+ * generic handset drawn in CSS, with a WhatsApp-style chat with Zox on it
  * and a composer that really sends.
  *
- * It plays `script` once after the page has painted: the person's message,
- * "typing…" under Zox's name, then Zox's reply, each bubble rising 8px as
- * it fades in. It pauses while the phone is off screen or the tab is hidden.
- * Every bubble is in the page from the first paint, hidden, so nothing
- * shifts as the demo plays and screen readers get the whole exchange.
+ * The chat opens with HERO_HISTORY already there, so the first paint is a
+ * full conversation. After hydration it plays the other scenarios (a
+ * YouTube link, voice notes both ways, a photo of a problem, a generated
+ * poster, a web search...) in a shuffled order, and repeats none until
+ * every one has played. Zox shows "typing…" or "recording audio…" under
+ * its name first, as WhatsApp does. New bubbles fade in and the chat
+ * scrolls up under them. It runs only while the phone is on screen and
+ * the tab is showing.
  *
- * Any focus, press or typing in the composer ends the demo: what is left
- * fades in quickly, from wherever it was. Sending adds the visitor's
- * message as a bubble with a "sending" clock (nothing has been sent yet,
- * so no ticks and no reply), then hands over to WhatsApp. With reduced
- * motion the conversation is simply there.
+ * Any focus, press or typing in the composer stops the demo; a half-played
+ * exchange finishes at once. Sending adds the visitor's message with a
+ * "sending" clock (nothing has been sent yet, so no ticks and no reply),
+ * then hands over to WhatsApp. With reduced motion the opening
+ * conversation stays as it is.
  */
-export function PhoneDemo({ script = HERO_CHAT }: { script?: ChatScript }) {
-  const steps = script.steps;
-  const reduced = useReducedMotion();
+export function PhoneDemo() {
   const [phase, setPhase] = useState<PhonePhase>("idle");
-  const [revealed, setRevealed] = useState(0);
-  const [typing, setTyping] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>(HISTORY);
+  const [status, setStatus] = useState<"online" | "typing" | "recording">("online");
+  const [current, setCurrent] = useState<{ scenario: ChatScenario; cursor: number } | null>(null);
   const [onScreen, setOnScreen] = useState(false);
-  const [sent, setSent] = useState<string | null>(null);
+  const [reduced, setReduced] = useState(false);
   const [text, setText] = useState("");
+  const currentRef = useRef(current);
+  const round = useRef<string[]>([]);
+  const lastPlayed = useRef<string | undefined>(undefined);
+  const counter = useRef(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const keepInView = useKeepInView(formRef);
   const now = useNow();
-  // Every bubble without a scripted time shows the visitor's own clock.
-  const timeOf = (time?: string) => time ?? (now ? chatTime(now) : "");
   const inputId = useId();
   const noteId = useId();
+  const time = now ? chatTime(now) : "";
 
-  const finish = useCallback(() => {
-    setRevealed(steps.length);
-    setTyping(false);
-  }, [steps.length]);
+  const append = useCallback((added: ChatMessage[]) => {
+    setMessages((list) => [...list, ...added].slice(-KEEP));
+  }, []);
 
-  const { status, href, send } = useHandoff(
-    useCallback((message: string) => {
-      setSent(message);
-      setPhase("handoff");
-    }, []),
+  const { status: handoff, href, send } = useHandoff(
+    useCallback(
+      (message: string) => {
+        append([
+          {
+            key: `sent-${counter.current++}`,
+            from: "person",
+            content: { kind: "text", text: message },
+            receipt: "pending",
+            fresh: true,
+          },
+        ]);
+        setPhase("handoff");
+      },
+      [append],
+    ),
   );
 
-  // Start once the page is idle after hydration. Reduced motion: show it all.
+  // Reduced motion: no demo. Otherwise start once the page is idle after hydration.
   useEffect(() => {
-    if (reduced) {
-      finish();
-      return;
-    }
-    const start = () => setPhase((current) => (current === "idle" ? "demo" : current));
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(query.matches);
+    if (query.matches) return;
+    const start = () => setPhase((value) => (value === "idle" ? "demo" : value));
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(start, { timeout: START_TIMEOUT });
       return () => window.cancelIdleCallback(id);
     }
     const id = window.setTimeout(start, 200);
     return () => window.clearTimeout(id);
-  }, [reduced, finish]);
+  }, []);
 
   // Play only while the phone is on screen and the tab is showing.
   useEffect(() => {
@@ -187,32 +171,87 @@ export function PhoneDemo({ script = HERO_CHAT }: { script?: ChatScript }) {
     };
   }, []);
 
-  // The script runner: one timer for the next thing to happen.
+  // The runner: one timer for the next thing to happen.
   useEffect(() => {
     if (phase !== "demo" || !onScreen) return;
-    const step = steps[revealed];
+    let timer: number;
+    if (!current) {
+      // Between scenarios: the next from this round; a new shuffled round once all have played.
+      timer = window.setTimeout(() => {
+        if (round.current.length === 0) {
+          const ids = playableScenarios().map((scenario) => scenario.id);
+          // The first round skips what the chat opened with, since it has just been seen.
+          const opening = lastPlayed.current === undefined;
+          round.current = shuffledRound(
+            opening ? ids.filter((id) => !(HERO_HISTORY_IDS as readonly string[]).includes(id)) : ids,
+            lastPlayed.current,
+          );
+        }
+        const id = round.current.shift();
+        const scenario = HERO_SCENARIOS.find((item) => item.id === id);
+        if (scenario) {
+          lastPlayed.current = scenario.id;
+          setCurrent({ scenario, cursor: 0 });
+        }
+      }, SCENARIO_GAP);
+      return () => window.clearTimeout(timer);
+    }
+    const step = current.scenario.steps[current.cursor];
+    const next = () => setCurrent((value) => (value ? { ...value, cursor: value.cursor + 1 } : value));
     if (!step) {
-      setPhase("idle");
+      setCurrent(null);
       return;
     }
-    let timer: number;
-    if (step.type === "typing") {
-      timer = typing
-        ? window.setTimeout(() => {
-            setTyping(false);
-            setRevealed((n) => n + 1);
-          }, step.duration)
-        : window.setTimeout(() => setTyping(true), step.delay);
+    if (step.type === "wait") {
+      timer =
+        status === "online"
+          ? window.setTimeout(() => setStatus(step.status), step.delay)
+          : window.setTimeout(() => {
+              setStatus("online");
+              next();
+            }, step.duration);
     } else {
-      timer = window.setTimeout(() => setRevealed((n) => n + 1), step.delay);
+      timer = window.setTimeout(() => {
+        append([toMessage(step, `${current.scenario.id}-${counter.current++}`, true)]);
+        next();
+      }, step.delay);
     }
     return () => window.clearTimeout(timer);
-  }, [phase, onScreen, revealed, typing, steps]);
+  }, [phase, onScreen, current, status, append]);
 
+  // The chat scrolls up under a new bubble: the list is pushed down by the
+  // bubble's height, then eases back. A transform only, so nothing is laid
+  // out again; with reduced motion the global rule makes it instant.
+  const shown = useRef(messages.length);
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const added = messages.length - shown.current;
+    shown.current = messages.length;
+    const last = list?.lastElementChild as HTMLElement | null;
+    if (!list || !last || added < 1 || reduced) return;
+    list.style.transition = "none";
+    list.style.transform = `translateY(${last.offsetHeight + BUBBLE_GAP}px)`;
+    void list.offsetHeight;
+    list.style.transition = "transform var(--dur-slow) var(--ease-zox)";
+    list.style.transform = "";
+  }, [messages, reduced]);
+
+  useEffect(() => {
+    currentRef.current = current;
+  }, [current]);
+
+  // The visitor takes over: stop the demo, and finish a half-played exchange at once.
   const engage = useCallback(() => {
-    finish();
-    setPhase((current) => (current === "handoff" ? current : "typing"));
-  }, [finish]);
+    setPhase((value) => (value === "handoff" ? value : "typing"));
+    setStatus("online");
+    const value = currentRef.current;
+    if (value) {
+      currentRef.current = null;
+      const rest = value.scenario.steps.slice(value.cursor).filter((step): step is SendStep => step.type === "send");
+      if (rest.length) append(rest.map((step) => toMessage(step, `${value.scenario.id}-${counter.current++}`, true)));
+    }
+    setCurrent(null);
+  }, [append]);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -221,161 +260,139 @@ export function PhoneDemo({ script = HERO_CHAT }: { script?: ChatScript }) {
     setText(""); // As WhatsApp does: the message leaves the field.
   };
 
-  const rise = reduced ? { duration: 0 } : { duration: duration.base, ease };
   const hasText = text.trim().length > 0;
+  const statusLine = status === "typing" ? "typing…" : status === "recording" ? "recording audio…" : "online";
 
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div ref={rootRef} data-phase={phase}>
-        {/* The handset: a tall, slim phone (19.5:9 screen), thin even bezels, buttons on the right. Dark in both themes. */}
-        <div className="relative rounded-[2.6rem] bg-device p-2 shadow-device ring-1 ring-device-edge">
-          <span aria-hidden="true" className="absolute top-32 -right-0.75 h-20 w-0.75 rounded-r-sm bg-device-edge" />
-          <span aria-hidden="true" className="absolute top-56 -right-0.75 h-12 w-0.75 rounded-r-sm bg-device-edge" />
+    <div ref={rootRef} data-phase={phase}>
+      {/* The handset: a tall, slim phone (19.5:9 screen), thin even bezels, buttons on the right. Dark in both themes. */}
+      <div className="relative rounded-[2.6rem] bg-device p-2 shadow-device ring-1 ring-device-edge">
+        <span aria-hidden="true" className="absolute top-32 -right-0.75 h-20 w-0.75 rounded-r-sm bg-device-edge" />
+        <span aria-hidden="true" className="absolute top-56 -right-0.75 h-12 w-0.75 rounded-r-sm bg-device-edge" />
 
-          <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.15rem] bg-wa-bg">
-            {/* Status bar: real time, live Wi-Fi, signal and battery, the front camera in the middle. */}
-            <PhoneStatusBar live={onScreen && !reduced} className="bg-wa-bar" />
+        {/* On wide screens the phone fits the window's height: shorter on a short window, never taller than 19.5:9. */}
+        <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.15rem] bg-wa-bg lg:aspect-auto lg:h-[clamp(26rem,calc(100dvh-12rem),41rem)]">
+          <PhoneStatusBar live={onScreen && !reduced} className="shrink-0 bg-wa-bar" />
 
-            {/* Chat header: Zox, "online" or "typing…". */}
-            <div className="flex h-14 items-center gap-1.5 bg-wa-bar pr-2 pl-1.5 text-wa-icon">
-              <ArrowLeft aria-hidden="true" size={20} strokeWidth={2} className="shrink-0" />
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-tint">
-                <LogoMark alt="" className="size-5" />
-              </span>
-              <div className="ml-1 min-w-0 flex-1 leading-tight">
-                <p className="text-copy font-semibold text-wa-ink">Zox</p>
-                <p aria-live="off" className="text-xs text-wa-meta">
-                  {typing ? "typing…" : "online"}
-                </p>
+          {/* Chat header: Zox, then "online", "typing…" or "recording audio…". */}
+          <div className="flex h-14 shrink-0 items-center gap-1.5 bg-wa-bar pr-2 pl-1.5 text-wa-icon">
+            <ArrowLeft aria-hidden="true" size={20} strokeWidth={2} className="shrink-0" />
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-tint">
+              <LogoMark alt="" className="size-5" />
+            </span>
+            <div className="ml-1 min-w-0 flex-1 leading-tight">
+              <p className="text-copy font-semibold text-wa-ink">Zox</p>
+              <p className="text-xs text-wa-meta">{statusLine}</p>
+            </div>
+            <span aria-hidden="true" className="flex items-center gap-4">
+              <Video size={20} strokeWidth={1.8} />
+              <Phone size={18} strokeWidth={1.8} />
+              <EllipsisVertical size={20} strokeWidth={1.8} />
+            </span>
+          </div>
+
+          <div className="wa-wallpaper flex min-h-0 flex-1 flex-col">
+            {/* Newest at the bottom; older bubbles slide up and out of view. */}
+            <div className="flex min-h-0 flex-1 flex-col justify-end overflow-hidden px-4 pt-3 pb-2">
+              <div ref={listRef} role="list" aria-label="A chat with Zox" className="flex flex-col gap-1.5">
+                <div
+                  role="listitem"
+                  aria-hidden="true"
+                  className="mb-1 self-center rounded-md bg-wa-date px-2.5 py-1 text-micro text-wa-meta shadow-wa"
+                >
+                  Today
+                </div>
+                {messages.map((message) => (
+                  <div
+                    key={message.key}
+                    role="listitem"
+                    className={cn(
+                      message.from === "person" ? "ml-auto max-w-[84%]" : "mr-auto max-w-[86%]",
+                      message.fresh && "animate-[zox-bubble-in_var(--dur-base)_var(--ease-zox)_both]",
+                    )}
+                  >
+                    <ChatBubble from={message.from} content={message.content} time={time} receipt={message.receipt} />
+                  </div>
+                ))}
               </div>
-              <span aria-hidden="true" className="flex items-center gap-4">
-                <Video size={20} strokeWidth={1.8} />
-                <Phone size={18} strokeWidth={1.8} />
-                <EllipsisVertical size={20} strokeWidth={1.8} />
-              </span>
             </div>
 
-            <div className="wa-wallpaper flex min-h-0 flex-1 flex-col">
-              {/* The screen's height is fixed by the phone, newest at the bottom: nothing moves as messages arrive. */}
-              <ol
-                role="list"
-                aria-label="A chat with Zox"
-                className="flex min-h-0 flex-1 flex-col justify-end gap-1.5 overflow-hidden px-4 pt-3 pb-2"
-              >
-                <li aria-hidden="true" className="mb-1 self-center rounded-md bg-wa-date px-2.5 py-1 text-micro text-wa-meta shadow-wa">
-                  Today
-                </li>
-                {steps.map((step, index) => {
-                  if (!isBubble(step)) return null;
-                  const person = step.actor === "person";
-                  return (
-                    <m.li
-                      key={index}
-                      data-chat-reveal=""
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={index < revealed ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-                      transition={rise}
-                      className={person ? "ml-auto max-w-[82%]" : "mr-auto max-w-[86%]"}
-                    >
-                      <Bubble
-                        from={step.actor}
-                        text={step.text}
-                        attachment={step.type === "message" ? step.attachment : undefined}
-                        time={timeOf(step.time)}
-                        receipt={person ? "read" : undefined}
-                      />
-                    </m.li>
-                  );
-                })}
-                {sent ? (
-                  <m.li
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={rise}
-                    className="ml-auto max-w-[82%]"
-                  >
-                    <Bubble from="person" text={sent} time={timeOf()} receipt="pending" />
-                  </m.li>
-                ) : null}
-              </ol>
-
-              {/* Suggestions, in one row that scrolls sideways. Tapping one fills the input. */}
-              <ul
-                role="list"
-                aria-label="Suggestions"
-                className="flex gap-2 overflow-x-auto px-2 pb-2 [scrollbar-width:none]"
-              >
-                {COMPOSER.suggestions.map((suggestion) => (
-                  <li key={suggestion} className="shrink-0">
-                    <button
-                      type="button"
-                      onPointerDown={engage}
-                      onClick={() => {
-                        engage();
-                        setText(suggestion);
-                      }}
-                      className="min-h-9 rounded-full bg-wa-in px-3 text-note whitespace-nowrap text-wa-ink shadow-wa transition-colors duration-(--dur-fast) ease-zox hover:bg-wa-out max-sm:min-h-11"
-                    >
-                      {suggestion}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-
-              {/* The composer, WhatsApp style: the field, then the round button (mic when empty, send when not). */}
-              <form ref={formRef} onSubmit={submit} className="flex items-end gap-1.5 px-1.5 pb-2">
-                <div className="flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full bg-wa-in px-3 text-wa-icon shadow-wa">
-                  <Smile aria-hidden="true" size={22} strokeWidth={1.8} className="shrink-0" />
-                  <label htmlFor={inputId} className="sr-only">
-                    {COMPOSER.placeholder}
-                  </label>
-                  <input
-                    id={inputId}
-                    type="text"
-                    value={text}
-                    maxLength={CHAT_MESSAGE_MAX}
+            {/* Suggestions, in one row that scrolls sideways. Tapping one fills the input. */}
+            <ul
+              role="list"
+              aria-label="Suggestions"
+              className="flex shrink-0 gap-2 overflow-x-auto px-2 pb-2 [scrollbar-width:none]"
+            >
+              {COMPOSER.suggestions.map((suggestion) => (
+                <li key={suggestion} className="shrink-0">
+                  <button
+                    type="button"
                     onPointerDown={engage}
-                    onFocus={(event) => {
+                    onClick={() => {
                       engage();
-                      keepInView(event.currentTarget);
+                      setText(suggestion);
                     }}
-                    onChange={(event) => {
-                      engage();
-                      setText(event.target.value);
-                    }}
-                    placeholder={COMPOSER.placeholder}
-                    aria-describedby={noteId}
-                    autoComplete="off"
-                    enterKeyHint="send"
-                    className="min-w-0 flex-1 bg-transparent py-2 text-base text-wa-ink outline-none placeholder:text-wa-meta"
-                  />
-                  <Paperclip aria-hidden="true" size={19} strokeWidth={1.8} className="shrink-0 -rotate-45" />
-                  {hasText ? null : <Camera aria-hidden="true" size={20} strokeWidth={1.8} className="shrink-0" />}
-                </div>
-                <button
-                  type="submit"
-                  aria-label={COMPOSER.sendLabel}
-                  onPointerDown={engage}
-                  className="flex size-12 shrink-0 items-center justify-center rounded-full bg-wa-green text-wa-on-green transition-transform duration-(--dur-fast) ease-zox active:scale-[0.96]"
-                >
-                  {hasText ? (
-                    <SendHorizontal aria-hidden="true" size={20} strokeWidth={2} />
-                  ) : (
-                    <Mic aria-hidden="true" size={21} strokeWidth={2} />
-                  )}
-                </button>
-              </form>
+                    className="min-h-9 rounded-full bg-wa-in px-3 text-note whitespace-nowrap text-wa-ink shadow-wa transition-colors duration-(--dur-fast) ease-zox hover:bg-wa-out max-sm:min-h-11"
+                  >
+                    {suggestion}
+                  </button>
+                </li>
+              ))}
+            </ul>
 
-              {/* The gesture bar. */}
-              <div aria-hidden="true" className="flex h-5 items-start justify-center">
-                <span className="h-1 w-28 rounded-full bg-wa-meta opacity-50" />
+            {/* The composer, WhatsApp style: the field, then the round button (mic when empty, send when not). */}
+            <form ref={formRef} onSubmit={submit} className="flex shrink-0 items-end gap-1.5 px-1.5 pb-2">
+              <div className="flex min-h-12 min-w-0 flex-1 items-center gap-2 rounded-full bg-wa-in px-3 text-wa-icon shadow-wa">
+                <Smile aria-hidden="true" size={22} strokeWidth={1.8} className="shrink-0" />
+                <label htmlFor={inputId} className="sr-only">
+                  {COMPOSER.placeholder}
+                </label>
+                <input
+                  id={inputId}
+                  type="text"
+                  value={text}
+                  maxLength={CHAT_MESSAGE_MAX}
+                  onPointerDown={engage}
+                  onFocus={(event) => {
+                    engage();
+                    keepInView(event.currentTarget);
+                  }}
+                  onChange={(event) => {
+                    engage();
+                    setText(event.target.value);
+                  }}
+                  placeholder={COMPOSER.placeholder}
+                  aria-describedby={noteId}
+                  autoComplete="off"
+                  enterKeyHint="send"
+                  className="min-w-0 flex-1 bg-transparent py-2 text-base text-wa-ink outline-none placeholder:text-wa-meta"
+                />
+                <Paperclip aria-hidden="true" size={19} strokeWidth={1.8} className="shrink-0 -rotate-45" />
+                {hasText ? null : <Camera aria-hidden="true" size={20} strokeWidth={1.8} className="shrink-0" />}
               </div>
+              <button
+                type="submit"
+                aria-label={COMPOSER.sendLabel}
+                onPointerDown={engage}
+                className="flex size-12 shrink-0 items-center justify-center rounded-full bg-wa-green text-wa-on-green transition-transform duration-(--dur-fast) ease-zox active:scale-[0.96]"
+              >
+                {hasText ? (
+                  <SendHorizontal aria-hidden="true" size={20} strokeWidth={2} />
+                ) : (
+                  <Mic aria-hidden="true" size={21} strokeWidth={2} />
+                )}
+              </button>
+            </form>
+
+            {/* The gesture bar. */}
+            <div aria-hidden="true" className="flex h-5 shrink-0 items-start justify-center">
+              <span className="h-1 w-28 rounded-full bg-wa-meta opacity-50" />
             </div>
           </div>
         </div>
-
-        <HandoffNote id={noteId} status={status} href={href} centered className="mt-5" />
       </div>
-    </LazyMotion>
+
+      <HandoffNote id={noteId} status={handoff} href={href} centered className="mt-4" />
+    </div>
   );
 }

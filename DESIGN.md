@@ -282,7 +282,7 @@ The landing page has a fixed motion budget. Section 9's vocabulary still holds f
 | # | Effect | What moves | Timing | Built with |
 |---|---|---|---|---|
 | 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. | `--dur-slow` (420ms), `ease-zox` | CSS transitions |
-| 2 | Hero phone demo | The person's message, "typing…" under Zox's name, then Zox's reply arriving whole (as WhatsApp does; owner's choice, November 16, 2026, over word-by-word). Bubbles rise 8px as they fade in. Plays once. The status bar is live too (owner's request, November 16, 2026): the visitor's real time, and Wi-Fi and signal that drift every few seconds and a battery that drains a percent at a time, only while the phone is on screen. | `--dur-base` per bubble and icon change | Motion (`m`, `LazyMotion` + `domAnimation`); CSS for the status bar |
+| 2 | Hero phone demo | The chat opens with two exchanges already there. Then it plays the other scenarios in `content/chat-script.ts` (a YouTube link, voice notes both ways, a photo of a problem, a generated poster, a web search, an Instagram download once a link is set) in a shuffled order, repeating none until every one has played, for as long as the phone is on screen (owner's request, November 16, 2026, over "plays once"). Zox shows "typing…" or "recording audio…" first; a new bubble fades in and the chat scrolls up under it. The status bar is live: the visitor's real time, Wi-Fi and signal that drift every few seconds, a battery that drains a percent at a time. | `--dur-base` fade, `--dur-slow` scroll | CSS and a small script; no animation library |
 | 3 | Button icon slide | The icon inside a button nudges 2px toward the action on hover. | `--dur-fast` | CSS |
 | 4 | Bento illustration | The small drawing in a card shifts a few px on card hover. The card itself does not move, scale or gain a shadow. | `--dur-base` | CSS |
 | 5 | FAQ open and close | The answer's height and opacity. | `--dur-base` | CSS (`interpolate-size`, `::details-content`) |
@@ -296,10 +296,10 @@ Banned on the public pages: parallax, cursor effects, marquees, count-up numbers
 - Animate `transform` and `opacity`. The navbar pill also animates `clip-path` on one childless layer. Nothing animates `width`, `height`, `top` or `left` on an element with children, except the FAQ answer, whose height change is confined to that one block.
 - Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. No scroll-linked animation.
 - `will-change` only where a trace shows it helps. None is set by default.
-- Script-driven motion uses Motion's `m` components inside `LazyMotion` with `domAnimation`, so only the animation features ship. Effects that CSS can do stay in CSS.
+- Effects that CSS can do stay in CSS. The landing page ships no animation library: the hero's scroll is one transform set from script. If one is ever needed, it is Motion's `m` components inside `LazyMotion` with `domAnimation`.
 - Nothing above the fold waits for motion. The headline and the phone shell render at once; the demo starts after hydration, in idle time.
 - Every effect has a final state that is correct with no animation at all.
 
 **Reduced motion**
 
-With `prefers-reduced-motion: reduce`: the navbar switches state at once (the global rule cuts transitions to 1ms); the phone shows the whole conversation, still; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
+With `prefers-reduced-motion: reduce`: the navbar switches state at once (the global rule cuts transitions to 1ms); the phone shows its opening conversation, still, and plays nothing; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.

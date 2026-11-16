@@ -117,6 +117,7 @@
   --color-wa-date: #ffffff; /* the "Today" chip */
   --color-wa-doc: #c9efc2; /* a document card inside the person's bubble */
   --color-wa-pdf: #e2574c; /* the PDF badge on a document card */
+  --color-wa-link: #027eb5; /* a link's address in a bubble */
 
   /* 38 to 61px, and smaller on phones: the longer headline line is about
      9.7 times the font size wide, so under 432px the size follows the
@@ -208,6 +209,7 @@
   --color-wa-on-green: #0b141a;
   --color-wa-date: #182229;
   --color-wa-doc: #0e3b2a;
+  --color-wa-link: #53bdeb;
 
   --grain-opacity: 0.05;
   --drop-soft: 0 2px 16px rgb(8 5 2 / 0.3);
@@ -321,12 +323,10 @@
     mask: var(--wa-doodles) 0 0 / 132px 132px repeat;
   }
 
-  /* The hero phone renders its bubbles hidden and reveals them in script.
-     With reduced motion they are simply there, from the first paint. */
-  @media (prefers-reduced-motion: reduce) {
-    [data-chat-reveal] {
-      opacity: 1 !important;
-      transform: none !important;
+  /* A new bubble in the hero phone fades in (components/marketing/PhoneDemo.tsx). */
+  @keyframes zox-bubble-in {
+    from {
+      opacity: 0;
     }
   }
 

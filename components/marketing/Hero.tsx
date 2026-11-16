@@ -34,12 +34,6 @@ function Phone() {
       <div className="relative">
         <PhoneDemo />
       </div>
-      {/* Without script the demo cannot play: show the conversation as it ends. */}
-      <noscript
-        dangerouslySetInnerHTML={{
-          __html: "<style>[data-chat-reveal]{opacity:1!important;transform:none!important}</style>",
-        }}
-      />
     </div>
   );
 }
