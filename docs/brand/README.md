@@ -31,6 +31,8 @@ The wordmark and isolated `z` were **contour-traced from the approved terracotta
 | `zox-logo-email.png` | Terracotta transparent wordmark, 640 px wide for signatures |
 | `zox-icon.svg` | Isolated terracotta `z` vector in a transparent square |
 
+The site also serves two pieces of the wordmark, made on 2026-11-16 for the landing page header, where the wordmark folds into its Z: `public/brand/zox-logo-z.svg` (the Z) and `public/brand/zox-logo-ox.svg` (the O and X). They are `zox-logo.svg` split at its subpaths: same viewBox, same transform, same fill, and the path data copied unchanged (the Z is the first subpath, the O and X the rest). Laid over each other they are the wordmark exactly. Nothing was redrawn.
+
 ### `web/`
 
 | File | Purpose |

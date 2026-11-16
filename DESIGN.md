@@ -191,7 +191,7 @@ The owner's decision for these pages (November 12, 2026): **build them as design
 
 - Tokens only. The marketing values below are tokens in `globals.css`; no component writes a color.
 - Text meets WCAG AA. Where the design's colors do not, the build uses the nearest token that does (see "Contrast" below).
-- Visible focus, keyboard reach, 44px tap targets on phones, reduced motion respected. The landing page moves only in answer to a hover or a press.
+- Visible focus, keyboard reach, 44px tap targets on phones, reduced motion respected. The landing page moves only as "Marketing motion" below allows.
 - One icon set (Lucide, at the navigation's stroke weight). The WhatsApp, X and Instagram marks are drawn from the design, because Lucide carries no brand marks.
 - The real logo, through `components/ui/Logo.tsx`. The design's hexagon was a placeholder.
 - No invented numbers. Pack names, credits and prices come from `lib/pricing.ts`, which `pnpm run test:pricing` checks against the backend.
@@ -257,3 +257,34 @@ The design's values, and what the build uses where they fall short of AA:
 `eyebrow` is its own token because `accent-ink` reaches only 4.3:1 on the tinted band.
 
 The chat illustration is a picture of the product. Screen readers get one description of it, and WCAG does not hold text inside a picture to a contrast ratio. Its colored bubbles are drawn as designed: white on the terracotta gradient runs from 3.7:1 to 5.0:1, and the faint times under each message are fainter still. The times on the white bubbles use `ink-2`.
+
+### Marketing motion
+
+The landing page has a fixed motion budget. Section 9's vocabulary still holds for the dashboard; this section is the whole list for the public pages. Anything not named here does not move.
+
+**The budget**
+
+| # | Effect | What moves | Timing | Built with |
+|---|---|---|---|---|
+| 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. | `--dur-slow` (420ms), `ease-zox` | CSS transitions |
+| 2 | Hero phone demo | Typing indicator, bubbles rising 8px as they fade in, Zox's reply word by word. Plays once. | `--dur-base` per bubble, about 60ms per word | Motion (`m`, `LazyMotion` + `domAnimation`) |
+| 3 | Button icon slide | The icon inside a button nudges 2px toward the action on hover. | `--dur-fast` | CSS |
+| 4 | Bento illustration | The small drawing in a card shifts a few px on card hover. The card itself does not move, scale or gain a shadow. | `--dur-base` | CSS |
+| 5 | FAQ open and close | The answer's height and opacity. | `--dur-base` | CSS (`interpolate-size`, `::details-content`) |
+| 6 | Heading reveal | Section headings only, once, as they enter: fade plus an 8px rise. Body copy does not animate. | `--dur-slow` | `IntersectionObserver` + CSS |
+
+Banned on the public pages: parallax, cursor effects, marquees, count-up numbers, hover shadows, hover scale on cards or links, looping decoration, scroll-linked values, hide-on-scroll headers.
+
+**Rules**
+
+- Durations and easing come from the tokens (`--dur-fast` 140ms, `--dur-base` 240ms, `--dur-slow` 420ms, `ease-zox`), or from `lib/motion.ts` in script. No other curves.
+- Animate `transform` and `opacity`. The navbar pill also animates `clip-path` on one childless layer. Nothing animates `width`, `height`, `top` or `left` on an element with children, except the FAQ answer, whose height change is confined to that one block.
+- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. No scroll-linked animation.
+- `will-change` only where a trace shows it helps. None is set by default.
+- Script-driven motion uses Motion's `m` components inside `LazyMotion` with `domAnimation`, so only the animation features ship. Effects that CSS can do stay in CSS.
+- Nothing above the fold waits for motion. The headline and the phone shell render at once; the demo starts after hydration, in idle time.
+- Every effect has a final state that is correct with no animation at all.
+
+**Reduced motion**
+
+With `prefers-reduced-motion: reduce`: the navbar switches state at once (the global rule cuts transitions to 1ms); the phone shows the whole conversation, still; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.

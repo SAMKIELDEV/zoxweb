@@ -16,7 +16,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
     <div className="flex min-h-dvh flex-col [font-variation-settings:normal]">
       <a
         href="#content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-30 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:text-ink"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-40 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm focus:text-ink"
       >
         Skip to content
       </a>

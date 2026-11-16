@@ -132,6 +132,9 @@
   --dur-base: 240ms;
   --dur-slow: 420ms;
   --grain-opacity: 0.03;
+  /* shadow-soft as a drop-shadow() filter, for the navbar pill, whose
+     shape comes from clip-path (a box-shadow would be clipped with it). */
+  --drop-soft: 0 2px 16px rgb(42 36 32 / 0.06);
   color-scheme: light;
 }
 
@@ -171,6 +174,7 @@
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
 
   --grain-opacity: 0.05;
+  --drop-soft: 0 2px 16px rgb(8 5 2 / 0.3);
   color-scheme: dark;
 }
 
