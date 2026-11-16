@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
-import { SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -31,10 +31,13 @@ const dmSans = DM_Sans({
 // icon.svg, apple-icon.png, manifest.json, opengraph-image.png,
 // twitter-image.png). They come from the brand pack in docs/brand.
 export const metadata: Metadata = {
-  // Makes the social image addresses absolute.
+  // Makes canonical and social image addresses absolute. Each public page
+  // names its own canonical path; nothing is set here, so no page inherits
+  // another's.
   metadataBase: new URL(SITE_URL),
-  title: { default: "Zox", template: "%s | Zox" },
-  description: "Your Zox credits, usage and WhatsApp link.",
+  applicationName: SITE_NAME,
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: "Zox is an AI agent on WhatsApp: chat, search, PDFs, images and voice notes, paid for with credits.",
 };
 
 export const viewport: Viewport = {
