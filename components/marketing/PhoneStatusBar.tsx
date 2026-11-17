@@ -76,17 +76,17 @@ function BatteryIcon({ level }: { level: number }) {
   const move = "transition-[transform,clip-path] duration-(--dur-slow) ease-zox";
   return (
     <span className="flex items-center">
-      <span className="relative h-3 w-6 overflow-hidden rounded-[0.25rem] bg-wa-ink/25">
+      <span className="relative h-2.75 w-5.5 overflow-hidden rounded-[0.22rem] bg-wa-ink/25">
         <span
           className={cn("absolute inset-0 origin-left bg-wa-ink", move)}
           style={{ transform: `scaleX(${level / 100})` }}
         />
-        <span className="absolute inset-0 flex items-center justify-center text-[0.5rem] leading-none font-bold tabular-nums text-wa-ink">
+        <span className="absolute inset-0 flex items-center justify-center text-[0.4375rem] leading-none font-bold tabular-nums text-wa-ink">
           {level}
         </span>
         <span
           className={cn(
-            "absolute inset-0 flex items-center justify-center text-[0.5rem] leading-none font-bold tabular-nums text-wa-bar",
+            "absolute inset-0 flex items-center justify-center text-[0.4375rem] leading-none font-bold tabular-nums text-wa-bar",
             move,
           )}
           style={{ clipPath: `inset(0 ${empty} 0 0)` }}
@@ -94,7 +94,7 @@ function BatteryIcon({ level }: { level: number }) {
           {level}
         </span>
       </span>
-      <span className="ml-px h-1 w-0.5 rounded-r-full bg-wa-ink/25" />
+      <span className="ml-px h-1 w-px rounded-r-full bg-wa-ink/25" />
     </span>
   );
 }
