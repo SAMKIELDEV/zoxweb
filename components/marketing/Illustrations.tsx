@@ -1,5 +1,4 @@
 import { cn } from "@/lib/cn";
-import type { JobArt } from "./content";
 
 /**
  * Flat drawings for the landing page, built from the design tokens only
@@ -114,88 +113,5 @@ export function ProblemArt({ className }: { className?: string }) {
         <path d="M434 329l4 4" className="stroke-ink-2 [stroke-linecap:round]" strokeWidth="1.6" />
       </g>
     </svg>
-  );
-}
-
-/** Brief 05: one small drawing per card. */
-export function JobIllustration({ art, className }: { art: JobArt; className?: string }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 160 96" fill="none" className={cn("h-auto w-full", className)}>
-      <g className={sketch} strokeWidth="1.8">
-        {art === "ask" ? <AskArt /> : null}
-        {art === "search" ? <SearchArt /> : null}
-        {art === "pdf" ? <PdfArt /> : null}
-        {art === "video" ? <VideoArt /> : null}
-        {art === "photo" ? <PhotoArt /> : null}
-      </g>
-    </svg>
-  );
-}
-
-function AskArt() {
-  return (
-    <>
-      <path d="M14 14h78a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8H34l-12 10V50h-8a8 8 0 0 1-8-8V22a8 8 0 0 1 8-8z" className="fill-card" />
-      <path d="M20 28h64M20 38h40" className="stroke-track" />
-      <path
-        d="M68 46h78a8 8 0 0 1 8 8v20a8 8 0 0 1-8 8h-8v10l-12-10H68a8 8 0 0 1-8-8V54a8 8 0 0 1 8-8z"
-        className="fill-accent stroke-accent-strong"
-      />
-      <path d="M74 60h64M74 70h30" className="stroke-on-bubble" strokeWidth="2.4" />
-    </>
-  );
-}
-
-function SearchArt() {
-  return (
-    <>
-      <rect x="10" y="12" width="104" height="72" rx="8" className="fill-card" />
-      <path d="M22 30h56M22 44h80M22 58h70M22 72h44" className="stroke-track" />
-      <circle cx="112" cy="50" r="22" className="fill-forest-tint stroke-forest" strokeWidth="2.4" />
-      <path d="M128 66l18 18" className="stroke-forest" strokeWidth="5" />
-    </>
-  );
-}
-
-function PdfArt() {
-  return (
-    <>
-      <path d="M40 6h58l18 18v66H40z" className="fill-card" />
-      <path d="M98 6v18h18" />
-      <path d="M52 34h52M52 46h52M52 58h40M52 70h48" className="stroke-track" />
-      <rect x="48" y="52" width="48" height="10" rx="3" className="fill-accent-tint stroke-accent" strokeWidth="1.4" />
-      <path d="M124 40l14 8-14 8" className="stroke-accent-ink" strokeWidth="2.4" />
-    </>
-  );
-}
-
-function VideoArt() {
-  return (
-    <>
-      <rect x="10" y="10" width="96" height="62" rx="8" className="fill-forest-tint" />
-      <path d="M50 28v26l22-13z" className="fill-forest stroke-forest" />
-      <path d="M18 82h80" className="stroke-track" strokeWidth="3" />
-      <path d="M18 82h20" className="stroke-forest" strokeWidth="3" />
-      <rect x="114" y="22" width="38" height="50" rx="6" className="fill-card" />
-      <path d="M121 34h24M121 44h24M121 54h16" className="stroke-track" />
-    </>
-  );
-}
-
-function PhotoArt() {
-  return (
-    <>
-      <g transform="rotate(-5 70 48)">
-        <rect x="16" y="10" width="112" height="76" rx="6" className="fill-card" />
-        <rect x="24" y="18" width="96" height="60" rx="3" className="fill-wash" />
-        <path
-          d="M34 36c4-6 8 6 12 0M54 36h8M58 32v8M70 36c4-8 10 8 14-2M92 36h8M92 40h8"
-          className="stroke-ink"
-          strokeWidth="1.6"
-        />
-        <path d="M34 60c8-10 18 4 26-4s14 2 22-2" className="stroke-ink" strokeWidth="1.6" />
-      </g>
-      <ellipse cx="78" cy="56" rx="30" ry="14" className="stroke-accent" strokeWidth="2.4" />
-    </>
   );
 }

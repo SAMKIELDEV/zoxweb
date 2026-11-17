@@ -4,7 +4,8 @@ import { Cta } from "@/components/marketing/Cta";
 import { Faq } from "@/components/marketing/Faq";
 import { Hero } from "@/components/marketing/Hero";
 import { PricingTeaser } from "@/components/marketing/PricingTeaser";
-import { Problem, Solution, Trust } from "@/components/marketing/Story";
+import { SolutionEditorial } from "@/components/marketing/SolutionVariants";
+import { Problem, Trust } from "@/components/marketing/Story";
 import { OPEN_GRAPH_IMAGE, SITE_NAME, TWITTER_IMAGE } from "@/lib/site";
 
 const title = `Zox: ${HERO.headline.join(" ")}`;
@@ -32,7 +33,7 @@ export default function LandingPage() {
       <Hero />
       <Trust />
       <Problem />
-      <Solution />
+      <SolutionEditorial />
       <PricingTeaser />
       <Faq />
       <Cta />
