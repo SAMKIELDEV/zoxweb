@@ -172,7 +172,7 @@ export function MarketingNav() {
   }, [open, menuId]);
 
   const g = compact ? geometry : FLAT;
-  const move = ready ? "transition-[transform,opacity,clip-path] duration-(--dur-slow) ease-zox" : "";
+  const move = ready ? "transition-[transform,opacity,clip-path] duration-(--dur-nav) ease-nav" : "";
   const clip = (extra: number): CSSProperties => ({
     clipPath: `inset(${extra}px ${g.inset + extra}px ${extra}px ${g.inset + extra}px round ${PILL_RADIUS - extra}px)`,
   });

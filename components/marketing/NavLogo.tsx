@@ -49,7 +49,7 @@ export function NavLogo({ compact, animate }: { compact: boolean; animate: boole
         loading="eager"
         className={cn(
           "absolute top-0 left-0 max-w-none",
-          animate && "transition-[opacity,transform] duration-(--dur-slow) ease-zox",
+          animate && "transition-[opacity,transform] duration-(--dur-nav) ease-nav",
         )}
         style={{
           width: NAV_LOGO_WIDTH,

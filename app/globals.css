@@ -75,6 +75,8 @@
 
   /* Motion */
   --ease-zox: cubic-bezier(0.22, 1, 0.36, 1);
+  /* The navbar fold: even speed through the middle, so the slower morph reads as one movement (owner, Nov 17 2026). */
+  --ease-nav: cubic-bezier(0.65, 0, 0.35, 1);
 
   /*
     Marketing tokens (DESIGN.md section 14). Taken from the landing page
@@ -155,6 +157,7 @@
   --dur-fast: 140ms;
   --dur-base: 240ms;
   --dur-slow: 420ms;
+  --dur-nav: 700ms; /* the navbar fold; slower than anything else on purpose */
   --grain-opacity: 0.03;
   /* shadow-soft as a drop-shadow() filter, for the navbar pill, whose
      shape comes from clip-path (a box-shadow would be clipped with it). */
