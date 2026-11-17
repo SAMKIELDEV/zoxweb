@@ -83,11 +83,22 @@ Rules:
 - Favicon, app icons, web manifest and the Open Graph and Twitter images are the files from the pack's `web/` folder, placed in `app/` and `public/` as its README describes.
 - Page header pattern: the serif title lives in the top bar. A page may open with a one-line sans subtitle in `ink-2`, with its primary action aligned right.
 
+### Dashboard shell (owner's direction, November 17, 2026)
+
+This replaces the full-height sidebar and full-width top bar described above as the shell is rebuilt.
+
+- **Desktop:** a floating sidebar panel, inset from the screen edges (it does not touch the top, bottom or left edge), on `sidebar` with a hairline border and `shadow-soft`, radius `lg`. The Z mark at the top. Nav items are rows with a tinted active background (`wash`) and a small terracotta edge marker on the active row. Settings and Sign out sit at the bottom of the panel.
+- **Narrow desktop** (768 to 1023px): the panel collapses to an icon rail, each icon with a tooltip giving its name.
+- **Phones:** no sidebar. A slim top bar with the Z mark and a menu button that opens a sheet with the same items.
+- **Page header:** inside the content area, not in a full-width bar: the serif page title, an optional one-line subtitle, and at most one primary action to the right.
+- **Home:** the balance is the hero (large serif number, a quiet line for what it covers), one large usage chart for the last 14 days (flat warm palette, direct labels, no gradients), recent activity as hairline rows, one primary action ("Top up"), and a small inline notice only when WhatsApp is not linked. No row of metric cards.
+- **Dashboard motion:** page enter, list stagger, the chart drawing in once on first load, the balance changing (the digit flip), button press feedback. Nothing else.
+
 ## 6. Components
 
 - **Buttons**: primary = `accent-strong` fill with `on-accent` text (the lighter `accent` fails contrast with light text). Secondary = transparent with `line` border. Destructive is rare and uses `danger`. One primary button per view. A button whose work is still running is marked `busy`, never `disabled`: a disabled button drops keyboard focus, and the person has to find it again when the work ends.
 - **Inputs**: `paper` fill, `line` border, terracotta focus ring (2px, offset 2px). Labels above, always visible.
-- **Icons**: one icon set, one stroke weight, used sparingly. Never emoji as icons. No icon in a colored circle as a card header.
+- **Icons**: one icon set, one stroke weight, used sparingly: **Phosphor, regular weight** (`@phosphor-icons/react`), whose rounded joins match the buttons' rounded corners. It replaces Lucide (owner's choice, November 17, 2026); pages move over as they are rebuilt, and the hero phone keeps its WhatsApp-style glyphs, since it is a picture of another app. Never emoji as icons. No icon in a colored circle as a card header.
 - **Credit balance**: the hero. Large serif number, small sans "credits" label, plus a quiet line for what it covers. Not wrapped in a gradient card.
 - **Charts (Usage page)**: flat, warm palette (terracotta, forest, ink tints), no gradients, no glow, direct labels preferred over legends, no chart junk.
 - **Tables / lists** (transactions, activity): rows separated by whitespace and hairlines, not boxed zebra stripes.
@@ -193,7 +204,7 @@ The owner's decision for these pages (November 12, 2026): **build them as design
 - Tokens only. The marketing values below are tokens in `globals.css`; no component writes a color.
 - Text meets WCAG AA. Where the design's colors do not, the build uses the nearest token that does (see "Contrast" below).
 - Visible focus, keyboard reach, 44px tap targets on phones, reduced motion respected. The landing page moves only as "Marketing motion" below allows.
-- One icon set (Lucide, at the navigation's stroke weight). The WhatsApp, X and Instagram marks are drawn from the design, because Lucide carries no brand marks.
+- One icon set: Phosphor, regular weight (see section 6). The WhatsApp, X and Instagram marks are drawn from the design, as brand marks.
 - The real logo, through `components/ui/Logo.tsx`. The design's hexagon was a placeholder.
 - No invented numbers. Pack names, credits and prices come from `lib/pricing.ts`, which `pnpm run test:pricing` checks against the backend.
 - No address written in code. The chat link is built from `NEXT_PUBLIC_ZOX_WHATSAPP_NUMBER`.
@@ -283,12 +294,27 @@ The landing page has a fixed motion budget. Section 9's vocabulary still holds f
 |---|---|---|---|---|
 | 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. The fold follows the scroll over the first 140px (owner's choice, November 17, 2026): slow scrolling folds it slowly, stopping holds it part-way, scrolling up unfolds it. | Tied to scroll; a `--dur-fast` ease-out smooths wheel steps | One CSS variable set per frame |
 | 2 | Hero phone demo | The chat opens with two exchanges already there. Then it plays the other scenarios in `content/chat-script.ts` (a YouTube link, voice notes both ways, a photo of a problem, a generated poster, a web search, an Instagram download once a link is set) in a shuffled order, repeating none until every one has played, for as long as the phone is on screen (owner's request, November 16, 2026, over "plays once"). Zox shows "typing…" or "recording audio…" in the header and, as WhatsApp now does, a typing bubble in the chat (three dots that rise in turn, or a pulsing mic while recording; the only looping motion on the page, and only while Zox is "typing"); a new bubble fades in and the chat scrolls up under it. The status bar is live: the visitor's real time, Wi-Fi and signal that drift every few seconds, a battery that drains a percent at a time. | `--dur-base` fade, `--dur-slow` scroll | CSS and a small script; no animation library |
-| 3 | Button icon slide | The icon inside a button nudges 2px toward the action on hover. | `--dur-fast` | CSS |
-| 4 | Bento illustration | The small drawing in a card shifts a few px on card hover. The card itself does not move, scale or gain a shadow. | `--dur-base` | CSS |
-| 5 | FAQ open and close | The answer's height and opacity. | `--dur-base` | CSS (`interpolate-size`, `::details-content`) |
-| 6 | Heading reveal | Section headings only, once, as they enter: fade plus an 8px rise. Body copy does not animate. | `--dur-slow` | `IntersectionObserver` + CSS |
 
-Banned on the public pages: parallax, cursor effects, marquees, count-up numbers, hover shadows, hover scale on cards or links, looping decoration, scroll-linked values (the navbar fold is the one exception), hide-on-scroll headers.
+**Section reveals (owner's change, November 17, 2026).** The fixed list above left the lower sections feeling dead. Each major landing section now gets **exactly one** content-driven animation, played once when the section first scrolls into view:
+
+- It explains the content, not decorates it: a rule drawing in, a highlight sweeping a line of a document, a timeline filling, source pills arriving in order, a pile collapsing into one chat bubble.
+- Under 1.2 seconds in total. Only `transform`, `opacity` or SVG stroke drawing (`stroke-dashoffset`).
+- It starts from the section's own observer (`components/marketing/Reveal.tsx`), once, and never replays on scroll back.
+- A section already on screen when the page loads is shown in its final state, not animated.
+
+| Section | Its one animation |
+|---|---|
+| 03 Trust | The hairline rule draws in from the left. |
+| 04 Problem | The pile of tabs and papers collapses into the one chat bubble. |
+| 05 Five jobs | Each job's small illustration plays once: the two bubbles arrive, the PDF highlight sweeps and the summary chip appears, the source pills arrive in order, the video timeline fills, the annotation bracket draws. |
+| 06 Pricing teaser | The price rows reveal with a 50ms stagger. |
+| 07 FAQ | The answer's height and opacity as it opens and closes (no reveal on scroll). |
+| 08 CTA | The composer rises 8px as it fades in. |
+| 09 Footer | The large faded wordmark rises into place. |
+
+**Micro-interactions** (on top of the reveals): button press feedback; the icon in a button nudges 2px toward its action on hover; a feature card's illustration reacts slightly on hover (the card itself never moves, scales or gains a shadow).
+
+Still banned on the public pages: parallax, cursor effects, marquees, count-up numbers, hover shadows, hover scale on cards or links, looping decoration (the phone's typing dots are the one exception), scroll-linked values (the navbar fold is the one exception), hide-on-scroll headers.
 
 **Rules**
 
@@ -302,4 +328,4 @@ Banned on the public pages: parallax, cursor effects, marquees, count-up numbers
 
 **Reduced motion**
 
-With `prefers-reduced-motion: reduce`: the navbar snaps between flat and pill at the halfway point, with nothing in between; the phone shows its opening conversation, still, and plays nothing; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
+With `prefers-reduced-motion: reduce`: the navbar snaps between flat and pill at the halfway point, with nothing in between; the phone shows its opening conversation, still, and plays nothing; every section reveal shows its final state at once (the rule drawn, the pile already collapsed, the rows in place); the icon slide and illustration shift do not run; the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
