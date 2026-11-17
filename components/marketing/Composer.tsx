@@ -1,8 +1,7 @@
 "use client";
 
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
-import { ICON_STROKE } from "@/components/shell/nav";
 import { cn } from "@/lib/cn";
 import { CHAT_MESSAGE_MAX, START_CHAT, cleanChatMessage, whatsAppLinkWithText } from "@/lib/site";
 import { COMPOSER } from "./content";
@@ -156,14 +155,14 @@ export function Composer({ className }: { className?: string }) {
           aria-describedby={noteId}
           autoComplete="off"
           enterKeyHint="send"
-          className="min-w-0 flex-1 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-2"
+          className="min-h-11 min-w-0 flex-1 bg-transparent py-2 text-base text-ink outline-none placeholder:text-ink-2"
         />
         <button
           type="submit"
           aria-label={COMPOSER.sendLabel}
           className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent-strong text-on-accent transition-[background-color,transform] duration-(--dur-fast) ease-zox hover:bg-accent-deep active:scale-[0.96]"
         >
-          <ArrowUp aria-hidden="true" size={20} strokeWidth={ICON_STROKE + 0.4} />
+          <ArrowUp aria-hidden="true" size={20} weight="bold" />
         </button>
       </form>
       <HandoffNote id={noteId} status={status} href={href} className="mt-3" />

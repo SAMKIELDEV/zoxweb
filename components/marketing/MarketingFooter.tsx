@@ -5,6 +5,8 @@ import { cn } from "@/lib/cn";
 import { INSTAGRAM_URL, WHATSAPP_URL, X_URL } from "@/lib/site";
 import { InstagramIcon, WhatsAppIcon, XIcon } from "./BrandIcons";
 import { FOOTER_COLUMNS, FOOTER_DISCLAIMER, FOOTER_LEGAL_LINE, FOOTER_TAGLINE } from "./content";
+import { HideWhenSignedIn } from "./HideWhenSignedIn";
+import { Reveal } from "./Reveal";
 import { container } from "./Section";
 
 interface SocialLink {
@@ -66,19 +68,23 @@ export function MarketingFooter() {
               <div key={column.title}>
                 <h2 className="mb-3 font-sans text-note font-semibold tracking-normal text-on-night">{column.title}</h2>
                 <ul role="list">
-                  {column.links.map((link) => (
-                    <li key={link.href}>
-                      {link.external ? (
-                        <a href={link.href} target="_blank" rel="noreferrer" className={linkClass}>
-                          {link.label}
-                        </a>
-                      ) : (
-                        <Link href={link.href} className={linkClass}>
-                          {link.label}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
+                  {column.links.map((link) => {
+                    const item = (
+                      <li key={link.href}>
+                        {link.external ? (
+                          <a href={link.href} target="_blank" rel="noreferrer" className={linkClass}>
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link href={link.href} className={linkClass}>
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                    // A signed-in visitor has Dashboard right below; "Sign in" would be a dead end.
+                    return link.href === "/login" ? <HideWhenSignedIn key={link.href}>{item}</HideWhenSignedIn> : item;
+                  })}
                 </ul>
               </div>
             ))}
@@ -90,10 +96,14 @@ export function MarketingFooter() {
           <small className="text-xs">{FOOTER_DISCLAIMER}</small>
         </p>
 
-        {/* The large faded wordmark: decoration, cut off by the card's lower edge. */}
-        <div aria-hidden="true" className="pointer-events-none mt-8 -mb-[13%] select-none">
-          <Logo alt="" className="h-auto w-full opacity-[0.07]" />
-        </div>
+        {/* The large faded wordmark: decoration, cut off by the card's lower edge. The footer's
+            one animation: it rises into place once. */}
+        <Reveal aria-hidden="true" threshold={0.2} className="pointer-events-none mt-8 -mb-[17%] select-none">
+          <Logo
+            alt=""
+            className="h-auto w-full opacity-[0.07] transition-[opacity,transform] duration-1000 ease-zox group-data-[reveal=ready]/reveal:translate-y-1/4 group-data-[reveal=ready]/reveal:opacity-0"
+          />
+        </Reveal>
       </div>
     </footer>
   );

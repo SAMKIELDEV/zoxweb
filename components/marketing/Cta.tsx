@@ -5,11 +5,13 @@ import { WhatsAppIcon } from "./BrandIcons";
 import { Composer } from "./Composer";
 import { CTA } from "./content";
 import { Glow } from "./Hero";
+import { Reveal } from "./Reveal";
 import { SectionTitle, container } from "./Section";
 
 /**
  * Brief 08: the hero's background again, centred: two lines, one button,
- * and the composer repeated.
+ * and the composer repeated. Its one animation: the composer rises 8px as
+ * it fades in, once.
  */
 export function Cta() {
   return (
@@ -28,7 +30,11 @@ export function Cta() {
           <WhatsAppIcon />
           {CTA.button}
         </ButtonLink>
-        <Composer className="relative w-full max-w-120 text-left" />
+        <Reveal threshold={0.6} className="relative w-full max-w-120 text-left">
+          <div className="transition-[opacity,transform] duration-(--dur-slow) ease-zox group-data-[reveal=ready]/reveal:translate-y-2 group-data-[reveal=ready]/reveal:opacity-0">
+            <Composer />
+          </div>
+        </Reveal>
       </div>
     </section>
   );

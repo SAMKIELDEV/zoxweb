@@ -1,6 +1,5 @@
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import { ICON_STROKE } from "@/components/shell/nav";
 import { cn } from "@/lib/cn";
 import { FAQS, FAQ_HEADING } from "./content";
 import { SectionTitle, container } from "./Section";
@@ -8,6 +7,8 @@ import { SectionTitle, container } from "./Section";
 /**
  * Brief 07: plain dividers, no card per question, the first answer open.
  * Native <details>, so it opens with a keyboard and works without script.
+ * The section's one animation is the answer opening and closing: height
+ * and opacity (`.faq-item` in globals.css).
  */
 export function Faq() {
   return (
@@ -16,13 +17,12 @@ export function Faq() {
         <SectionTitle id="faq-heading" lines={[FAQ_HEADING]} />
         <div className="divide-y divide-line border-y border-line">
           {FAQS.map((faq, index) => (
-            <details key={faq.question} open={index === 0} className="group">
+            <details key={faq.question} open={index === 0} className="faq-item group">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-4 text-lead font-medium text-ink [&::-webkit-details-marker]:hidden">
                 {faq.question}
                 <Plus
                   aria-hidden="true"
                   size={20}
-                  strokeWidth={ICON_STROKE}
                   className="shrink-0 text-ink-2 transition-transform duration-(--dur-base) ease-zox group-open:rotate-45"
                 />
               </summary>

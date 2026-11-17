@@ -1,19 +1,29 @@
 import { cn } from "@/lib/cn";
 import { JOBS, PROBLEM, SOLUTION, TRUST, HOW_IT_WORKS_ID, type Job } from "./content";
 import { JobIllustration, ProblemArt } from "./Illustrations";
+import { Reveal } from "./Reveal";
 import { SectionTitle, container } from "./Section";
 
-/** Brief 03: one number, one line. No logo wall, no testimonials. */
+/**
+ * Brief 03: one number, treated as a signature. An oversized serif figure
+ * with its line beside it (below it on a phone), a hairline rule that draws
+ * in once, and who makes Zox. No cards, no logo wall, no other stats.
+ */
 export function Trust() {
   return (
-    <section aria-label="Who uses Zox" className="border-y border-line">
-      <div className={cn(container, "flex flex-col gap-2 py-8 md:flex-row md:items-baseline md:justify-between")}>
-        <p className="text-lead text-ink">
-          <span className="mr-2 font-display text-figure font-semibold text-accent-ink tabular-nums">{TRUST.count}</span>
-          {TRUST.line}
+    <section aria-label="Who uses Zox">
+      <Reveal className={cn(container, "py-16 lg:py-24")}>
+        <p className="flex flex-col gap-2 md:flex-row md:items-end md:gap-8">
+          <span className="font-display text-signature font-semibold text-accent-ink tabular-nums">{TRUST.count}</span>
+          <span className="max-w-110 pb-1 font-display text-title text-ink md:pb-3">{TRUST.line}</span>
         </p>
-        <p className="text-note text-ink-2">{TRUST.maker}</p>
-      </div>
+        {/* The section's one animation: the rule draws in from the left. */}
+        <span
+          aria-hidden="true"
+          className="mt-8 block h-px w-full origin-left bg-line transition-transform duration-1000 ease-zox group-data-[reveal=ready]/reveal:scale-x-0"
+        />
+        <p className="mt-4 text-note text-ink-2">{TRUST.maker}</p>
+      </Reveal>
     </section>
   );
 }
@@ -24,10 +34,13 @@ export function Problem() {
     <section aria-labelledby="problem-heading">
       <div className={cn(container, "grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28")}>
         <div>
-          <SectionTitle id="problem-heading" lines={PROBLEM.heading} className="mb-5" />
+          {/* Two lines at every width, as the brief caps it. */}
+          <SectionTitle id="problem-heading" lines={PROBLEM.heading} className="mb-5" fit />
           <p className="max-w-120 text-lead text-ink-2">{PROBLEM.body}</p>
         </div>
-        <ProblemArt className="mx-auto max-w-120" />
+        <Reveal threshold={0.5} className="mx-auto w-full max-w-120">
+          <ProblemArt />
+        </Reveal>
       </div>
     </section>
   );

@@ -96,6 +96,11 @@
   --color-on-night: #f0e8dc; /* text on night */
   --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
   --color-night-line: #3d342c; /* hairlines and chips on night */
+  /* The "five jobs" bento band (variant A): deep forest, with cream cards. */
+  --color-band-deep: #2c3b2e;
+  --color-on-band: #f0e8dc; /* text on band-deep, 9.6:1 */
+  --color-on-band-2: #c3cbbf; /* secondary text on band-deep, 6.9:1 */
+  --color-band-card: #faf6f0; /* the cards on band-deep */
 
   /* The hero phone (components/marketing/PhoneDemo.tsx): a generic
      handset and a WhatsApp-style chat screen, so the picture reads as the
@@ -122,6 +127,13 @@
   /* 38 to 61px, and smaller on phones: the longer headline line is about
      9.7 times the font size wide, so under 432px the size follows the
      content column (viewport less 48px of padding) to keep two lines. */
+  /* The Trust section's signature number: oversized serif, 72 to 144px. */
+  --text-signature: clamp(4.5rem, 14vw, 9rem);
+  --text-signature--line-height: 0.9;
+  /* A section title that must stay on two lines on a phone (the Problem
+     heading): it follows the column width below 760px. */
+  --text-title-fit: clamp(1.25rem, calc((100vw - 3rem) / 15.5), 2.6rem);
+  --text-title-fit--line-height: 1.15;
   --text-hero: clamp(1.6rem, min(calc((100vw - 3rem) / 10), max(2.4rem, 5vw)), 3.8rem);
   --text-hero--line-height: 1.08;
   --text-title: clamp(1.8rem, 3vw, 2.6rem); /* 29 to 42px */
@@ -192,8 +204,12 @@
   --color-accent-tint: #2e1e10;
   --color-forest-tint: #1c2a1e;
   --color-eyebrow: #d4845a;
-  --color-night: #0c0905;
-  --color-night-line: #2e2519;
+  /* Dark theme: the footer card sits above the page (#141009), not below it,
+     so it still reads as a card (audit, Must fix 2). */
+  --color-night: #241c14;
+  --color-night-line: #3a2f24;
+  --color-band-deep: #18231a;
+  --color-band-card: #2b2219; /* warm and raised from the band, so cards and their drawings both read */
   --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
   --shadow-device: 0 2px 4px rgb(8 5 2 / 0.4), 0 30px 60px rgb(8 5 2 / 0.5);
@@ -324,6 +340,25 @@
   }
 
   /* A new bubble in the hero phone fades in (components/marketing/PhoneDemo.tsx). */
+  /* FAQ answers open and close with height and opacity (DESIGN.md,
+     "Marketing motion"). Browsers without ::details-content just snap. */
+  .faq-item {
+    interpolate-size: allow-keywords;
+  }
+  .faq-item::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      block-size var(--dur-base) var(--ease-zox),
+      opacity var(--dur-base) var(--ease-zox),
+      content-visibility var(--dur-base) allow-discrete;
+  }
+  .faq-item[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+
   @keyframes zox-bubble-in {
     from {
       opacity: 0;

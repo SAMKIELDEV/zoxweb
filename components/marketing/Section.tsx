@@ -18,12 +18,16 @@ export function Eyebrow({ children }: { children: ReactNode }) {
  */
 export const headingTracking = "tracking-normal";
 
-/** A section title. `lines` are stacked, as the design breaks them. */
-export function SectionTitle({ id, lines, className }: { id: string; lines: readonly string[]; className?: string }) {
+/**
+ * A section title. `lines` are stacked, as the design breaks them. `fit`
+ * keeps each line whole on a phone (the size follows the column width
+ * there), for a heading the brief caps at two lines.
+ */
+export function SectionTitle({ id, lines, className, fit = false }: { id: string; lines: readonly string[]; className?: string; fit?: boolean }) {
   return (
-    <h2 id={id} className={cn("font-display text-title font-semibold text-ink", headingTracking, className)}>
+    <h2 id={id} className={cn("font-display font-semibold text-ink", fit ? "text-title-fit" : "text-title", headingTracking, className)}>
       {lines.map((line, index) => (
-        <span key={line} className="block">
+        <span key={line} className={cn("block", fit && "whitespace-nowrap")}>
           {line}
           {/* A space between the stacked lines, so the heading reads as one sentence. */}
           {index < lines.length - 1 ? " " : null}
