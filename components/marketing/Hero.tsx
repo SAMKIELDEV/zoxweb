@@ -25,11 +25,11 @@ export function Glow({ className }: { className?: string }) {
 /**
  * The hero's phone, with the glow behind it. The handset, the chat screen
  * and the demo are PhoneDemo; they render with the page, and only the demo
- * waits for script.
+ * waits for script. The sign-in page shows it too.
  */
-function Phone() {
+export function Phone({ className }: { className?: string }) {
   return (
-    <div className="relative mx-auto w-full max-w-80 lg:-mt-6">
+    <div className={cn("relative mx-auto w-full max-w-80", className)}>
       <Glow className="-inset-x-10 -inset-y-8" />
       <div className="relative">
         <PhoneDemo />
@@ -100,7 +100,7 @@ export function Hero() {
           </div>
         </div>
 
-        <Phone />
+        <Phone className="lg:-mt-6" />
       </div>
     </section>
   );

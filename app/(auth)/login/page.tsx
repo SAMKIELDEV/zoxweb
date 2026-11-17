@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { ThemeToggle } from "@/components/shell/ThemeToggle";
+import { Phone } from "@/components/marketing/Hero";
+import { MarketingNav } from "@/components/marketing/MarketingNav";
+import { container, headingTracking } from "@/components/marketing/Section";
 import { ButtonLink } from "@/components/ui/Button";
-import { Logo } from "@/components/ui/Logo";
-import { TextLink } from "@/components/ui/TextLink";
+import { cn } from "@/lib/cn";
 import { ACCOUNTS_URL, accountsUrl, safeNext } from "@/lib/paths";
 import { hasSessionCookie, publicOrigin } from "@/lib/session";
 
@@ -15,10 +16,13 @@ interface LoginPageProps {
 }
 
 /**
- * The way in. Zox has no sign-in form of its own: the button goes to
- * SAMKIEL ID at the accounts site, which signs the person in for every
- * samkiel.tech site and sends them back here, to ?next= when that is a
- * dashboard path and to Home otherwise.
+ * The way in, dressed like the landing page: its header, a display
+ * headline, pill buttons, and the live phone beside them.
+ *
+ * Zox has no sign-in form of its own: the button goes to SAMKIEL ID at the
+ * accounts site, which signs the person in for every samkiel.tech site and
+ * sends them back here, to ?next= when that is a dashboard path and to Home
+ * otherwise.
  */
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const query = await searchParams;
@@ -39,38 +43,43 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const accountsHost = new URL(ACCOUNTS_URL).host;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-280 flex-col px-5 md:px-8 lg:px-12">
-      <header className="flex h-16 items-center justify-between">
-        <Logo className="h-7" />
-        <ThemeToggle />
-      </header>
-
-      <main className="flex flex-1 flex-col pt-12 pb-16 md:pt-24">
-        <div className="w-full max-w-96">
-          <h1 className="text-2xl font-semibold text-ink">Sign in</h1>
-          <p className="mt-3 text-base text-ink-2">
-            Use your SAMKIEL ID to see your credits and connect WhatsApp.
-          </p>
-
-          {ended ? (
-            <p role="status" className="mt-6 border-l-2 border-accent pl-4 text-base text-ink">
-              You were signed out. Sign in again to carry on.
+    // The public pages' type: Fraunces at its optical sizes (see app/(marketing)/layout.tsx).
+    <div className="flex min-h-dvh flex-col [font-variation-settings:normal]">
+      <MarketingNav />
+      <main className="flex-1 overflow-x-clip">
+        <div className={cn(container, "grid items-center gap-14 pt-8 pb-20 lg:grid-cols-[1.3fr_1fr] lg:pt-6")}>
+          <div className="max-w-140">
+            <h1 className={cn("mb-5 font-display text-hero font-semibold text-ink", headingTracking)}>
+              Sign in to <em className="text-accent italic">Zox.</em>
+            </h1>
+            <p className="mb-8 text-lead text-ink-2">
+              Use your SAMKIEL ID to see your credits and connect WhatsApp.
             </p>
-          ) : null}
 
-          <div className="mt-10">
-            <ButtonLink href={accountsUrl("login", origin, next)} variant="primary" className="w-full">
-              Continue with SAMKIEL ID
-            </ButtonLink>
-            <p className="mt-3 text-sm text-ink-2">
-              You sign in at {accountsHost} and come straight back.
-            </p>
+            {ended ? (
+              <p role="status" className="mb-8 border-l-2 border-accent pl-4 text-base text-ink">
+                You were signed out. Sign in again to carry on.
+              </p>
+            ) : null}
+
+            <div className="flex flex-wrap items-center gap-3">
+              <ButtonLink
+                href={accountsUrl("login", origin, next)}
+                variant="primary"
+                size="lg"
+                shape="pill"
+                className="shadow-cta"
+              >
+                Continue with SAMKIEL ID
+              </ButtonLink>
+              <ButtonLink href={accountsUrl("register", origin, next)} variant="secondary" size="lg" shape="pill">
+                Create a SAMKIEL ID
+              </ButtonLink>
+            </div>
+            <p className="mt-4 text-note text-ink-2">You sign in at {accountsHost} and come straight back.</p>
           </div>
 
-          <p className="mt-8 text-sm text-ink-2">
-            No SAMKIEL ID yet?{" "}
-            <TextLink href={accountsUrl("register", origin, next)}>Create one</TextLink>
-          </p>
+          <Phone />
         </div>
       </main>
     </div>
