@@ -7,11 +7,18 @@ import type { Snapshot } from "@/lib/api/types";
 
 export interface UseAccountOptions {
   /**
-   * Poll interval in ms: while a WhatsApp link code is live, and on Home
-   * so the balance follows chats. Polling pauses while the tab is hidden.
+   * Poll interval in ms: faster while a WhatsApp link code is live, and on
+   * Home so the balance follows chats. Polling pauses while the tab is hidden.
    */
   refreshInterval?: number;
 }
+
+/**
+ * Every signed-in page re-reads the account this often (and when the tab
+ * comes back into focus), so a change made in the chat, such as an UNLINK,
+ * shows here within seconds instead of after a reload.
+ */
+export const ACCOUNT_SYNC_MS = 15_000;
 
 /**
  * The account snapshot, shared by every page through SWR's cache: the
@@ -20,7 +27,7 @@ export interface UseAccountOptions {
  */
 export function useAccount(options: UseAccountOptions = {}) {
   const { data, error, isLoading, isValidating, mutate } = useSWR<Snapshot, ApiError>(ACCOUNT_KEY, getAccount, {
-    refreshInterval: options.refreshInterval ?? 0,
+    refreshInterval: options.refreshInterval || ACCOUNT_SYNC_MS,
     refreshWhenHidden: false,
     revalidateOnFocus: true,
     dedupingInterval: 4000,
