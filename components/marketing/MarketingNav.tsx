@@ -8,9 +8,10 @@ import { ThemeToggle } from "@/components/shell/ThemeToggle";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { START_CHAT } from "@/lib/site";
-import { NAV_BUTTON, NAV_LINKS } from "./content";
+import { NAV_BUTTON, NAV_LINKS, NAV_SIGNED_IN } from "./content";
 import { NAV_Z_WIDTH, NavLogo } from "./NavLogo";
 import { container } from "./Section";
+import { useSignedIn } from "./useSignedIn";
 
 /**
  * The fold follows the scroll: it is flat at the top and fully a pill after
@@ -80,6 +81,9 @@ export function MarketingNav() {
   const headerRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
+  // Signed in: "Dashboard" where "Sign in" would be.
+  const signedIn = useSignedIn();
+  const links = signedIn ? NAV_LINKS.map((link) => (link.href === "/login" ? NAV_SIGNED_IN : link)) : NAV_LINKS;
 
   // Where the pill goes, from the row's width and the cluster's.
   const measure = useCallback(() => {
@@ -233,7 +237,7 @@ export function MarketingNav() {
                 style={{ transform: `translateX(${atProgress(`${geometry.clusterDx}px`)})` }}
               >
                 <ul role="list" className="hidden items-center md:flex">
-                  {NAV_LINKS.map((link) => (
+                  {links.map((link) => (
                     <li key={link.href}>
                       <Link href={link.href} className={linkClass}>
                         {link.label}
@@ -276,7 +280,7 @@ export function MarketingNav() {
               className="absolute inset-x-0 top-full rounded-lg border border-line bg-card p-3 shadow-card md:hidden"
             >
               <ul role="list" className="mb-3 flex flex-col">
-                {NAV_LINKS.map((link) => (
+                {links.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} onClick={close} className={cn(linkClass, "w-full text-base")}>
                       {link.label}

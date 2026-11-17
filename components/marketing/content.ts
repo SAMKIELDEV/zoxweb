@@ -26,6 +26,9 @@ export const NAV_LINKS: readonly NavLink[] = [
   { label: "Sign in", href: "/login" },
 ];
 
+/** Takes the place of "Sign in" for a visitor who is already signed in. */
+export const NAV_SIGNED_IN: NavLink = { label: "Dashboard", href: "/dashboard" };
+
 export const NAV_BUTTON = "Text Zox";
 
 // ---------------------------------------------------------------------------
