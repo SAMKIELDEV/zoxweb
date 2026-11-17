@@ -8,10 +8,10 @@ import { PlayOnMount, Reveal } from "./Reveal";
 import { container, headingTracking } from "./Section";
 
 /** The section title, stacked as the brief breaks it. */
-function Title({ id, onDark = false }: { id: string; onDark?: boolean }) {
+function Title({ id }: { id: string }) {
   return (
     <div className="mb-12 max-w-150">
-      <h2 id={id} className={cn("font-display text-title font-semibold", onDark ? "text-on-band" : "text-ink", headingTracking)}>
+      <h2 id={id} className={cn("font-display text-title font-semibold text-ink", headingTracking)}>
         {SOLUTION.heading.map((line, index) => (
           <span key={line} className="block">
             {line}
@@ -19,68 +19,17 @@ function Title({ id, onDark = false }: { id: string; onDark?: boolean }) {
           </span>
         ))}
       </h2>
-      <p className={cn("mt-4 text-lead", onDark ? "text-on-band-2" : "text-ink-2")}>{SOLUTION.subtitle}</p>
+      <p className="mt-4 text-lead text-ink-2">{SOLUTION.subtitle}</p>
     </div>
   );
 }
 
-// ─── Variant A: bento on a deep forest band ──────────────────────────────────
-
 /**
- * Where each card sits. From 1024px a 12-column grid: "Ask anything" is the
- * tall card on the left (7 columns, two rows), PDF and Search stack on the
- * right (5), Video (5) and Photo (7) run across the bottom. From 768px a
- * 6-column grid keeps the sizes different. Phones stack them.
+ * Section 05, the five jobs: a numbered list on the left (tabs from 1024px),
+ * one large panel on the right showing the chosen job, which plays its
+ * illustration once. Phones get a stacked list with a small illustration
+ * under each job.
  */
-const BENTO: Record<Job["art"], string> = {
-  ask: "md:col-span-6 lg:col-span-7 lg:row-span-2",
-  pdf: "md:col-span-3 lg:col-span-5",
-  search: "md:col-span-3 lg:col-span-5",
-  video: "md:col-span-2 lg:col-span-5",
-  photo: "md:col-span-4 lg:col-span-7",
-};
-const ORDER: Job["art"][] = ["ask", "pdf", "search", "video", "photo"];
-
-function BentoCard({ job }: { job: Job }) {
-  const large = job.art === "ask";
-  return (
-    <Reveal
-      as="li"
-      className={cn(
-        "group/card flex flex-col justify-between gap-6 rounded-lg bg-band-card p-6",
-        large ? "lg:p-9" : "",
-        BENTO[job.art],
-      )}
-    >
-      <JobArt art={job.art} className={cn("mx-auto", large ? "w-full max-w-none lg:my-auto" : "max-w-72")} />
-      <div>
-        <h3 className={cn("mb-2 font-display font-semibold text-ink", large ? "text-xl" : "text-lead")}>{job.title}</h3>
-        <p className={cn("text-ink-2", large ? "max-w-110 text-lead" : "text-copy")}>{job.body}</p>
-      </div>
-    </Reveal>
-  );
-}
-
-/** Section 05, variant A. */
-export function SolutionBento() {
-  const jobs = ORDER.map((art) => JOBS.find((job) => job.art === art)!);
-  return (
-    <section id={HOW_IT_WORKS_ID} aria-labelledby="solution-heading-a" className="scroll-mt-24 bg-band-deep">
-      <div className={cn(container, "py-20 lg:py-28")}>
-        <Title id="solution-heading-a" onDark />
-        <ul role="list" className="grid gap-4 md:grid-cols-6 lg:grid-cols-12">
-          {jobs.map((job) => (
-            <BentoCard key={job.art} job={job} />
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-// ─── Variant B: editorial list with one large panel ──────────────────────────
-
-/** Section 05, variant B. */
 export function SolutionEditorial() {
   const [selected, setSelected] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);

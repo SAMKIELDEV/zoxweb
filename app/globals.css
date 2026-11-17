@@ -96,11 +96,6 @@
   --color-on-night: #f0e8dc; /* text on night */
   --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
   --color-night-line: #3d342c; /* hairlines and chips on night */
-  /* The "five jobs" bento band (variant A): deep forest, with cream cards. */
-  --color-band-deep: #2c3b2e;
-  --color-on-band: #f0e8dc; /* text on band-deep, 9.6:1 */
-  --color-on-band-2: #c3cbbf; /* secondary text on band-deep, 6.9:1 */
-  --color-band-card: #faf6f0; /* the cards on band-deep */
 
   /* The hero phone (components/marketing/PhoneDemo.tsx): a generic
      handset and a WhatsApp-style chat screen, so the picture reads as the
@@ -208,8 +203,7 @@
      so it still reads as a card (audit, Must fix 2). */
   --color-night: #241c14;
   --color-night-line: #3a2f24;
-  --color-band-deep: #18231a;
-  --color-band-card: #2b2219; /* warm and raised from the band, so cards and their drawings both read */
+
   --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
   --shadow-device: 0 2px 4px rgb(8 5 2 / 0.4), 0 30px 60px rgb(8 5 2 / 0.5);
