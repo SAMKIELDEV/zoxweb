@@ -281,20 +281,20 @@ The landing page has a fixed motion budget. Section 9's vocabulary still holds f
 
 | # | Effect | What moves | Timing | Built with |
 |---|---|---|---|---|
-| 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. | `--dur-nav` (700ms), `ease-nav` (ease-in-out); slower than the rest at the owner's request, November 17, 2026 | CSS transitions |
+| 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. The fold follows the scroll over the first 140px (owner's choice, November 17, 2026): slow scrolling folds it slowly, stopping holds it part-way, scrolling up unfolds it. | Tied to scroll; a `--dur-fast` ease-out smooths wheel steps | One CSS variable set per frame |
 | 2 | Hero phone demo | The chat opens with two exchanges already there. Then it plays the other scenarios in `content/chat-script.ts` (a YouTube link, voice notes both ways, a photo of a problem, a generated poster, a web search, an Instagram download once a link is set) in a shuffled order, repeating none until every one has played, for as long as the phone is on screen (owner's request, November 16, 2026, over "plays once"). Zox shows "typing…" or "recording audio…" first; a new bubble fades in and the chat scrolls up under it. The status bar is live: the visitor's real time, Wi-Fi and signal that drift every few seconds, a battery that drains a percent at a time. | `--dur-base` fade, `--dur-slow` scroll | CSS and a small script; no animation library |
 | 3 | Button icon slide | The icon inside a button nudges 2px toward the action on hover. | `--dur-fast` | CSS |
 | 4 | Bento illustration | The small drawing in a card shifts a few px on card hover. The card itself does not move, scale or gain a shadow. | `--dur-base` | CSS |
 | 5 | FAQ open and close | The answer's height and opacity. | `--dur-base` | CSS (`interpolate-size`, `::details-content`) |
 | 6 | Heading reveal | Section headings only, once, as they enter: fade plus an 8px rise. Body copy does not animate. | `--dur-slow` | `IntersectionObserver` + CSS |
 
-Banned on the public pages: parallax, cursor effects, marquees, count-up numbers, hover shadows, hover scale on cards or links, looping decoration, scroll-linked values, hide-on-scroll headers.
+Banned on the public pages: parallax, cursor effects, marquees, count-up numbers, hover shadows, hover scale on cards or links, looping decoration, scroll-linked values (the navbar fold is the one exception), hide-on-scroll headers.
 
 **Rules**
 
-- Durations and easing come from the tokens (`--dur-fast` 140ms, `--dur-base` 240ms, `--dur-slow` 420ms, `ease-zox`), or from `lib/motion.ts` in script. The navbar fold alone has its own pair, `--dur-nav` 700ms and `ease-nav`. No other curves.
+- Durations and easing come from the tokens (`--dur-fast` 140ms, `--dur-base` 240ms, `--dur-slow` 420ms, `ease-zox`), or from `lib/motion.ts` in script. No other curves.
 - Animate `transform` and `opacity`. The navbar pill also animates `clip-path` on one childless layer. Nothing animates `width`, `height`, `top` or `left` on an element with children, except the FAQ answer, whose height change is confined to that one block.
-- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. No scroll-linked animation.
+- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. The navbar fold is the only scroll-linked effect, and it sets one CSS variable per frame, never React state.
 - `will-change` only where a trace shows it helps. None is set by default.
 - Effects that CSS can do stay in CSS. The landing page ships no animation library: the hero's scroll is one transform set from script. If one is ever needed, it is Motion's `m` components inside `LazyMotion` with `domAnimation`.
 - Nothing above the fold waits for motion. The headline and the phone shell render at once; the demo starts after hydration, in idle time.
@@ -302,4 +302,4 @@ Banned on the public pages: parallax, cursor effects, marquees, count-up numbers
 
 **Reduced motion**
 
-With `prefers-reduced-motion: reduce`: the navbar switches state at once (the global rule cuts transitions to 1ms); the phone shows its opening conversation, still, and plays nothing; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
+With `prefers-reduced-motion: reduce`: the navbar snaps between flat and pill at the halfway point, with nothing in between; the phone shows its opening conversation, still, and plays nothing; the icon slide, illustration shift and heading reveal do not run (headings are simply there); the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.

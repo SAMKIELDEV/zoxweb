@@ -13,11 +13,11 @@ import { NAV_Z_WIDTH, NavLogo } from "./NavLogo";
 import { container } from "./Section";
 
 /**
- * Scroll distances for the morph, with a gap between them so the header
- * never flickers near the boundary: compact past 24px, flat again under 8px.
+ * The fold follows the scroll: it is flat at the top and fully a pill after
+ * this many pixels. In between it is part-way, and stays there while the
+ * page is still.
  */
-const COMPACT_AT = 24;
-const FLAT_AT = 8;
+const FOLD_DISTANCE = 140;
 
 /** Pill geometry, in px. The flat bar is 80px tall; the pill sits 12px down and is 56px tall, so the row's centre line never moves. */
 const PILL_TOP = 12;
@@ -36,6 +36,9 @@ interface Geometry {
 
 const FLAT: Geometry = { inset: 0, logoDx: 0, clusterDx: 0 };
 
+/** Every moving part reads the fold's progress, --nav-p (0 flat, 1 pill), so a frame of scrolling sets one variable and React does not render. */
+const atProgress = (px: string) => `calc(var(--nav-p, 0) * ${px})`;
+
 const linkClass =
   "inline-flex min-h-11 items-center rounded-full px-3 text-sm font-medium text-ink-2 " +
   "transition-colors duration-(--dur-fast) ease-zox hover:text-ink";
@@ -49,24 +52,26 @@ function focusables(root: HTMLElement): HTMLElement[] {
  * The public pages' header (DESIGN.md, "Marketing motion", effect 1).
  *
  * At the top of the page it is flat: full width on the paper, wordmark
- * left, links and one button right. Once the page scrolls it folds into a
- * compact pill centred at the top, the wordmark folding into its Z, and
- * stays that way until the page is back at the top. It never hides.
+ * left, links and one button right. As the page scrolls it folds into a
+ * compact pill centred at the top, the wordmark folding into its Z. The
+ * fold follows the scroll (owner's choice, November 17, 2026): scroll
+ * slowly and it folds slowly, stop and it holds part-way, scroll back up
+ * and it unfolds. It never hides.
  *
  * The header is fixed; a spacer of constant height holds its place, so
- * nothing shifts. The fold animates transform, opacity and one clip-path,
- * in CSS. Positions are measured, not animated: the logo and the cluster
- * slide by a transform to where the pill will be, and the pill's surface
- * is a full-width layer clipped down to its size.
+ * nothing shifts. The fold moves transform, opacity and one clip-path.
+ * Positions are measured once (and on resize); the scroll only sets
+ * --nav-p, and each part works out where it is from that.
  *
  * Phones: the logo and a menu button (with the theme switch). The menu
  * traps focus while open and closes on Escape.
  */
 export function MarketingNav() {
+  // Past halfway: the logo's box shrinks to the Z, so its focus ring fits what shows.
   const [compact, setCompact] = useState(false);
   const [geometry, setGeometry] = useState<Geometry>(FLAT);
-  // Transitions switch on only after the first measurement, so a page
-  // loaded halfway down starts compact without animating into it.
+  // Smoothing switches on only after the first reading, so a page loaded
+  // halfway down starts folded without animating into it.
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -95,12 +100,21 @@ export function MarketingNav() {
     setGeometry({ inset, logoDx: inset + PILL_PAD_LEFT, clusterDx: -(inset + padRight) });
   }, []);
 
+  // The fold's progress from the scroll position. With reduced motion it
+  // snaps: flat or pill, nothing in between.
+  const follow = useCallback(() => {
+    const raw = Math.min(1, Math.max(0, window.scrollY / FOLD_DISTANCE));
+    const progress = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? (raw >= 0.5 ? 1 : 0) : raw;
+    headerRef.current?.style.setProperty("--nav-p", progress.toFixed(4));
+    setCompact(progress >= 0.5);
+  }, []);
+
   useLayoutEffect(() => {
     measure();
-    setCompact(window.scrollY > COMPACT_AT);
+    follow();
     const frame = requestAnimationFrame(() => setReady(true));
     return () => cancelAnimationFrame(frame);
-  }, [measure]);
+  }, [measure, follow]);
 
   // Re-measure when the row or the cluster changes size (resize, fonts, zoom).
   useEffect(() => {
@@ -110,15 +124,14 @@ export function MarketingNav() {
     return () => observer.disconnect();
   }, [measure]);
 
-  // A passive scroll listener, read once per frame, with hysteresis.
+  // A passive scroll listener, read once per frame.
   useEffect(() => {
     let frame = 0;
     const onScroll = () => {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        const y = window.scrollY;
-        setCompact((current) => (current ? y > FLAT_AT : y > COMPACT_AT));
+        follow();
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -126,7 +139,7 @@ export function MarketingNav() {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, []);
+  }, [follow]);
 
   // The menu: Escape closes it, Tab stays inside it, a press outside or a
   // switch to the wide layout closes it.
@@ -171,10 +184,11 @@ export function MarketingNav() {
     };
   }, [open, menuId]);
 
-  const g = compact ? geometry : FLAT;
-  const move = ready ? "transition-[transform,opacity,clip-path] duration-(--dur-nav) ease-nav" : "";
+  // A short ease between frames smooths a mouse wheel's jumps; it still stops where the scroll stops.
+  const move = ready ? "transition-[transform,opacity,clip-path] duration-(--dur-fast) ease-out" : "";
+  const side = (extra: number) => `calc(var(--nav-p, 0) * ${geometry.inset}px + ${extra}px)`;
   const clip = (extra: number): CSSProperties => ({
-    clipPath: `inset(${extra}px ${g.inset + extra}px ${extra}px ${g.inset + extra}px round ${PILL_RADIUS - extra}px)`,
+    clipPath: `inset(${extra}px ${side(extra)} ${extra}px ${side(extra)} round ${PILL_RADIUS - extra}px)`,
   });
   const close = () => setOpen(false);
 
@@ -194,7 +208,8 @@ export function MarketingNav() {
               style={{
                 top: PILL_TOP,
                 height: PILL_HEIGHT,
-                opacity: compact ? 1 : 0,
+                // The surface arrives in the first half of the fold, so the pill reads as one before it is done.
+                opacity: "min(1, calc(var(--nav-p, 0) * 2))",
                 filter: "drop-shadow(var(--drop-soft))",
               }}
             >
@@ -207,7 +222,7 @@ export function MarketingNav() {
                 href="/"
                 aria-label="Zox, home"
                 className={cn("-mx-2.5 inline-flex min-h-11 items-center rounded-sm px-2.5", move)}
-                style={{ transform: g.logoDx ? `translateX(${g.logoDx}px)` : undefined }}
+                style={{ transform: `translateX(${atProgress(`${geometry.logoDx}px`)})` }}
               >
                 <NavLogo compact={compact} animate={ready} />
               </Link>
@@ -215,7 +230,7 @@ export function MarketingNav() {
               <div
                 ref={clusterRef}
                 className={cn("flex items-center gap-1", move)}
-                style={{ transform: g.clusterDx ? `translateX(${g.clusterDx}px)` : undefined }}
+                style={{ transform: `translateX(${atProgress(`${geometry.clusterDx}px`)})` }}
               >
                 <ul role="list" className="hidden items-center md:flex">
                   {NAV_LINKS.map((link) => (

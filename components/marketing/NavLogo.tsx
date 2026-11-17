@@ -49,13 +49,14 @@ export function NavLogo({ compact, animate }: { compact: boolean; animate: boole
         loading="eager"
         className={cn(
           "absolute top-0 left-0 max-w-none",
-          animate && "transition-[opacity,transform] duration-(--dur-nav) ease-nav",
+          animate && "transition-[opacity,transform] duration-(--dur-fast) ease-out",
         )}
+        // Follows the header's fold progress (--nav-p, set by MarketingNav).
         style={{
           width: NAV_LOGO_WIDTH,
           height: NAV_LOGO_HEIGHT,
-          opacity: compact ? 0 : 1,
-          transform: compact ? `translateX(${OX_SLIDE}px)` : "none",
+          opacity: "calc(1 - var(--nav-p, 0))",
+          transform: `translateX(calc(var(--nav-p, 0) * ${OX_SLIDE}px))`,
         }}
       />
     </span>
