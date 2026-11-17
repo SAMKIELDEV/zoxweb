@@ -330,6 +330,21 @@
     }
   }
 
+  /* WhatsApp's typing bubble: each dot lifts and brightens in turn. Only
+     while Zox is "typing", and cut to one quiet pass with reduced motion. */
+  @keyframes zox-typing-dot {
+    0%,
+    60%,
+    100% {
+      opacity: 0.4;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(-2px);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

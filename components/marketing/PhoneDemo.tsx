@@ -42,8 +42,6 @@ const START_TIMEOUT = 1200;
 const SCENARIO_GAP = 2600;
 /** Older bubbles beyond this are dropped; they are long out of view. */
 const KEEP = 12;
-/** The gap between bubbles (gap-1.5), for the scroll. */
-const BUBBLE_GAP = 6;
 
 type SendStep = Extract<ChatStep, { type: "send" }>;
 const sends = (scenario: ChatScenario) => scenario.steps.filter((step): step is SendStep => step.type === "send");
@@ -219,22 +217,29 @@ export function PhoneDemo() {
     return () => window.clearTimeout(timer);
   }, [phase, onScreen, current, status, append]);
 
-  // The chat scrolls up under a new bubble: the list is pushed down by the
-  // bubble's height, then eases back. A transform only, so nothing is laid
-  // out again; with reduced motion the global rule makes it instant.
-  const shown = useRef(messages.length);
+  // The chat scrolls up under whatever arrives at the bottom (a bubble, the
+  // typing bubble, a reply taking its place). After each change, see how
+  // far a bubble that was already there moved up, start the list that far
+  // down, and ease it back: a transform only, so nothing is laid out again.
+  // Bubbles trimmed off the top do not move the rest, since the list is
+  // anchored to the bottom. With reduced motion the global rule makes it instant.
+  const lift = useRef(new Map<string, number>());
   useLayoutEffect(() => {
     const list = listRef.current;
-    const added = messages.length - shown.current;
-    shown.current = messages.length;
-    const last = list?.lastElementChild as HTMLElement | null;
-    if (!list || !last || added < 1 || reduced) return;
+    if (!list) return;
+    const items = [...list.querySelectorAll<HTMLElement>("[data-key]")];
+    const fromBottom = (item: HTMLElement) => list.offsetHeight - item.offsetTop;
+    const before = lift.current;
+    const anchor = items.find((item) => item.dataset.key !== "typing" && before.has(item.dataset.key!));
+    const moved = anchor ? fromBottom(anchor) - before.get(anchor.dataset.key!)! : 0;
+    lift.current = new Map(items.map((item) => [item.dataset.key!, fromBottom(item)]));
+    if (moved <= 0 || reduced) return;
     list.style.transition = "none";
-    list.style.transform = `translateY(${last.offsetHeight + BUBBLE_GAP}px)`;
+    list.style.transform = `translateY(${moved}px)`;
     void list.offsetHeight;
     list.style.transition = "transform var(--dur-slow) var(--ease-zox)";
     list.style.transform = "";
-  }, [messages, reduced]);
+  }, [messages, status, reduced]);
 
   useEffect(() => {
     currentRef.current = current;
@@ -305,6 +310,7 @@ export function PhoneDemo() {
                 {messages.map((message) => (
                   <div
                     key={message.key}
+                    data-key={message.key}
                     role="listitem"
                     className={cn(
                       message.from === "person" ? "ml-auto max-w-[84%]" : "mr-auto max-w-[86%]",
@@ -314,6 +320,39 @@ export function PhoneDemo() {
                     <ChatBubble from={message.from} content={message.content} time={time} receipt={message.receipt} />
                   </div>
                 ))}
+                {/* WhatsApp's typing bubble: three dots while Zox writes, a mic while it records. */}
+                {status !== "online" ? (
+                  <div
+                    data-key="typing"
+                    role="listitem"
+                    aria-label={statusLine}
+                    className="mr-auto animate-[zox-bubble-in_var(--dur-base)_var(--ease-zox)_both]"
+                  >
+                    <div className="relative flex h-9 items-center gap-1 rounded-md rounded-tl-none bg-wa-in px-3.5 shadow-wa">
+                      <span
+                        aria-hidden="true"
+                        className="absolute top-0 -left-2 h-3 w-2 bg-wa-in [clip-path:polygon(0_0,100%_0,100%_100%)]"
+                      />
+                      {status === "typing" ? (
+                        [0, 1, 2].map((dot) => (
+                          <span
+                            key={dot}
+                            aria-hidden="true"
+                            className="size-1.5 animate-[zox-typing-dot_1.2s_ease-in-out_infinite] rounded-full bg-wa-meta"
+                            style={{ animationDelay: `${dot * 160}ms` }}
+                          />
+                        ))
+                      ) : (
+                        <Mic
+                          aria-hidden="true"
+                          size={16}
+                          strokeWidth={2}
+                          className="animate-[zox-typing-dot_1.2s_ease-in-out_infinite] text-wa-green"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </div>
 
