@@ -1,56 +1,118 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useReducedMotion } from "motion/react";
+import { useEffect, useId, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ReferenceDot,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type { UsageDay } from "@/lib/api/types";
 import { cn } from "@/lib/cn";
 import { creditCount, formatCount, requestCount } from "@/lib/format";
-import { duration, ease, reducedFade } from "@/lib/motion";
 import { axisDays, busiestDay, formatDay, formatDayLong, sumDays } from "@/lib/usage";
 
-/** The tallest bar fills this share of the plot, leaving room for its label above. */
-const HEADROOM = 0.86;
-/** The draw-in is spread over at most this long, however many days there are. */
-const DRAW_SPREAD = 0.36;
 /** How many dates the axis shows at most. */
 const AXIS_LABELS = 5;
+/** The draw-in on first load. Polling and a change of period redraw without it. */
+const DRAW_MS = 900;
 
-const plotHeight = "h-44 md:h-56";
+/**
+ * "large": Usage, the page's one chart. "compact": Home's top band,
+ * beside the balance.
+ */
+export type ChartSize = "large" | "compact";
 
-/** Gaps shrink as the days grow, so 90 bars still fit a phone. */
-function gapFor(days: number): string {
-  if (days > 45) return "gap-px";
-  if (days > 20) return "gap-0.5 md:gap-1";
-  return "gap-1.5 md:gap-3";
+/** The chart's whole height, axes included, so the skeleton matches it. */
+const chartHeight: Record<ChartSize, string> = {
+  large: "h-60 md:h-72",
+  compact: "h-44 md:h-48",
+};
+
+// Theme tokens as CSS variables, so the chart follows light and dark
+// without branching (DESIGN.md section 2).
+const color = {
+  accent: "var(--color-accent)",
+  grid: "var(--color-line)",
+  cursor: "var(--color-track)",
+  axis: "var(--color-ink-2)",
+  ink: "var(--color-ink)",
+  ring: "var(--color-surface)",
+};
+
+const tick = { fill: color.axis, fontSize: 12 };
+
+/** A round top for the scale (1, 2, 2.5 or 5 times a power of ten), so the axis reads 0, 50, 100. */
+function niceTop(max: number): number {
+  if (max <= 4) return 4;
+  const power = 10 ** Math.floor(Math.log10(max));
+  const step = [1, 2, 2.5, 5, 10].find((factor) => factor * power >= max) ?? 10;
+  return step * power;
+}
+
+/** A date under the axis, held inside the plot at its two ends. */
+function DateTick({ x, y, payload, first, last }: { x?: number; y?: number; payload?: { value: string }; first: string; last: string }) {
+  const value = payload?.value ?? "";
+  const anchor = value === first ? "start" : value === last ? "end" : "middle";
+  return (
+    <text x={x} y={y} dy={12} textAnchor={anchor} fill={color.axis} fontSize={12}>
+      {value === last ? "Today" : formatDay(value)}
+    </text>
+  );
+}
+
+interface Point {
+  date: string;
+  credits: number;
+  requests: number;
+}
+
+/** The hover readout: the day, its credits and its requests. */
+function Readout({ active, payload }: { active?: boolean; payload?: ReadonlyArray<{ payload?: Point }> }) {
+  const point = payload?.[0]?.payload;
+  if (!active || !point) return null;
+  return (
+    <div className="rounded-sm border border-line bg-surface px-3 py-2 text-xs text-ink shadow-soft">
+      <p className="text-ink-2">{formatDayLong(point.date)}</p>
+      <p className="mt-1 flex items-center gap-2 tabular-nums">
+        <span aria-hidden="true" className="size-2 rounded-full bg-accent" />
+        <span className="font-medium">{creditCount(point.credits)}</span>
+        <span className="text-ink-2">· {requestCount(point.requests)}</span>
+      </p>
+    </div>
+  );
 }
 
 /**
- * Credits used per day, oldest on the left, as flat terracotta bars
- * (DESIGN.md section 6: no gradients, no glow, direct labels). The
- * busiest day and today carry their numbers; hovering any day shows its
- * own. The drawing is for sighted readers: assistive tech gets a summary
- * and a table of the same numbers instead.
- *
- * It draws in once, the first time it renders with data. Polling and a
- * change of period after that redraw it without motion.
+ * Credits used per day, oldest on the left, as a smooth terracotta area
+ * over faint gridlines (owner's choice, November 18, 2026: Recharts, an
+ * area with a soft fill). The busiest day carries its number; hovering
+ * any day shows its own. The drawing is for sighted readers: assistive
+ * tech gets a summary and a table of the same numbers instead.
  */
-export function DailyChart({ days, label }: { days: UsageDay[]; label: string }) {
+export function DailyChart({ days, label, size = "large" }: { days: UsageDay[]; label: string; size?: ChartSize }) {
   const reduced = useReducedMotion();
-  // True for the first render only. A bar reads `initial` when it mounts,
-  // so bars that mount later (a new day, another period) appear drawn.
+  // Draw in once, on first load. After that, new data replaces the old
+  // without motion, so polling does not replay it every few seconds.
   const [animate, setAnimate] = useState(true);
-  useEffect(() => setAnimate(false), []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setAnimate(false), DRAW_MS + 100);
+    return () => window.clearTimeout(timer);
+  }, []);
 
-  const max = Math.max(1, ...days.map((day) => day.credits));
+  const fillId = `daily-fill-${useId().replace(/[^\w-]/g, "")}`;
+  const points: Point[] = days.map((day) => ({ date: day.date, credits: day.credits, requests: day.requests }));
   const peak = busiestDay(days);
   const lastIndex = days.length - 1;
-  const peakIndex = peak ? days.indexOf(peak) : -1;
-  // Today's number is left off when it would crowd the busiest day's.
-  const todayLabelled = lastIndex >= 0 && days[lastIndex].credits > 0 && lastIndex - peakIndex > 2;
-  const marks = axisDays(days.length, AXIS_LABELS);
+  const ticks = [...axisDays(days.length, AXIS_LABELS)].sort((a, b) => a - b).map((index) => days[index].date);
   const totals = sumDays(days);
-  const step = days.length > 1 ? DRAW_SPREAD / (days.length - 1) : 0;
+  const top = niceTop(Math.max(0, ...days.map((day) => day.credits)));
 
   return (
     <figure>
@@ -59,68 +121,68 @@ export function DailyChart({ days, label }: { days: UsageDay[]; label: string })
         {peak ? ` Busiest day ${formatDayLong(peak.date)}, ${creditCount(peak.credits)}.` : ""}
       </figcaption>
 
-      <div aria-hidden="true">
-        <div className={cn("flex items-end border-b border-line", plotHeight, gapFor(days.length))}>
-          {days.map((day, index) => {
-            const height = (day.credits / max) * HEADROOM * 100;
-            const labelled = index === peakIndex || (index === lastIndex && todayLabelled);
-            return (
-              <div key={day.date} className="group relative flex h-full min-w-0 flex-1 items-end justify-center">
-                {day.credits > 0 ? (
-                  <motion.div
-                    className="w-full max-w-10 origin-bottom rounded-t-sm bg-accent"
-                    // The height is data, not a design value, so it is set inline.
-                    style={{ height: `${height}%` }}
-                    initial={animate ? (reduced ? { opacity: 0 } : { scaleY: 0 }) : false}
-                    animate={reduced ? { opacity: 1 } : { scaleY: 1 }}
-                    transition={reduced ? reducedFade : { duration: duration.slow, ease, delay: index * step }}
-                  />
-                ) : (
-                  <div className="h-0.5 w-full max-w-10 rounded-full bg-wash" />
-                )}
-                {labelled ? (
-                  <span
-                    className={cn(
-                      "absolute text-xs font-medium whitespace-nowrap text-ink tabular-nums",
-                      // At the plot's edges, keep the number inside it.
-                      index === 0 ? "left-0" : index === lastIndex ? "right-0" : null,
-                    )}
-                    style={{ bottom: `calc(${height}% + 6px)` }}
-                  >
-                    {formatCount(day.credits)}
-                  </span>
-                ) : null}
-                <span
-                  className={cn(
-                    "pointer-events-none absolute z-10 rounded-sm border border-line bg-surface px-2 py-1 text-xs whitespace-nowrap text-ink shadow-soft",
-                    "opacity-0 transition-opacity duration-(--dur-fast) ease-zox group-hover:opacity-100",
-                    index < days.length / 2 ? "left-0" : "right-0",
-                  )}
-                  style={{ bottom: `calc(${Math.max(height, 0)}% + 6px)` }}
-                >
-                  {formatDay(day.date)}: {creditCount(day.credits)}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className={cn("mt-2 flex", gapFor(days.length))}>
-          {days.map((day, index) => (
-            <div key={day.date} className="relative h-5 min-w-0 flex-1">
-              {marks.has(index) ? (
-                <span
-                  className={cn(
-                    "absolute top-0 text-xs whitespace-nowrap text-ink-2 tabular-nums",
-                    index === 0 ? "left-0" : index === lastIndex ? "right-0" : "left-1/2 -translate-x-1/2",
-                  )}
-                >
-                  {index === lastIndex ? "Today" : formatDay(day.date)}
-                </span>
-              ) : null}
-            </div>
-          ))}
-        </div>
+      <div aria-hidden="true" className={cn("w-full", chartHeight[size])}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={points} margin={{ top: 22, right: 8, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id={fillId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={color.accent} stopOpacity={0.4} />
+                <stop offset="100%" stopColor={color.accent} stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} stroke={color.grid} strokeDasharray="3 4" />
+            <XAxis
+              dataKey="date"
+              ticks={ticks}
+              // Recharts drops dates that would collide (a phone's narrow
+              // band), always keeping the first and today.
+              interval="preserveStartEnd"
+              minTickGap={20}
+              tickFormatter={(date: string) => (date === days[lastIndex]?.date ? "Today" : formatDay(date))}
+              tick={<DateTick first={days[0]?.date ?? ""} last={days[lastIndex]?.date ?? ""} />}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={6}
+            />
+            <YAxis
+              domain={[0, top]}
+              ticks={[0, top / 2, top]}
+              width={36}
+              tick={tick}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value: number) => formatCount(value)}
+            />
+            <Tooltip
+              content={<Readout />}
+              cursor={{ stroke: color.cursor, strokeWidth: 1 }}
+              isAnimationActive={false}
+            />
+            <Area
+              type="monotone"
+              dataKey="credits"
+              stroke={color.accent}
+              strokeWidth={2}
+              fill={`url(#${fillId})`}
+              dot={false}
+              activeDot={{ r: 4, fill: color.accent, stroke: color.ring, strokeWidth: 2 }}
+              isAnimationActive={animate && !reduced}
+              animationDuration={DRAW_MS}
+              animationEasing="ease-out"
+            />
+            {peak ? (
+              <ReferenceDot
+                x={peak.date}
+                y={peak.credits}
+                r={4}
+                fill={color.accent}
+                stroke={color.ring}
+                strokeWidth={2}
+                label={{ value: formatCount(peak.credits), position: "top", offset: 8, fill: color.ink, fontSize: 12 }}
+              />
+            ) : null}
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
 
       <table className="sr-only">
@@ -146,12 +208,7 @@ export function DailyChart({ days, label }: { days: UsageDay[]; label: string })
   );
 }
 
-/** Loading placeholder: the plot and its axis, the same height as the real chart. */
-export function DailyChartSkeleton() {
-  return (
-    <div aria-hidden="true">
-      <Skeleton className={cn("w-full rounded-md", plotHeight)} />
-      <Skeleton className="mt-2 h-lh w-full text-xs" />
-    </div>
-  );
+/** Loading placeholder, the same height as the real chart. */
+export function DailyChartSkeleton({ size = "large" }: { size?: ChartSize }) {
+  return <Skeleton className={cn("w-full rounded-md", chartHeight[size])} />;
 }

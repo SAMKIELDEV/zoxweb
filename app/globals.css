@@ -86,7 +86,7 @@
   /*
     Marketing tokens (DESIGN.md section 14). Taken from the landing page
     design and used by components/marketing only. The dashboard does not
-    use them: its rules (no white surfaces, no gradients) still stand there.
+    use them: its rules (no white surfaces, no gradients but the chart's area fill) still stand there.
   */
   --color-card: #ffffff; /* feature and pricing cards, the person's chat bubbles */
   --color-band: #f5ede5; /* the tinted "Why Zox" section */
@@ -188,7 +188,7 @@
 [data-theme="dark"] {
   --color-paper: #141009;
   --color-surface: #1e1710;
-  --color-sidebar: #110e07;
+  --color-sidebar: #19130c;
   --color-wash: #2e2519;
   --color-line: #2e2519;
   --color-line-soft: #261e13;

@@ -25,7 +25,7 @@ Components use semantic names, never raw values. Each name has a light and a dar
 |---|---|---|---|
 | `paper` | `#FAF6F0` | `#141009` | Page background |
 | `surface` | `#F5EDE5` | `#1E1710` | Raised surface |
-| `sidebar` | `#F2EBE0` | `#110E07` | Sidebar background |
+| `sidebar` | `#F2EBE0` | `#19130C` | Sidebar background (dark: just above `paper`, so the panel lifts rather than sinks; owner's change, November 18, 2026) |
 | `wash` | `#EEE7DD` | `#2E2519` | Hover and selected fills, skeletons, bar tracks |
 | `line` | `#E4D9CE` | `#2E2519` | Borders |
 | `line-soft` | `#EDE3D8` | `#261E13` | Hairlines inside a surface |
@@ -91,7 +91,7 @@ Built November 18, 2026; the steps and the decisions made on the way are in `doc
 - **Narrow desktop** (768 to 1023px): the panel collapses to an icon rail, each icon with a tooltip giving its name.
 - **Phones:** no sidebar. A slim top bar with the Z mark and a menu button that opens a sheet with the same items.
 - **Page header:** inside the content area, not in a full-width bar: the serif page title, an optional one-line subtitle, and at most one primary action to the right.
-- **Home:** the balance is the hero (large serif number, a quiet line for what it covers), one large usage chart for the last 14 days (flat warm palette, direct labels, no gradients), recent activity as hairline rows, one primary action ("Top up"), and a small inline notice only when WhatsApp is not linked. No row of metric cards.
+- **Home (top band, owner's change, November 18, 2026):** one `surface` panel (hairline border, radius `lg`, the same panel as Billing's order summary) holding the balance on the left ("Balance" label, large serif number, a thin bar splitting today's free credits in `ink-3` from credits to keep in `accent`, and a key under it) and the last 14 days as a compact area chart on the right, with a hairline between them; stacked below 1024px. Then recent activity as hairline rows beside the account details. One primary action ("Top up"), and a small inline notice only when WhatsApp is not linked. No row of metric cards.
 - **Dashboard motion:** page enter, list stagger, the chart drawing in once on first load, the balance changing (the digit flip), button press feedback. Nothing else.
 - **Billing:** the balance, then the packages as rows (not cards) with prices in the visitor's currency, a sticky order summary on desktop, and the transaction history as hairline rows. The success page shows "Confirming your purchase" and polls until the webhook has credited the wallet; it never trusts the redirect alone. Status colors (`positive`, `warning`, `danger`) appear on this page only, always beside words. A "How credits work" link goes to the Pricing page.
 - **Usage:** one large chart with a 7d, 30d, 90d toggle, then a breakdown by tool for the same period as horizontal bars with direct labels, then recent activity. No pie or donut charts. Days are the visitor's own (the backend counts them in the browser's time zone).
@@ -103,8 +103,8 @@ Built November 18, 2026; the steps and the decisions made on the way are in `doc
 - **Buttons**: primary = `accent-strong` fill with `on-accent` text (the lighter `accent` fails contrast with light text). Secondary = transparent with `line` border. Destructive is rare and uses `danger`. One primary button per view. A button whose work is still running is marked `busy`, never `disabled`: a disabled button drops keyboard focus, and the person has to find it again when the work ends.
 - **Inputs**: `paper` fill, `line` border, terracotta focus ring (2px, offset 2px). Labels above, always visible.
 - **Icons**: one icon set, one stroke weight, used sparingly: **Phosphor, regular weight** (`@phosphor-icons/react`), whose rounded joins match the buttons' rounded corners. It replaces Lucide (owner's choice, November 17, 2026); pages move over as they are rebuilt, and the hero phone keeps its WhatsApp-style glyphs, since it is a picture of another app. Never emoji as icons. No icon in a colored circle as a card header.
-- **Credit balance**: the hero. Large serif number, small sans "credits" label, plus a quiet line for what it covers. Not wrapped in a gradient card.
-- **Charts (Home and Usage)**: flat, warm palette (terracotta, forest, ink tints), no gradients, no glow, direct labels preferred over legends, no chart junk. Drawn by hand, with no chart library (`components/account/DailyChart.tsx`): bars in `accent`, the busiest day and today labelled, a hover readout per day, and a summary and table for screen readers.
+- **Credit balance**: the hero. Large serif number, small sans "credits" label, then a thin bar and a key for what it covers (today's free credits, credits to keep), or one quiet line when it is all one kind or empty. Not wrapped in a gradient card. In Home's band, "Balance" and "Last 14 days" are small `text-sm` `ink-2` labels rather than the usual `text-lg` section headings, so the number stays the one focal point.
+- **Charts (Home and Usage)** (owner's change, November 18, 2026: Recharts, replacing the hand-drawn bars): one shared component, `components/account/DailyChart.tsx`, in a `large` size for Usage and a `compact` size for Home's band. A smooth `accent` area line with a soft fill fading to nothing under it (the one gradient the dashboard allows, and only here), dashed horizontal gridlines in `line`, a 0 / half / round-top y-axis, dates under it that thin out on narrow widths, the busiest day marked with its number, and a crosshair with a `surface` readout (day, credits, requests) on hover. Colors come from the theme's CSS variables. It draws in once on first load; polling redraws without motion; reduced motion shows it drawn, with no draw-in. Screen readers get a summary and a table.
 - **Tables / lists** (transactions, activity): rows separated by whitespace and hairlines, not boxed zebra stripes.
 
 ## 7. States (mandatory on every data view)
@@ -192,7 +192,7 @@ The owner's decision for these pages (November 12, 2026): **build them as design
 |---|---|---|
 | White cards in a grid | Feature cards, pricing packs | No pure white; no identical card grids |
 | An icon on a tinted square | Feature cards | No icon-in-colored-shape headers |
-| Gradient fills | Zox's two chat bubbles | No gradients |
+| Gradient fills | Zox's two chat bubbles | No gradients (the dashboard's one exception is the chart's area fill, section 6) |
 | Blurred color shapes | Behind the hero chat | No decorative blur |
 | Colored shadows | The hero button, Zox's chat bubbles | Shadows are warm and neutral |
 | Small all-caps labels above titles | "What Zox does", "Why Zox", "Pricing", pack names | Not part of the dashboard's type |

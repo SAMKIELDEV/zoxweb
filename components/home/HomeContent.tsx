@@ -15,12 +15,22 @@ import { RecentActivity, RecentActivitySkeleton } from "./RecentActivity";
 const LIVE_BALANCE_MS = 5000;
 
 /**
+ * Home's top band: the balance and the last 14 days side by side on one
+ * raised surface (the panel Billing's order summary uses), stacked with a
+ * hairline between them below 1024px.
+ */
+const topBand =
+  "grid gap-8 rounded-lg border border-line bg-surface p-6 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] lg:gap-0";
+const bandSecond = "border-t border-line-soft pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8";
+const bandFirst = "lg:pr-8";
+
+/**
  * Home, in each of its states:
  * - loading: skeletons laid out exactly like the real page
  * - failed: one line saying so, with a retry
  * - not linked: the WhatsApp link flow takes the place of the balance
- * - linked: balance, the last 14 days as a chart, recent activity,
- *   account details
+ * - linked: a top band with the balance beside the last 14 days, then
+ *   recent activity and account details
  * A closed account (403) renders nothing here; the shell already says why.
  */
 export function HomeContent() {
@@ -49,8 +59,14 @@ export function HomeContent() {
     }
     return (
       <LoadingRegion label="Loading your account" className={pageBlocks}>
-        <BalanceHeroSkeleton />
-        <HomeChartSkeleton />
+        <div className={topBand}>
+          <div className={bandFirst}>
+            <BalanceHeroSkeleton />
+          </div>
+          <div className={bandSecond}>
+            <HomeChartSkeleton />
+          </div>
+        </div>
         <div className={pageColumns}>
           <RecentActivitySkeleton />
           <HomeDetailsSkeleton />
@@ -69,9 +85,15 @@ export function HomeContent() {
             WhatsApp is linked. Here&apos;s your balance.
           </p>
         ) : null}
-        <BalanceHero wallet={snapshot.wallet} />
+        <div className={topBand}>
+          <div className={bandFirst}>
+            <BalanceHero wallet={snapshot.wallet} />
+          </div>
+          <div className={bandSecond}>
+            <HomeChart />
+          </div>
+        </div>
       </div>
-      <HomeChart />
       <div className={pageColumns}>
         <RecentActivity items={snapshot.recent} />
         <HomeDetails account={snapshot.account} wallet={snapshot.wallet} />
