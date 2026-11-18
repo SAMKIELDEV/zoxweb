@@ -5,11 +5,15 @@ import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingNav } from "@/components/marketing/MarketingNav";
 import { container, headingTracking } from "@/components/marketing/Section";
 import { ButtonLink } from "@/components/ui/Button";
+import { LogoMark } from "@/components/ui/Logo";
 import { cn } from "@/lib/cn";
 import { ACCOUNTS_URL, accountsUrl, safeNext } from "@/lib/paths";
 import { hasSessionCookie, publicOrigin } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Sign in" };
+
+/** What the dashboard holds, for the panel beside the form. Each is a real page. */
+const INSIDE = ["Your credit balance and what it covers", "Your WhatsApp number, linked in a minute", "Top-ups and every credit you spend"];
 
 interface LoginPageProps {
   searchParams: Promise<{ next?: string | string[]; ended?: string | string[] }>;
@@ -19,7 +23,8 @@ interface LoginPageProps {
  * The way in, dressed like the landing page: its header and footer, a
  * display headline, and one main button (owner's change, November 18, 2026:
  * no phone, "Continue with SAMKIEL ID" as the one call to action, creating
- * an ID as a quiet line under it).
+ * an ID as a quiet line under it). From 1024px a quiet warm panel sits
+ * beside it: the Z mark, the tagline, and what the dashboard holds.
  *
  * Zox has no sign-in form of its own: the button goes to SAMKIEL ID at the
  * accounts site, which signs the person in for every samkiel.tech site and
@@ -49,7 +54,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <div className="flex min-h-dvh flex-col [font-variation-settings:normal]">
       <MarketingNav />
       <main className="flex-1 overflow-x-clip">
-        <div className={cn(container, "py-20 md:py-28 lg:py-32")}>
+        <div className={cn(container, "grid items-center gap-16 py-20 md:py-28 lg:grid-cols-[1.15fr_1fr] lg:py-24")}>
           <div className="max-w-140">
             <h1 className={cn("mb-5 font-display text-hero font-semibold text-ink", headingTracking)}>
               Sign in to <em className="text-accent italic">Zox.</em>
@@ -84,6 +89,31 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             </p>
             <p className="mt-3 text-note text-ink-2">You sign in at {accountsHost} and come straight back.</p>
           </div>
+
+          {/* A quiet warm panel beside the form (desktop only): the Z mark, the tagline, and
+              what is waiting inside. A soft terracotta wash rises from its lower edge. */}
+          <aside
+            aria-label="Inside your dashboard"
+            className="relative isolate hidden min-h-120 flex-col justify-between overflow-hidden rounded-lg border border-line bg-surface p-10 lg:flex"
+          >
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 -z-10 bg-[radial-gradient(90%_70%_at_100%_100%,color-mix(in_oklab,var(--color-accent)_16%,transparent),transparent_70%)]"
+            />
+            <LogoMark alt="" className="size-14" />
+            <div>
+              <p className={cn("mb-8 font-display text-title font-semibold text-ink", headingTracking)}>
+                Zox gets to the point.
+              </p>
+              <ul role="list" className="divide-y divide-line border-y border-line">
+                {INSIDE.map((line) => (
+                  <li key={line} className="py-3.5 text-copy text-ink-2">
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </aside>
         </div>
       </main>
       <MarketingFooter />
