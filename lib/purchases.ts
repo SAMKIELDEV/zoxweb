@@ -30,3 +30,24 @@ export function purchaseAmount(transaction: Transaction): string {
   if (transaction.expected_amount) return formatMoney(transaction.expected_amount, transaction.currency);
   return formatMoney(transaction.amount_usd, "USD");
 }
+
+/**
+ * The color a status is marked with on Billing, the one page that uses
+ * status colors (DESIGN.md, "Dashboard shell"). Always shown beside the
+ * status word, never alone.
+ */
+export type StatusTone = "positive" | "warning" | "danger" | "neutral";
+
+const STATUS_TONES: Record<TransactionStatus, StatusTone> = {
+  pending: "warning",
+  completed: "positive",
+  succeeded: "positive",
+  failed: "danger",
+  expired: "danger",
+  needs_review: "warning",
+  refunded: "neutral",
+};
+
+export function statusTone(status: TransactionStatus): StatusTone {
+  return STATUS_TONES[status] ?? "warning";
+}

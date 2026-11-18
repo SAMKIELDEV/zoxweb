@@ -4,14 +4,15 @@ import { EmptyState } from "@/components/ui/States";
 import type { Transaction } from "@/lib/api/types";
 import { creditCount, formatWhen, isoTimestamp } from "@/lib/format";
 import { paymentStatusPath } from "@/lib/paths";
-import { purchaseAmount, statusWord } from "@/lib/purchases";
+import { purchaseAmount } from "@/lib/purchases";
+import { StatusMark } from "./StatusMark";
 
 /** The backend returns at most this many purchases and has no further pages. */
 const BACKEND_LIMIT = 20;
 
 /**
  * Past purchases, newest first. Each row opens that purchase's status
- * page. Status is always written as a word, never shown by color alone.
+ * page. Status is always written as a word, with its color as a dot beside it.
  */
 export function TransactionList({ transactions }: { transactions: Transaction[] }) {
   return (
@@ -39,7 +40,7 @@ export function TransactionList({ transactions }: { transactions: Transaction[] 
                   </span>
                   <span className="flex shrink-0 flex-col items-end gap-1 md:flex-row md:items-baseline md:gap-4">
                     <span className="text-sm tabular-nums text-ink md:w-28 md:text-right">{purchaseAmount(transaction)}</span>
-                    <span className="text-sm text-ink-2 md:w-24 md:text-right">{statusWord(transaction.status)}</span>
+                    <StatusMark status={transaction.status} className="md:w-32 md:justify-end" />
                   </span>
                 </Link>
               </li>
@@ -69,7 +70,7 @@ export function TransactionListSkeleton() {
             </div>
             <div className="flex shrink-0 flex-col items-end gap-1 md:flex-row md:items-center md:gap-4">
               <Skeleton className="h-lh w-20 text-sm" />
-              <Skeleton className="h-lh w-16 text-sm" />
+              <Skeleton className="h-lh w-16 text-sm md:w-32" />
             </div>
           </li>
         ))}

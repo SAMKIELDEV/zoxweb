@@ -75,6 +75,10 @@ function httpsUrl(value: string): string | null {
 
 const legend = "mb-3 text-sm font-medium text-ink";
 
+/** The choices, with the order summary in an 18rem column beside them from 1280px. */
+const formGrid = "grid gap-10 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start xl:gap-16";
+const summaryPanel = "flex flex-col gap-4 rounded-lg border border-line bg-surface p-6 xl:sticky xl:top-8";
+
 /**
  * Buying credits: pick a package, pick a currency, pay in the provider's
  * checkout, which opens as a modal over this page (Paystack's popup for
@@ -198,102 +202,109 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-      <fieldset disabled={busy}>
-        <legend className={legend}>Package</legend>
-        <div className="divide-y divide-line border-y border-line">
-          {packages.map((item) => (
-            <label
-              key={item.id}
-              className={cn(
-                "flex cursor-pointer items-center gap-4 px-3 py-4 transition-colors duration-(--dur-fast) ease-zox",
-                "hover:bg-wash has-[:checked]:bg-wash",
-                radioLabelFocus,
-              )}
-            >
-              <RadioInput
-                name="package"
-                value={item.id}
-                checked={item.id === pack.id}
-                onChange={() => {
-                  setPackageId(item.id);
-                  setFailure(null);
-                  setClosedId(null);
-                }}
-              />
-              <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
-                <span className="flex items-baseline gap-2">
-                  <span className="font-display text-xl font-semibold tabular-nums text-ink">{formatCount(item.credits)}</span>
-                  <span className="text-sm text-ink-2">credits</span>
-                </span>
-                <span className="text-sm text-ink-2">{item.name}</span>
-              </span>
-              <span className="w-28 shrink-0 text-right text-base tabular-nums text-ink">{priceOf(item, currency)}</span>
-            </label>
-          ))}
-        </div>
-      </fieldset>
-
-      <fieldset disabled={busy}>
-        <legend className={legend}>Pay in</legend>
-        <div className="flex flex-col gap-1 sm:flex-row sm:gap-6">
-          {CURRENCIES.map(({ code, label }) => {
-            const usable = canPayIn(code);
-            const reason = !available[code] ? "Not available yet" : !usable ? "Rate unavailable" : null;
-            return (
+    <form onSubmit={handleSubmit} className={formGrid}>
+      <div className="flex min-w-0 flex-col gap-8">
+        <fieldset disabled={busy}>
+          <legend className={legend}>Package</legend>
+          <div className="divide-y divide-line border-y border-line">
+            {packages.map((item) => (
               <label
-                key={code}
+                key={item.id}
                 className={cn(
-                  "flex min-h-11 items-center gap-3 rounded-md",
-                  usable ? "cursor-pointer" : "cursor-not-allowed",
+                  "flex cursor-pointer items-center gap-4 px-3 py-4 transition-colors duration-(--dur-fast) ease-zox",
+                  "hover:bg-wash has-[:checked]:bg-wash",
                   radioLabelFocus,
                 )}
               >
                 <RadioInput
-                  name="currency"
-                  value={code}
-                  checked={currency === code}
-                  disabled={!usable}
+                  name="package"
+                  value={item.id}
+                  checked={item.id === pack.id}
                   onChange={() => {
-                    setPickedCurrency(code);
+                    setPackageId(item.id);
                     setFailure(null);
                     setClosedId(null);
                   }}
                 />
-                <span className={cn("text-base", usable ? "text-ink" : "text-ink-3")}>{label}</span>
-                {reason ? <span className="text-sm text-ink-2">{reason}</span> : null}
+                <span className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                  <span className="flex items-baseline gap-2">
+                    <span className="font-display text-xl font-semibold tabular-nums text-ink">{formatCount(item.credits)}</span>
+                    <span className="text-sm text-ink-2">credits</span>
+                  </span>
+                  <span className="text-sm text-ink-2">{item.name}</span>
+                </span>
+                <span className="w-28 shrink-0 text-right text-base tabular-nums text-ink">{priceOf(item, currency)}</span>
               </label>
-            );
-          })}
-        </div>
-        {nairaRateMissing ? (
-          <div className="mt-3">
-            <p className="max-w-[52ch] text-sm text-ink-2">The naira rate isn&apos;t loading right now.</p>
-            {/* On its own line so the tap target can be a full 44px tall. */}
-            <button
-              type="button"
-              onClick={() => void refresh()}
-              disabled={isValidating}
-              className="flex min-h-11 items-center rounded-sm text-sm text-accent-ink underline underline-offset-4 hover:text-ink disabled:opacity-50"
-            >
-              {isValidating ? "Checking" : "Check the rate again"}
-            </button>
+            ))}
           </div>
-        ) : currency === "NGN" ? (
-          <p className="mt-3 max-w-[52ch] text-sm text-ink-2">
-            Naira prices follow the live exchange rate, so the amount can shift slightly at checkout.
-          </p>
-        ) : null}
-      </fieldset>
+        </fieldset>
 
-      <div className="flex flex-col gap-4">
-        <div>
-          <p className="text-base text-ink" data-testid="checkout-summary">
-            <span className="font-medium">{formatCount(pack.credits)} credits</span>
-            {currency ? ` for ${priceOf(pack, currency)}` : null}
+        <fieldset disabled={busy}>
+          <legend className={legend}>Pay in</legend>
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-6">
+            {CURRENCIES.map(({ code, label }) => {
+              const usable = canPayIn(code);
+              const reason = !available[code] ? "Not available yet" : !usable ? "Rate unavailable" : null;
+              return (
+                <label
+                  key={code}
+                  className={cn(
+                    "flex min-h-11 items-center gap-3 rounded-md",
+                    usable ? "cursor-pointer" : "cursor-not-allowed",
+                    radioLabelFocus,
+                  )}
+                >
+                  <RadioInput
+                    name="currency"
+                    value={code}
+                    checked={currency === code}
+                    disabled={!usable}
+                    onChange={() => {
+                      setPickedCurrency(code);
+                      setFailure(null);
+                      setClosedId(null);
+                    }}
+                  />
+                  <span className={cn("text-base", usable ? "text-ink" : "text-ink-3")}>{label}</span>
+                  {reason ? <span className="text-sm text-ink-2">{reason}</span> : null}
+                </label>
+              );
+            })}
+          </div>
+          {nairaRateMissing ? (
+            <div className="mt-3">
+              <p className="max-w-[52ch] text-sm text-ink-2">The naira rate isn&apos;t loading right now.</p>
+              {/* On its own line so the tap target can be a full 44px tall. */}
+              <button
+                type="button"
+                onClick={() => void refresh()}
+                disabled={isValidating}
+                className="flex min-h-11 items-center rounded-sm text-sm text-accent-ink underline underline-offset-4 hover:text-ink disabled:opacity-50"
+              >
+                {isValidating ? "Checking" : "Check the rate again"}
+              </button>
+            </div>
+          ) : currency === "NGN" ? (
+            <p className="mt-3 max-w-[52ch] text-sm text-ink-2">
+              Naira prices follow the live exchange rate, so the amount can shift slightly at checkout.
+            </p>
+          ) : null}
+        </fieldset>
+      </div>
+
+      {/* The order summary: beside the choices and sticky from 1280px, under them below that. */}
+      <section aria-labelledby="order-summary-heading" className={summaryPanel}>
+        <h3 id="order-summary-heading" className="text-sm font-medium text-ink-2">
+          Your order
+        </h3>
+        <div data-testid="checkout-summary">
+          <p className="flex items-baseline gap-2">
+            <span className="font-display text-xl font-semibold tabular-nums text-ink">{formatCount(pack.credits)}</span>
+            <span className="text-base text-ink-2">credits</span>
           </p>
+          <p className="mt-1 text-base tabular-nums text-ink">{currency ? priceOf(pack, currency) : "Not available"}</p>
           {movesUp ? (
-            <p className="mt-1 text-sm text-ink-2">This also moves you to the {tierLabel(pack.id)} plan.</p>
+            <p className="mt-2 text-sm text-ink-2">This also moves you to the {tierLabel(pack.id)} plan.</p>
           ) : null}
         </div>
 
@@ -313,40 +324,50 @@ export function TopUp({ currentTier }: { currentTier: Tier }) {
         ) : null}
 
         <div>
-          <Button type="submit" variant="primary" busy={busy} disabled={!currency} className="w-full sm:w-auto">
+          <Button type="submit" variant="primary" busy={busy} disabled={!currency} className="w-full">
             {busy ? "Opening checkout" : "Continue to payment"}
           </Button>
-          <p className="mt-3 max-w-[52ch] text-sm text-ink-2">
+          <p className="mt-3 text-sm text-ink-2">
             You pay in a {currency === "USD" ? "Bachs" : "Paystack"} window over this page. Credits arrive
             once the payment is confirmed.
           </p>
+          <p className="mt-3 text-sm">
+            <TextLink href="/pricing">How credits work</TextLink>
+          </p>
         </div>
-      </div>
+      </section>
     </form>
   );
 }
 
 export function TopUpSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col gap-8">
-      <div>
-        <Skeleton className="mb-3 h-5 w-20" />
-        <ul className="divide-y divide-line border-y border-line">
-          {[0, 1, 2].map((index) => (
-            <li key={index} className="flex items-center justify-between gap-4 px-3 py-4">
-              <Skeleton className="h-9 w-36" />
-              <Skeleton className="h-6 w-24" />
-            </li>
-          ))}
-        </ul>
+    <div aria-hidden="true" className={formGrid}>
+      <div className="flex flex-col gap-8">
+        <div>
+          <Skeleton className="mb-3 h-5 w-20" />
+          <ul className="divide-y divide-line border-y border-line">
+            {[0, 1, 2].map((index) => (
+              <li key={index} className="flex items-center justify-between gap-4 px-3 py-4">
+                <Skeleton className="h-9 w-36" />
+                <Skeleton className="h-6 w-24" />
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <Skeleton className="mb-3 h-5 w-16" />
+          <Skeleton className="h-11 w-64 max-w-full" />
+        </div>
       </div>
-      <div>
-        <Skeleton className="mb-3 h-5 w-16" />
-        <Skeleton className="h-11 w-64 max-w-full" />
-      </div>
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="h-11 w-full rounded-md sm:w-48" />
+      <div className={summaryPanel}>
+        <Skeleton className="h-lh w-20 text-sm" />
+        <div>
+          <Skeleton className="h-lh w-32 text-xl" />
+          <Skeleton className="mt-1 h-lh w-24 text-base" />
+        </div>
+        <Skeleton className="h-11 w-full rounded-md" />
+        <Skeleton className="h-lh w-full text-sm" />
       </div>
     </div>
   );

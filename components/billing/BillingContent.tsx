@@ -1,14 +1,17 @@
 "use client";
 
-import { CreditCosts } from "@/components/account/CreditCosts";
 import { NotLinked } from "@/components/account/NotLinked";
-import { mainColumn, pageBlocks, pageColumns } from "@/components/shell/layout";
+import { pageBlocks } from "@/components/shell/layout";
+import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { LoadingRegion, Skeleton } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/States";
 import { useAccount } from "@/hooks/useAccount";
-import { creditCount, tierLabel } from "@/lib/format";
+import type { Account, Wallet } from "@/lib/api/types";
+import { tierLabel } from "@/lib/format";
 import { TopUp, TopUpSkeleton } from "./TopUp";
 import { TransactionList, TransactionListSkeleton } from "./TransactionList";
+
+const sectionHeading = "mb-6 text-lg font-semibold text-ink";
 
 /**
  * Billing, in each of its states:
@@ -16,7 +19,8 @@ import { TransactionList, TransactionListSkeleton } from "./TransactionList";
  * - failed: one line and a retry
  * - not linked: credits belong to a WhatsApp number, so the way forward
  *   is linking one; prices are not fetched
- * - linked: balance line, top-up, purchases, with costs alongside
+ * - linked: the balance, the packages with the order summary beside them,
+ *   then past purchases
  * A closed account (403) renders nothing here; the shell already says why.
  */
 export function BillingContent() {
@@ -30,55 +34,57 @@ export function BillingContent() {
           message="Couldn't load your billing details. Try again."
           onRetry={() => void refresh()}
           retryLabel={isValidating ? "Trying again" : "Try again"}
+          className="border-y border-line"
         />
       );
     }
     return (
       <LoadingRegion label="Loading billing" className={pageBlocks}>
-        <Skeleton className="h-6 w-72 max-w-full" />
-        <div className={pageColumns}>
-          <div className={mainColumn}>
-            <div>
-              <Skeleton className="mb-6 h-7 w-24" />
-              <TopUpSkeleton />
-            </div>
-            <TransactionListSkeleton />
-          </div>
-          <CreditCosts />
+        <div>
+          <Skeleton className="h-11 w-40" />
+          <Skeleton className="mt-2 h-lh w-28 text-base" />
         </div>
+        <div>
+          <Skeleton className="mb-6 h-lh w-24 text-lg" />
+          <TopUpSkeleton />
+        </div>
+        <TransactionListSkeleton />
       </LoadingRegion>
     );
   }
 
   if (!snapshot.linked) {
-    return (
-      <div className={pageColumns}>
-        <NotLinked body="Credits belong to a WhatsApp number. Link yours, then come back to top up." />
-        <CreditCosts />
-      </div>
-    );
+    return <NotLinked body="Credits belong to a WhatsApp number. Link yours, then come back to top up." />;
   }
 
   const { wallet, account, transactions } = snapshot;
 
   return (
     <div className={pageBlocks}>
-      <p className="text-base text-ink-2" data-testid="billing-balance">
-        You have <span className="font-medium tabular-nums text-ink">{creditCount(wallet.credits)}</span> on the{" "}
-        {tierLabel(account.tier)} plan.
-      </p>
-      <div className={pageColumns}>
-        <div className={mainColumn}>
-          <section aria-labelledby="top-up-heading">
-            <h2 id="top-up-heading" className="mb-6 text-lg font-semibold text-ink">
-              Top up
-            </h2>
-            <TopUp currentTier={account.tier} />
-          </section>
-          <TransactionList transactions={transactions} />
-        </div>
-        <CreditCosts />
-      </div>
+      <Balance wallet={wallet} account={account} />
+      <section aria-labelledby="top-up-heading">
+        <h2 id="top-up-heading" className={sectionHeading}>
+          Top up
+        </h2>
+        <TopUp currentTier={account.tier} />
+      </section>
+      <TransactionList transactions={transactions} />
     </div>
+  );
+}
+
+/** The balance as type on the page, smaller than Home's hero, and the plan it sits on. */
+function Balance({ wallet, account }: { wallet: Wallet; account: Account }) {
+  return (
+    <section aria-labelledby="billing-balance-heading">
+      <h2 id="billing-balance-heading" className="sr-only">
+        Balance
+      </h2>
+      <p className="flex items-baseline gap-2" data-testid="billing-balance" data-value={wallet.credits}>
+        <AnimatedNumber value={wallet.credits} className="font-display text-2xl font-semibold tracking-tight text-ink" />
+        <span className="text-base text-ink-2">{wallet.credits === 1 ? "credit" : "credits"}</span>
+      </p>
+      <p className="mt-2 text-base text-ink-2">On the {tierLabel(account.tier)} plan.</p>
+    </section>
   );
 }
