@@ -7,6 +7,7 @@ import { LoadingRegion } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/States";
 import { useAccount } from "@/hooks/useAccount";
 import { BalanceHero, BalanceHeroSkeleton } from "./BalanceHero";
+import { HomeChart, HomeChartSkeleton } from "./HomeChart";
 import { HomeDetails, HomeDetailsSkeleton } from "./HomeDetails";
 import { RecentActivity, RecentActivitySkeleton } from "./RecentActivity";
 
@@ -18,7 +19,8 @@ const LIVE_BALANCE_MS = 5000;
  * - loading: skeletons laid out exactly like the real page
  * - failed: one line saying so, with a retry
  * - not linked: the WhatsApp link flow takes the place of the balance
- * - linked: balance, recent activity, account details
+ * - linked: balance, the last 14 days as a chart, recent activity,
+ *   account details
  * A closed account (403) renders nothing here; the shell already says why.
  */
 export function HomeContent() {
@@ -48,6 +50,7 @@ export function HomeContent() {
     return (
       <LoadingRegion label="Loading your account" className={pageBlocks}>
         <BalanceHeroSkeleton />
+        <HomeChartSkeleton />
         <div className={pageColumns}>
           <RecentActivitySkeleton />
           <HomeDetailsSkeleton />
@@ -68,6 +71,7 @@ export function HomeContent() {
         ) : null}
         <BalanceHero wallet={snapshot.wallet} />
       </div>
+      <HomeChart />
       <div className={pageColumns}>
         <RecentActivity items={snapshot.recent} />
         <HomeDetails account={snapshot.account} wallet={snapshot.wallet} />

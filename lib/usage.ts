@@ -4,7 +4,7 @@
  * here touches React, so each function can be tested by itself.
  */
 
-import type { UsageTotal, UsageToolTotal } from "./api/types";
+import type { UsageDay, UsageTotal, UsageToolTotal } from "./api/types";
 
 /** Anything with a type, a request count and a credit count: all-time totals or one period's. */
 type UsageCount = Pick<UsageTotal, "action_type"> & { requests: number | string; credits: number | string };
@@ -81,4 +81,66 @@ export function barPercent(share: number): number {
   if (!(share > 0)) return 0;
   const percent = Math.round(share * 10_000) / 100;
   return Math.min(100, Math.max(MIN_BAR_PERCENT, percent));
+}
+
+// ---------------------------------------------------------------------------
+// The daily charts
+// ---------------------------------------------------------------------------
+
+
+/** A chart day ("2026-11-18") as a date at UTC midnight, so formatting never shifts it a day. */
+function dayDate(date: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  return match ? new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]))) : null;
+}
+
+const shortDay = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" });
+const longDay = new Intl.DateTimeFormat("en", { weekday: "long", month: "short", day: "numeric", timeZone: "UTC" });
+
+/** "Nov 18". */
+export function formatDay(date: string): string {
+  const parsed = dayDate(date);
+  return parsed ? shortDay.format(parsed) : date;
+}
+
+/** "Wednesday, Nov 18". */
+export function formatDayLong(date: string): string {
+  const parsed = dayDate(date);
+  return parsed ? longDay.format(parsed) : date;
+}
+
+/** Credits and requests over the whole period. */
+export function sumDays(days: UsageDay[]): UsageSums {
+  let credits = 0;
+  let requests = 0;
+  for (const day of days) {
+    credits += toCount(day.credits);
+    requests += toCount(day.requests);
+  }
+  return { credits, requests };
+}
+
+/** The day with the most credits used, the latest one on a tie. Null when no credits were used. */
+export function busiestDay(days: UsageDay[]): UsageDay | null {
+  let best: UsageDay | null = null;
+  for (const day of days) {
+    if (toCount(day.credits) > 0 && (!best || toCount(day.credits) >= toCount(best.credits))) best = day;
+  }
+  return best;
+}
+
+/**
+ * Which days get a date under the chart: the first, the last, and evenly
+ * spaced ones between, about `count` in all, so the labels never crowd.
+ */
+export function axisDays(length: number, count: number): Set<number> {
+  const marks = new Set<number>();
+  if (length <= 0) return marks;
+  if (length <= count) {
+    for (let i = 0; i < length; i++) marks.add(i);
+    return marks;
+  }
+  const step = (length - 1) / (count - 1);
+  for (let i = 0; i < count; i++) marks.add(Math.round(i * step));
+  return marks;
 }

@@ -13,12 +13,13 @@ export function RecentActivity({ items }: { items: Activity[] }) {
 
   return (
     <section aria-labelledby="recent-activity-heading">
-      <div className="mb-4 flex items-baseline justify-between gap-4">
+      {/* The link is 44px tall for touch; the row centres it on the heading. */}
+      <div className="mb-4 flex items-center justify-between gap-4">
         <h2 id="recent-activity-heading" className="text-lg font-semibold text-ink">
           Recent activity
         </h2>
         {shown.length > 0 ? (
-          <TextLink href="/dashboard/usage" className="text-sm">
+          <TextLink href="/dashboard/usage" className="inline-flex min-h-11 items-center text-sm">
             Go to Usage
           </TextLink>
         ) : null}
@@ -38,7 +39,9 @@ export function RecentActivity({ items }: { items: Activity[] }) {
 export function RecentActivitySkeleton() {
   return (
     <div aria-hidden="true">
-      <Skeleton className="mb-4 h-7 w-40" />
+      <div className="mb-4 flex min-h-11 items-center">
+        <Skeleton className="h-7 w-40" />
+      </div>
       <ActivityRowsSkeleton rows={HOME_ACTIVITY_ROWS} />
     </div>
   );
