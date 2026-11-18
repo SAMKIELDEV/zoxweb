@@ -234,7 +234,7 @@ Used by `components/marketing` only, with one exception noted below. They sit in
 | `night` | `#2A2420` | `#241C14` | The footer card |
 | `on-night`, `on-night-2` | `#F0E8DC`, `#B3A797` | same | Footer headings; footer body and links (6.5:1 light, 7.1:1 dark) |
 | `night-line` | `#3D342C` | `#3A2F24` | Footer hairlines, social chips, the dark theme's card border |
-| `--footer-mark-opacity` | `0.8` | `0.75` | The footer wordmark: 3.2:1 against `night` in both themes |
+| `--footer-mark-line`, `--footer-mark-fill` | `0.7`, `0.16` | `0.65`, `0.14` | The footer wordmark's outline (about 2.7:1 against `night`) and its fill |
 
 | Type token | Size / line height | Use |
 |---|---|---|
@@ -329,7 +329,7 @@ The page-load bar in section 9 also runs on the public pages.
 | 06 Pricing teaser | The price rows reveal with a 50ms stagger. |
 | 07 FAQ | The answer's height and opacity as it opens and closes (no reveal on scroll). |
 | 08 CTA | The composer rises 8px as it fades in. |
-| 09 Footer | The large faded wordmark rises into place. |
+| 09 Footer | The wordmark's outline traces the letters, then its fill follows. |
 
 **05 Five jobs: sticky stacking cards (November 18, 2026).** The section's cards pin under the navbar and each one slides up over the one before as the visitor scrolls. Native scrolling only: nothing hijacks or snaps the scroll.
 
@@ -356,7 +356,7 @@ The page-load bar in section 9 also runs on the public pages.
 
 Behaviour does not change: a prefilled WhatsApp link, the message trimmed and capped at 300 characters, no fake delivered ticks, no fake reply.
 
-**Footer (November 18, 2026).** The footer card is a dark surface in both themes, from its own tokens (`night`, `on-night`, `on-night-2`, `night-line`). In the dark theme it also takes a `night-line` border so it separates from the page. Body and link text pass AA on it. The large wordmark is the brand file at the opacity in `--footer-mark-opacity`, tuned per theme to about 3:1 against the card: clearly there, still quieter than the links.
+**Footer (November 18, 2026).** The footer card is a dark surface in both themes, from its own tokens (`night`, `on-night`, `on-night-2`, `night-line`). In the dark theme it also takes a `night-line` border so it separates from the page. Body and link text pass AA on it. The large wordmark (owner's change, same day) is the brand file's own outline (`lib/brandWordmark.ts`, checked against the file by `tests/brand-wordmark.test.mjs`): a terracotta line at `--footer-mark-line` (about 2.7:1 against `night`) with a soft fill at `--footer-mark-fill`, fading out toward the card's lower edge through a mask. Its one animation: the outline traces the letters, then the fill follows (1.1 seconds, stroke drawing and opacity).
 
 **Micro-interactions** (on top of the reveals): button press feedback; the icon in a button nudges 2px toward its action on hover; a feature card's illustration reacts slightly on hover (the card itself never moves, scales or gains a shadow).
 

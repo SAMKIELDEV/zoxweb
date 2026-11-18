@@ -176,8 +176,9 @@
   /* The public pages' header height (the spacer in MarketingNav.tsx).
      Sticky content pins below it. */
   --nav-h: 5rem;
-  /* The footer wordmark: about 3.2:1 against night (DESIGN.md, "Footer"). */
-  --footer-mark-opacity: 0.8;
+  /* The footer wordmark (DESIGN.md, "Footer"): its outline and its fill. */
+  --footer-mark-line: 0.7;
+  --footer-mark-fill: 0.16;
   /* shadow-soft as a drop-shadow() filter, for the navbar pill, whose
      shape comes from clip-path (a box-shadow would be clipped with it). */
   --drop-soft: 0 2px 16px rgb(42 36 32 / 0.06);
@@ -239,7 +240,8 @@
   --color-wa-link: #53bdeb;
 
   --grain-opacity: 0.05;
-  --footer-mark-opacity: 0.75;
+  --footer-mark-line: 0.65;
+  --footer-mark-fill: 0.14;
   --drop-soft: 0 2px 16px rgb(8 5 2 / 0.3);
   color-scheme: dark;
 }

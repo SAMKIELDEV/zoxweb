@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/ui/Logo";
+import { WORDMARK } from "@/lib/brandWordmark";
 import { cn } from "@/lib/cn";
 import { INSTAGRAM_URL, WHATSAPP_URL, X_URL } from "@/lib/site";
 import { InstagramIcon, WhatsAppIcon, XIcon } from "./BrandIcons";
@@ -33,9 +34,9 @@ const linkClass =
  * Brief 09: the logo and tagline on a dark card, four plain link columns,
  * the company line, and a large wordmark along the bottom. The card is a
  * dark surface in both themes (the night tokens), with a hairline border in
- * the dark theme so it separates from the page. Text on it passes AA; the
- * wordmark sits at about 3:1, set per theme by --footer-mark-opacity
- * (DESIGN.md, "Footer").
+ * the dark theme so it separates from the page. Text on it passes AA. The
+ * wordmark is an outline with a soft fill, quiet but plain to see, fading
+ * out toward the card's lower edge (DESIGN.md, "Footer").
  */
 export function MarketingFooter() {
   const socials = socialLinks();
@@ -99,15 +100,33 @@ export function MarketingFooter() {
           <small className="text-xs">{FOOTER_DISCLAIMER}</small>
         </p>
 
-        {/* The large wordmark: decoration, cut off by the card's lower edge. The footer's one
-            animation: it rises into place once. */}
-        <Reveal aria-hidden="true" atPageEnd amount={{ desktop: 0.3, phone: 0.3 }} className="pointer-events-none mt-10 -mb-[14%] select-none">
-          <div className="opacity-(--footer-mark-opacity)">
-            <Logo
-              alt=""
-              className="h-auto w-full transition-[opacity,transform] duration-1000 ease-zox pre-reveal:translate-y-1/4 pre-reveal:opacity-0"
-            />
-          </div>
+        {/* The large wordmark: decoration, cut off by the card's lower edge and fading out
+            toward it. The footer's one animation: the outline traces the letters, then a soft
+            fill follows it, once. */}
+        <Reveal
+          aria-hidden="true"
+          atPageEnd
+          amount={{ desktop: 0.3, phone: 0.3 }}
+          className="pointer-events-none mt-10 -mb-[14%] select-none [mask-image:linear-gradient(to_bottom,black_30%,transparent_92%)]"
+        >
+          <svg viewBox={WORDMARK.viewBox} className="h-auto w-full overflow-visible">
+            <g transform={WORDMARK.transform}>
+              <path
+                d={WORDMARK.d}
+                fillRule="evenodd"
+                className="fill-accent opacity-(--footer-mark-fill) transition-opacity duration-(--dur-slow) ease-zox [transition-delay:700ms] pre-reveal:opacity-0"
+              />
+              <path
+                d={WORDMARK.d}
+                fill="none"
+                pathLength={1}
+                strokeDasharray="1"
+                strokeWidth={2}
+                strokeLinejoin="round"
+                className="stroke-accent opacity-(--footer-mark-line) transition-[stroke-dashoffset] duration-1000 ease-zox pre-reveal:[stroke-dashoffset:1]"
+              />
+            </g>
+          </svg>
         </Reveal>
       </div>
     </footer>
