@@ -17,7 +17,7 @@ function ManageNote({ className }: { className?: string }) {
 }
 
 /**
- * Who is signed in: name, SAMKIEL ID and email. Read-only, because all
+ * Profile: who is signed in, by name, SAMKIEL ID and email. Read-only, because all
  * three are managed on the SAMKIEL ID account site, which the line under
  * the rows links to. A row with nothing to show is left out, which is how
  * an account with no name set appears.
@@ -34,7 +34,7 @@ export function IdentityRows({ identity }: { identity: Identity }) {
   return (
     <section aria-labelledby="samkiel-id-heading">
       <h2 id="samkiel-id-heading" className="mb-4 text-lg font-semibold text-ink">
-        SAMKIEL ID
+        Profile
       </h2>
       <dl className="divide-y divide-line border-y border-line">
         {rows.map((row) => (
@@ -58,7 +58,7 @@ export function IdentityRows({ identity }: { identity: Identity }) {
 export function IdentityRowsSkeleton() {
   return (
     <div aria-hidden="true">
-      <Skeleton className="mb-4 h-lh w-32 text-lg" />
+      <Skeleton className="mb-4 h-lh w-20 text-lg" />
       <ul className="divide-y divide-line border-y border-line">
         {[0, 1, 2].map((index) => (
           <li key={index} className="flex items-center justify-between gap-4 py-4">

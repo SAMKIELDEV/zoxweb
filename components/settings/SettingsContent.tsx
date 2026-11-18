@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/ui/States";
 import { useAccount } from "@/hooks/useAccount";
 import { cn } from "@/lib/cn";
 import { IdentityRows, IdentityRowsSkeleton } from "./IdentityRows";
+import { PlanRows, PlanRowsSkeleton } from "./PlanRows";
 import { SignOutRow } from "./SignOutRow";
 import { WhatsAppRows, WhatsAppRowsSkeleton } from "./WhatsAppRows";
 
@@ -27,13 +28,15 @@ function Column({ children }: { children?: ReactNode }) {
 }
 
 /**
- * Settings, in each of its states:
+ * Settings, one column (DESIGN.md, "Dashboard shell"): Profile, WhatsApp,
+ * Plan, then Sign out. There is no Notifications section: Zox sends none
+ * yet, and the page shows nothing the product cannot do. In each state:
  * - loading: skeleton sections laid out like the linked page
  * - failed: one line saying so, with a retry
- * - not linked: the WhatsApp link flow first, because it is the one thing
- *   to do here, then who is signed in
- * - linked: who is signed in, then the linked number and plan. When the
- *   link lands during this visit, one line above them confirms it
+ * - not linked: the profile, then the WhatsApp link flow in WhatsApp's
+ *   place. There is no plan without a number
+ * - linked: profile, number, plan. When the link lands during this visit,
+ *   one line above them confirms it
  * A closed account (403) renders none of these; the shell already says why.
  * Sign out follows in every state, that one included.
  * The details shown are read-only. The one change made here is unlinking
@@ -61,6 +64,7 @@ export function SettingsContent() {
             message="Couldn't load your settings. Try again."
             onRetry={() => void refresh()}
             retryLabel={isValidating ? "Trying again" : "Try again"}
+            className="border-y border-line"
           />
         </Column>
       );
@@ -70,6 +74,7 @@ export function SettingsContent() {
         <LoadingRegion label="Loading your settings" className={blocks}>
           <IdentityRowsSkeleton />
           <WhatsAppRowsSkeleton />
+          <PlanRowsSkeleton />
         </LoadingRegion>
       </Column>
     );
@@ -83,8 +88,8 @@ export function SettingsContent() {
             WhatsApp is unlinked. Your credits and chats stay with the number.
           </p>
         ) : null}
-        <LinkWhatsApp identityId={snapshot.identity.id} />
         <IdentityRows identity={snapshot.identity} />
+        <LinkWhatsApp identityId={snapshot.identity.id} />
       </Column>
     );
   }
@@ -106,6 +111,7 @@ export function SettingsContent() {
           void refresh();
         }}
       />
+      <PlanRows tier={snapshot.account.tier} />
     </Column>
   );
 }
