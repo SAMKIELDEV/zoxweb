@@ -38,7 +38,17 @@ export type ActionType =
   | "youtubeSummary"
   | "pdfReader"
   | "imageUnderstanding"
-  | "socialMediaDownload";
+  | "socialMediaDownload"
+  | "paperSearch"
+  | "citationLookup"
+  | "bookSearch"
+  | "wikipedia"
+  | "dictionary"
+  | "wordFinder"
+  | "calculator"
+  | "exchangeRates"
+  | "countryStats"
+  | "publicHolidays";
 
 /** All-time totals for one action type. */
 export interface UsageTotal {

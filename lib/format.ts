@@ -160,6 +160,16 @@ const ACTION_LABELS: Record<string, string> = {
   pdfReader: "PDF summary",
   imageUnderstanding: "Image analysis",
   socialMediaDownload: "Media download",
+  paperSearch: "Paper search",
+  citationLookup: "Citation lookup",
+  bookSearch: "Book search",
+  wikipedia: "Wikipedia",
+  dictionary: "Dictionary",
+  wordFinder: "Word finder",
+  calculator: "Calculator",
+  exchangeRates: "Exchange rates",
+  countryStats: "Country statistics",
+  publicHolidays: "Public holidays",
 };
 
 /** Plain name for a backend action type. Unknown types get an explicit fallback. */
