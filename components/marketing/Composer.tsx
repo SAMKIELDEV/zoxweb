@@ -170,7 +170,7 @@ export function Composer({ className }: { className?: string }) {
           {COMPOSER.send}
         </button>
       </form>
-      <HandoffNote id={noteId} status={status} href={href} hint={COMPOSER.hint.cta} className="mt-3" />
+      <HandoffNote id={noteId} status={status} href={href} hint={COMPOSER.hint.cta} centered className="mt-3" />
     </div>
   );
 }
