@@ -170,6 +170,7 @@ const ACTION_LABELS: Record<string, string> = {
   exchangeRates: "Exchange rates",
   countryStats: "Country statistics",
   publicHolidays: "Public holidays",
+  xSearch: "X search",
 };
 
 /** Plain name for a backend action type. Unknown types get an explicit fallback. */

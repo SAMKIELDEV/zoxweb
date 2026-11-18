@@ -48,7 +48,8 @@ export type ActionType =
   | "calculator"
   | "exchangeRates"
   | "countryStats"
-  | "publicHolidays";
+  | "publicHolidays"
+  | "xSearch";
 
 /** All-time totals for one action type. */
 export interface UsageTotal {

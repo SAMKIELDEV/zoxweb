@@ -30,7 +30,7 @@ const PROCESSORS: { name: string; does: string; data: string }[] = [
   { name: "Tavily", does: "Web search.", data: "The search query Zox writes from your message." },
   { name: "FreeAPI.pro", does: "Fetches media from social media links, makes images, and speaks voice replies.", data: "The links you ask Zox to download, your image descriptions, and the text of replies Zox speaks." },
   { name: "Reference sources: OpenAlex, Crossref, Open Library, Wikipedia, Free Dictionary API, Datamuse, math.js, Frankfurter, World Bank and Nager.Date", does: "Quick lookups: papers, citations, books, encyclopedia summaries, word meanings, sums, exchange rates, country statistics and public holidays.", data: "The word, sum, title, topic, currency pair or country Zox looks up for you." },
-  { name: "FxTwitter", does: "Fetches media from X (Twitter) links.", data: "The X links you ask Zox to download." },
+  { name: "FxTwitter", does: "Fetches media from X (Twitter) links and searches public X posts.", data: "The X links you ask Zox to download, and the search terms Zox writes when you ask what people are saying on X." },
   { name: "YouTube", does: "Provides video transcripts for summaries.", data: "The video link you send." },
   { name: "Paystack", does: "Takes payments in naira.", data: "Your email address, the amount, and the card or bank details you enter on Paystack's page." },
   { name: "Bachs", does: "Takes payments in US dollars and gives the naira exchange rate.", data: "Your email address, the amount, and the card details you enter on Bachs's page." },

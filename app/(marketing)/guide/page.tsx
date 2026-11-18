@@ -75,8 +75,8 @@ const sections: LegalSection[] = [
         </li>
         <li>
           <strong>A quick fact to look up.</strong> A word&rsquo;s meaning or synonyms, a sum or unit conversion, an
-          exchange rate, research papers or a citation, a book, a country&rsquo;s statistics or the next public holiday.
-          Zox checks a reference source instead of guessing.
+          exchange rate, research papers or a citation, a book, a country&rsquo;s statistics, the next public holiday, or
+          what people are saying on X. Zox checks a source instead of guessing.
         </li>
         <li>
           <strong>A PDF</strong> of up to {PDF_PAGES} pages and {MEDIA_MB} MB. Zox reads it and sends back the key points.
