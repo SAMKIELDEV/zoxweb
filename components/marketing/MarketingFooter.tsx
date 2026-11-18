@@ -101,7 +101,7 @@ export function MarketingFooter() {
 
         {/* The large wordmark: decoration, cut off by the card's lower edge. The footer's one
             animation: it rises into place once. */}
-        <Reveal aria-hidden="true" className="pointer-events-none mt-10 -mb-[14%] select-none">
+        <Reveal aria-hidden="true" atPageEnd amount={{ desktop: 0.3, phone: 0.3 }} className="pointer-events-none mt-10 -mb-[14%] select-none">
           <div className="opacity-(--footer-mark-opacity)">
             <Logo
               alt=""

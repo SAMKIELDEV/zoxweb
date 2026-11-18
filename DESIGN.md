@@ -311,6 +311,7 @@ The page-load bar in section 9 also runs on the public pages.
 - It explains the content, not decorates it: a rule drawing in, a highlight sweeping a line of a document, a timeline filling, source pills arriving in order, a pile collapsing into one chat bubble.
 - Under 1.2 seconds in total. Only `transform`, `opacity` or SVG stroke drawing (`stroke-dashoffset`).
 - It plays once and never replays on scroll back.
+- Something at the very end of the page (the footer wordmark) can never rise above the bottom 20% of the screen, so its trigger counts the whole screen (`atPageEnd`).
 - Still banned: parallax, marquees, looping decorative motion, cursor effects, hover shadows, count-up numbers.
 - Reduced motion shows the final state.
 
@@ -333,8 +334,9 @@ The page-load bar in section 9 also runs on the public pages.
 **05 Five jobs: sticky stacking cards (November 18, 2026).** The section's cards pin under the navbar and each one slides up over the one before as the visitor scrolls. Native scrolling only: nothing hijacks or snaps the scroll.
 
 - Each card is `position: sticky`, its `top` the navbar height (`--nav-h`) plus 14px per card, so the top edge of every earlier card stays visible.
-- When a card is mostly in place, the cards under it scale to 0.96 from their top edge and dim (a `paper` layer fades in over them). This is a state change with a transition, not a scroll-linked value.
-- Heights use `svh`, never `vh`. Each card's scroll runway is about 75% of the screen height, so five cards stay a short scroll on a phone.
+- It reads as a real stack of paper (owner's request, November 18, 2026): the cards beneath shrink from their top edge by 4% per card on top of them (to 3 deep), so their peeking edges narrow, and take a `shade` layer (7% per card, at most 20%). Each card casts `shadow-stack` up onto the card beneath. Both follow the scroll as the next card slides over: one CSS variable per card (`--depth`), set per frame while the stack is near the screen, never React state. This is the second scroll-linked effect, after the navbar fold.
+- A card's illustration plays once, when its card is 65% of the way into place.
+- Heights use `svh`, never `vh`. Cards are tall (about two thirds of the screen) and each card's scroll runway is about 75% of the screen height, so five cards stay a short scroll on a phone with little empty space between them.
 - No ancestor of the cards may have `overflow: hidden` (it breaks sticky, worst on iOS Safari). Use `overflow: clip` on the card itself if it must clip.
 - Reduced motion and no script: a plain vertical list, no sticky, no transforms.
 
@@ -364,7 +366,7 @@ Still banned on the public pages: parallax, cursor effects, marquees, count-up n
 
 - Durations and easing come from the tokens (`--dur-fast` 140ms, `--dur-base` 240ms, `--dur-slow` 420ms, `ease-zox`), or from `lib/motion.ts` in script. No other curves.
 - Animate `transform` and `opacity`. The navbar pill also animates `clip-path` on one childless layer. Nothing animates `width`, `height`, `top` or `left` on an element with children, except the FAQ answer, whose height change is confined to that one block.
-- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. The navbar fold is the only scroll-linked effect, and it sets one CSS variable per frame, never React state. The five-jobs stack reads the scroll the same way, but only to work out which card is active; it sets a data attribute when that changes, and CSS transitions do the rest.
+- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. The navbar fold and the five-jobs stack are the only scroll-linked effects, and each sets CSS variables per frame, never React state.
 - `will-change` only where a trace shows it helps. None is set by default.
 - Effects that CSS can do stay in CSS. The landing page ships no animation library: the hero's scroll is one transform set from script. If one is ever needed, it is Motion's `m` components inside `LazyMotion` with `domAnimation`.
 - Nothing above the fold waits for motion. The headline and the phone shell render at once; the demo starts after hydration, in idle time.

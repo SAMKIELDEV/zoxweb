@@ -26,7 +26,13 @@ export function motionAllowed(): boolean {
  * 20% of the screen, or, for an element taller than the screen, that share
  * of the screen filled by it.
  */
-export function useInViewOnce(ref: RefObject<Element | null>, onEnter: () => void, amount: InViewAmount = DEFAULT_AMOUNT) {
+export function useInViewOnce(
+  ref: RefObject<Element | null>,
+  onEnter: () => void,
+  amount: InViewAmount = DEFAULT_AMOUNT,
+  /** Set for something at the very end of the page (the footer), which can never rise above the bottom 20%. */
+  atPageEnd = false,
+) {
   const callback = useRef(onEnter);
   useEffect(() => {
     callback.current = onEnter;
@@ -47,11 +53,11 @@ export function useInViewOnce(ref: RefObject<Element | null>, onEnter: () => voi
         observer.disconnect();
         callback.current();
       },
-      { rootMargin: ROOT_MARGIN, threshold: STEPS },
+      { rootMargin: atPageEnd ? "0px" : ROOT_MARGIN, threshold: STEPS },
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [ref, desktop, phone]);
+  }, [ref, desktop, phone, atPageEnd]);
 }
 
 /**
@@ -75,12 +81,15 @@ export function Reveal({
   className,
   children,
   amount = DEFAULT_AMOUNT,
+  atPageEnd = false,
   ...rest
 }: {
   as?: ElementType;
   className?: string;
   children: ReactNode;
   amount?: InViewAmount;
+  /** See useInViewOnce. */
+  atPageEnd?: boolean;
 } & Record<string, unknown>) {
   const ref = useRef<HTMLElement>(null);
   const [state, setState] = useState<"pending" | "shown">("pending");
@@ -89,7 +98,7 @@ export function Reveal({
   useEffect(() => {
     if (!motionAllowed()) setState("shown");
   }, []);
-  useInViewOnce(ref, () => setState("shown"), amount);
+  useInViewOnce(ref, () => setState("shown"), amount, atPageEnd);
 
   return (
     <Tag ref={ref} data-reveal={state} className={cn("group/reveal", className)} {...rest}>

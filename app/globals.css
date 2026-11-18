@@ -103,6 +103,7 @@
   --color-on-night: #f0e8dc; /* text on night */
   --color-on-night-2: #b3a797; /* secondary text on night, 6.4:1 */
   --color-night-line: #3d342c; /* hairlines and chips on night */
+  --color-shade: #2a2420; /* the shade on a card lower in the five-jobs stack */
 
   /* The hero phone (components/marketing/PhoneDemo.tsx): a generic
      handset and a WhatsApp-style chat screen, so the picture reads as the
@@ -160,6 +161,8 @@
   --shadow-bubble-accent: 0 6px 24px rgb(196 112 63 / 0.22);
   --shadow-bubble-forest: 0 6px 24px rgb(44 59 46 / 0.18);
   --shadow-cta: 0 4px 20px rgb(196 112 63 / 0.3);
+  /* A card in the five-jobs stack: it casts onto the card beneath (upward) as well as below. */
+  --shadow-stack: 0 -1px 3px rgb(42 36 32 / 0.04), 0 -12px 32px rgb(42 36 32 / 0.07), 0 2px 16px rgb(42 36 32 / 0.06);
   --shadow-wa: 0 1px 0.5px rgb(11 20 26 / 0.13); /* chat bubbles in the phone */
   --shadow-device: 0 2px 4px rgb(42 36 32 / 0.12), 0 30px 60px rgb(42 36 32 / 0.18);
 }
@@ -215,6 +218,8 @@
      so it still reads as a card (audit, Must fix 2). */
   --color-night: #241c14;
   --color-night-line: #3a2f24;
+  --color-shade: #080502;
+  --shadow-stack: 0 -1px 3px rgb(8 5 2 / 0.3), 0 -12px 32px rgb(8 5 2 / 0.45), 0 2px 16px rgb(8 5 2 / 0.3);
 
   --shadow-card: 0 2px 20px rgb(8 5 2 / 0.3);
   --shadow-bubble: 0 6px 24px rgb(8 5 2 / 0.4);
@@ -399,7 +404,7 @@
      script and motion allowed; otherwise the cards are a plain list. No
      ancestor of .job-card may clip (overflow: hidden breaks sticky). */
   .job-stack {
-    --job-card-h: clamp(23rem, 64svh, 27rem);
+    --job-card-h: clamp(24rem, 68svh, 30rem);
     --job-step: 14px;
     display: flex;
     flex-direction: column;
@@ -407,18 +412,29 @@
   }
   @media (width >= 48rem) {
     .job-stack {
-      --job-card-h: clamp(22rem, 56svh, 26rem);
+      --job-card-h: clamp(24rem, 64svh, 32rem);
     }
   }
   [data-motion="ok"] .job-stack {
     /* Each card's runway is about 75% of the screen: its height plus the gap. */
-    gap: max(1rem, calc(75svh - var(--job-card-h)));
+    gap: max(1.5rem, calc(75svh - var(--job-card-h)));
     padding-bottom: 10svh;
   }
   [data-motion="ok"] .job-card {
     position: sticky;
     top: calc(var(--nav-h) + env(safe-area-inset-top) + var(--job-index) * var(--job-step));
     height: var(--job-card-h);
+  }
+  /* --depth: how many cards lie on top of this one, 0 to 4, fractional while
+     one slides over (set per frame by JobStack.tsx). Deeper cards shrink
+     from their top edge, so the peeking edges narrow like a real stack, and
+     take a shade. */
+  [data-motion="ok"] .job-card > article {
+    transform: scale(calc(1 - min(var(--depth, 0), 3) * 0.04));
+    transform-origin: 50% 0;
+  }
+  [data-motion="ok"] .job-card .job-shade {
+    opacity: min(calc(var(--depth, 0) * 0.07), 0.2);
   }
 
   @keyframes zox-bubble-in {
