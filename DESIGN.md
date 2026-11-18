@@ -93,6 +93,10 @@ This replaces the full-height sidebar and full-width top bar described above as 
 - **Page header:** inside the content area, not in a full-width bar: the serif page title, an optional one-line subtitle, and at most one primary action to the right.
 - **Home:** the balance is the hero (large serif number, a quiet line for what it covers), one large usage chart for the last 14 days (flat warm palette, direct labels, no gradients), recent activity as hairline rows, one primary action ("Top up"), and a small inline notice only when WhatsApp is not linked. No row of metric cards.
 - **Dashboard motion:** page enter, list stagger, the chart drawing in once on first load, the balance changing (the digit flip), button press feedback. Nothing else.
+- **Billing:** the balance, then the packages as rows (not cards) with prices in the visitor's currency, a sticky order summary on desktop, and the transaction history as hairline rows. The success page shows "Confirming your purchase" and polls until the webhook has credited the wallet; it never trusts the redirect alone. Status colors (`positive`, `warning`, `danger`) appear on this page only, always beside words. A "How credits work" link goes to the Pricing page.
+- **Usage:** one large chart with a 7d, 30d, 90d toggle, then a breakdown by tool as horizontal bars with direct labels. No pie or donut charts.
+- **Settings:** one column with dividers: Profile (SAMKIEL ID, preferred name), WhatsApp link (status, and the code flow with polling), Notifications, Plan. Nothing the product cannot do (no fake toggles).
+- **Sign-in:** two columns on desktop: the form on the left, and on the right a quiet warm panel with the paper grain, the Z mark and "Zox gets to the point." Phones show the form only. It covers loading, wrong credentials, and the first sign-in of a migrated account that must set a password.
 
 ## 6. Components
 
@@ -132,6 +136,7 @@ Examples:
 - Purposeful motion: page enter (fade + 8px rise), list stagger (40 to 60ms), digit flip on balance change (only the digits that changed, right to left, upward when credits arrive and downward when they are spent; owner's choice, November 13, 2026), press feedback on buttons. That is the whole vocabulary.
 - No parallax, no bouncing, no looping decorative animation, no hover-scale on everything.
 - Respect `prefers-reduced-motion`: disable transforms and the flip, keep opacity fades under 100ms.
+- **Page-load bar (owner's request, November 18, 2026), on every page, public and dashboard:** a 2px `accent` line fixed along the top of the window while a page loads. On first load it grows from the first paint and fills and fades once the page has loaded; between pages, a click on an in-app link (or back and forward to another path) starts it, and it fills and fades when the new page renders. `transform` and `opacity` only, no dependency (`components/ui/RouteProgress.tsx`). Without script it never shows. With reduced motion it does not grow: it appears part-way and fades in under 100ms.
 - Home keeps the balance live: it refetches the account every 5 seconds while the tab is visible, so credits spent on WhatsApp flip down without a reload.
 
 ## 10. Banned list (reject on sight)
@@ -226,6 +231,10 @@ Used by `components/marketing` only, with one exception noted below. They sit in
 | `bubble-accent`, `bubble-accent-end` | `#C4703F` to `#A85C30` | same | Chat illustration, Zox's first reply |
 | `bubble-forest`, `bubble-forest-end` | `#2C3B2E` to `#1E2A20` | same | Chat illustration, Zox's second reply |
 | `on-bubble` | `#FFFFFF` | same | Text on the two colored bubbles |
+| `night` | `#2A2420` | `#241C14` | The footer card |
+| `on-night`, `on-night-2` | `#F0E8DC`, `#B3A797` | same | Footer headings; footer body and links (6.5:1 light, 7.1:1 dark) |
+| `night-line` | `#3D342C` | `#3A2F24` | Footer hairlines, social chips, the dark theme's card border |
+| `--footer-mark-opacity` | `0.8` | `0.75` | The footer wordmark: 3.2:1 against `night` in both themes |
 
 | Type token | Size / line height | Use |
 |---|---|---|
@@ -295,22 +304,57 @@ The landing page has a fixed motion budget. Section 9's vocabulary still holds f
 | 1 | Navbar morph | Flat bar to floating pill and back. The wordmark's O and X fade and slide into the Z. The fold follows the scroll over the first 140px (owner's choice, November 17, 2026): slow scrolling folds it slowly, stopping holds it part-way, scrolling up unfolds it. | Tied to scroll; a `--dur-fast` ease-out smooths wheel steps | One CSS variable set per frame |
 | 2 | Hero phone demo | The chat opens with two exchanges already there. Then it plays the other scenarios in `content/chat-script.ts` (a YouTube link, voice notes both ways, a photo of a problem, a generated poster, a web search, an Instagram download once a link is set) in a shuffled order, repeating none until every one has played, for as long as the phone is on screen (owner's request, November 16, 2026, over "plays once"). Zox shows "typing…" or "recording audio…" in the header and, as WhatsApp now does, a typing bubble in the chat (three dots that rise in turn, or a pulsing mic while recording; the only looping motion on the page, and only while Zox is "typing"); a new bubble fades in and the chat scrolls up under it. The status bar is live: the visitor's real time, Wi-Fi and signal that drift every few seconds, a battery that drains a percent at a time. | `--dur-base` fade, `--dur-slow` scroll | CSS and a small script; no animation library |
 
-**Section reveals (owner's change, November 17, 2026).** The fixed list above left the lower sections feeling dead. Each major landing section now gets **exactly one** content-driven animation, played once when the section first scrolls into view:
+The page-load bar in section 9 also runs on the public pages.
+
+**Section reveals (owner's change, November 17, 2026; budget restated November 18, 2026).** The fixed list above left the lower sections feeling dead. Each major landing section now gets **exactly one** content-driven animation, played once when the section first scrolls into view:
 
 - It explains the content, not decorates it: a rule drawing in, a highlight sweeping a line of a document, a timeline filling, source pills arriving in order, a pile collapsing into one chat bubble.
 - Under 1.2 seconds in total. Only `transform`, `opacity` or SVG stroke drawing (`stroke-dashoffset`).
-- It starts from the section's own observer (`components/marketing/Reveal.tsx`), once, and never replays on scroll back.
-- A section already on screen when the page loads is shown in its final state, not animated.
+- It plays once and never replays on scroll back.
+- Still banned: parallax, marquees, looping decorative motion, cursor effects, hover shadows, count-up numbers.
+- Reduced motion shows the final state.
+
+**Scroll triggers (November 18, 2026).** An animation must not start, and must not show its final state, before its section is genuinely in view.
+
+- The trigger is `useInViewOnce` in `components/marketing/Reveal.tsx`, an `IntersectionObserver` with a bottom root margin of 20% (the lowest fifth of the screen does not count). It fires once, when about **50%** of the watched element is visible on desktop (768px and up) or about **35%** on phones. For an element taller than the screen, the same share of the screen is enough.
+- Watch the element that animates, not a taller wrapper: on a phone a stacked section's text can be on screen while its illustration is still below it.
+- Elements stay in their start pose until the trigger fires. The start pose is in the server markup (`data-reveal="pending"`), and CSS shows it only when script is running and motion is allowed (`data-motion="ok"`, set on `<html>` by an inline script before first paint). So there is no flash of the finished state, a visitor without script sees the final state, and reduced motion sees the final state. Write start poses with the `pre-reveal:` variant (`app/globals.css`).
 
 | Section | Its one animation |
 |---|---|
 | 03 Trust | The hairline rule draws in from the left. |
-| 04 Problem | The pile of tabs and papers collapses into the one chat bubble. |
-| 05 Five jobs | Each job's small illustration plays once: the two bubbles arrive, the PDF highlight sweeps and the summary chip appears, the source pills arrive in order, the video timeline fills, the annotation bracket draws. |
+| 04 Problem | The pile of tabs and papers collapses into the one chat bubble. Watches the illustration, not the heading. |
+| 05 Five jobs | Sticky stacking cards (below). Each card's illustration plays once when its card first becomes the active one: the two bubbles arrive, the PDF highlight sweeps and the summary chip appears, the source pills arrive in order, the video timeline fills, the annotation bracket draws. |
 | 06 Pricing teaser | The price rows reveal with a 50ms stagger. |
 | 07 FAQ | The answer's height and opacity as it opens and closes (no reveal on scroll). |
 | 08 CTA | The composer rises 8px as it fades in. |
 | 09 Footer | The large faded wordmark rises into place. |
+
+**05 Five jobs: sticky stacking cards (November 18, 2026).** The section's cards pin under the navbar and each one slides up over the one before as the visitor scrolls. Native scrolling only: nothing hijacks or snaps the scroll.
+
+- Each card is `position: sticky`, its `top` the navbar height (`--nav-h`) plus 14px per card, so the top edge of every earlier card stays visible.
+- When a card is mostly in place, the cards under it scale to 0.96 from their top edge and dim (a `paper` layer fades in over them). This is a state change with a transition, not a scroll-linked value.
+- Heights use `svh`, never `vh`. Each card's scroll runway is about 75% of the screen height, so five cards stay a short scroll on a phone.
+- No ancestor of the cards may have `overflow: hidden` (it breaks sticky, worst on iOS Safari). Use `overflow: clip` on the card itself if it must clip.
+- Reduced motion and no script: a plain vertical list, no sticky, no transforms.
+
+**FAQ (November 18, 2026).** A single-open accordion: opening one answer closes the others. Each question is a `button` with `aria-expanded` and `aria-controls`; the answer is a region labelled by it, and is `inert` while closed. Plain dividers, no card per question, the first answer open, 44px tap targets on phones. Without script every answer shows.
+
+**Gradients on the public pages (November 18, 2026).** Allowed only as a soft wash: one or two brand tokens, the terracotta tint at low opacity, radial from an edge. Used in the hero, the closing CTA, and at most one more place. Never behind body text, never on cards or buttons. (The chat bubbles in the hero phone are part of the picture and keep their gradient.)
+
+**Composers (November 18, 2026).** Every text box that sends a message to WhatsApp (the hero phone, the closing CTA, any other) uses the same words, from `COMPOSER` in `components/marketing/content.ts`:
+
+| Part | Copy |
+|---|---|
+| Placeholder | Type your message here |
+| Button (visible text, or the accessible name of an icon button) | Send |
+| Under the composer before sending | Nothing. No microcopy about WhatsApp or pressing send there. |
+| After the visitor taps Send | Opening WhatsApp with your message ready |
+| Fallback button, if the browser blocks the hand-off | Open WhatsApp |
+
+Behaviour does not change: a prefilled WhatsApp link, the message trimmed and capped at 300 characters, no fake delivered ticks, no fake reply.
+
+**Footer (November 18, 2026).** The footer card is a dark surface in both themes, from its own tokens (`night`, `on-night`, `on-night-2`, `night-line`). In the dark theme it also takes a `night-line` border so it separates from the page. Body and link text pass AA on it. The large wordmark is the brand file at the opacity in `--footer-mark-opacity`, tuned per theme to about 3:1 against the card: clearly there, still quieter than the links.
 
 **Micro-interactions** (on top of the reveals): button press feedback; the icon in a button nudges 2px toward its action on hover; a feature card's illustration reacts slightly on hover (the card itself never moves, scales or gains a shadow).
 
@@ -320,7 +364,7 @@ Still banned on the public pages: parallax, cursor effects, marquees, count-up n
 
 - Durations and easing come from the tokens (`--dur-fast` 140ms, `--dur-base` 240ms, `--dur-slow` 420ms, `ease-zox`), or from `lib/motion.ts` in script. No other curves.
 - Animate `transform` and `opacity`. The navbar pill also animates `clip-path` on one childless layer. Nothing animates `width`, `height`, `top` or `left` on an element with children, except the FAQ answer, whose height change is confined to that one block.
-- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. The navbar fold is the only scroll-linked effect, and it sets one CSS variable per frame, never React state.
+- Scroll is read with a passive listener batched to one `requestAnimationFrame`, or with `IntersectionObserver`. The navbar fold is the only scroll-linked effect, and it sets one CSS variable per frame, never React state. The five-jobs stack reads the scroll the same way, but only to work out which card is active; it sets a data attribute when that changes, and CSS transitions do the rest.
 - `will-change` only where a trace shows it helps. None is set by default.
 - Effects that CSS can do stay in CSS. The landing page ships no animation library: the hero's scroll is one transform set from script. If one is ever needed, it is Motion's `m` components inside `LazyMotion` with `domAnimation`.
 - Nothing above the fold waits for motion. The headline and the phone shell render at once; the demo starts after hydration, in idle time.
@@ -328,4 +372,4 @@ Still banned on the public pages: parallax, cursor effects, marquees, count-up n
 
 **Reduced motion**
 
-With `prefers-reduced-motion: reduce`: the navbar snaps between flat and pill at the halfway point, with nothing in between; the phone shows its opening conversation, still, and plays nothing; every section reveal shows its final state at once (the rule drawn, the pile already collapsed, the rows in place); the icon slide and illustration shift do not run; the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
+With `prefers-reduced-motion: reduce`: the navbar snaps between flat and pill at the halfway point, with nothing in between; the phone shows its opening conversation, still, and plays nothing; every section reveal shows its final state at once (the rule drawn, the pile already collapsed, the rows in place); the five jobs are a plain list, not a sticky stack; the icon slide and illustration shift do not run; the FAQ opens and closes at once. Opacity fades, where any remain, stay under 100ms.
