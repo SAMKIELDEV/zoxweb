@@ -19,11 +19,11 @@ const sketch = "stroke-ink-2 [stroke-linecap:round] [stroke-linejoin:round]";
 const collapse =
   "origin-center [transform-box:fill-box] transition-[transform,opacity] duration-700 ease-zox opacity-0 " +
   "[transform:translate(var(--dx),var(--dy))_scale(0.15)] " +
-  "group-data-[reveal=ready]/reveal:opacity-100 group-data-[reveal=ready]/reveal:[transform:none]";
-const fadeTrails = "transition-opacity duration-500 ease-zox opacity-0 group-data-[reveal=ready]/reveal:opacity-100";
+  "pre-reveal:opacity-100 pre-reveal:[transform:none]";
+const fadeTrails = "transition-opacity duration-500 ease-zox opacity-0 pre-reveal:opacity-100";
 const bubble =
   "origin-center [transform-box:fill-box] transition-transform duration-700 ease-zox [transition-delay:350ms] " +
-  "[transform:translate(-144px,-128px)_scale(1.6)] group-data-[reveal=ready]/reveal:[transform:none]";
+  "[transform:translate(-144px,-128px)_scale(1.6)] pre-reveal:[transform:none]";
 
 /**
  * Brief 04: a messy pile of tabs and papers collapsing into one chat

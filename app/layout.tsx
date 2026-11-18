@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
+import { RouteProgress } from "@/components/ui/RouteProgress";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { motionScript } from "@/lib/motion";
 import { themeScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -47,13 +49,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    // The inline script sets data-theme before first paint, so the server
-    // markup and the browser's differ on that one attribute by design.
+    // The inline scripts set data-theme and data-motion before first paint,
+    // so the server markup and the browser's differ on those by design.
     <html lang="en" className={`${fraunces.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: motionScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        <RouteProgress />
+        {children}
+      </body>
     </html>
   );
 }

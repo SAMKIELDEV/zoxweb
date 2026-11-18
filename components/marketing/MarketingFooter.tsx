@@ -31,15 +31,18 @@ const linkClass =
 
 /**
  * Brief 09: the logo and tagline on a dark card, four plain link columns,
- * the company line, and a large faded wordmark along the bottom. The card
- * is dark in both themes.
+ * the company line, and a large wordmark along the bottom. The card is a
+ * dark surface in both themes (the night tokens), with a hairline border in
+ * the dark theme so it separates from the page. Text on it passes AA; the
+ * wordmark sits at about 3:1, set per theme by --footer-mark-opacity
+ * (DESIGN.md, "Footer").
  */
 export function MarketingFooter() {
   const socials = socialLinks();
 
   return (
     <footer className={cn(container, "pb-6 print:hidden")}>
-      <div className="relative overflow-hidden rounded-lg bg-night px-6 pt-12 pb-6 md:px-10">
+      <div className="relative overflow-hidden rounded-lg border border-transparent bg-night px-6 pt-12 pb-6 md:px-10 dark:border-night-line">
         <div className="relative grid gap-10 lg:grid-cols-[1fr_2fr]">
           <div>
             <Logo className="mb-3 h-7" />
@@ -96,13 +99,15 @@ export function MarketingFooter() {
           <small className="text-xs">{FOOTER_DISCLAIMER}</small>
         </p>
 
-        {/* The large faded wordmark: decoration, cut off by the card's lower edge. The footer's
-            one animation: it rises into place once. */}
-        <Reveal aria-hidden="true" threshold={0.2} className="pointer-events-none mt-8 -mb-[17%] select-none">
-          <Logo
-            alt=""
-            className="h-auto w-full opacity-[0.07] transition-[opacity,transform] duration-1000 ease-zox group-data-[reveal=ready]/reveal:translate-y-1/4 group-data-[reveal=ready]/reveal:opacity-0"
-          />
+        {/* The large wordmark: decoration, cut off by the card's lower edge. The footer's one
+            animation: it rises into place once. */}
+        <Reveal aria-hidden="true" className="pointer-events-none mt-10 -mb-[14%] select-none">
+          <div className="opacity-(--footer-mark-opacity)">
+            <Logo
+              alt=""
+              className="h-auto w-full transition-[opacity,transform] duration-1000 ease-zox pre-reveal:translate-y-1/4 pre-reveal:opacity-0"
+            />
+          </div>
         </Reveal>
       </div>
     </footer>

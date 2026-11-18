@@ -411,7 +411,7 @@ export function PhoneDemo() {
               </div>
               <button
                 type="submit"
-                aria-label={COMPOSER.sendLabel}
+                aria-label={COMPOSER.send}
                 onPointerDown={engage}
                 className="flex size-12 shrink-0 items-center justify-center rounded-full bg-wa-green text-wa-on-green transition-transform duration-(--dur-fast) ease-zox active:scale-[0.96]"
               >

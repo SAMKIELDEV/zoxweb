@@ -3,6 +3,13 @@
 /* dark: follows the data-theme attribute set in app/layout.tsx. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* pre-reveal: a scroll reveal's start pose (DESIGN.md, "Scroll triggers").
+   It holds while an ancestor is data-reveal="pending" and only when the
+   inline script has marked <html> data-motion="ok": without script, or with
+   reduced motion, the final state shows. components/marketing/Reveal.tsx
+   flips the ancestor to "shown" once it is genuinely in view. */
+@custom-variant pre-reveal (&:where([data-motion="ok"] [data-reveal="pending"] *));
+
 /*
   Zox tokens. Source of truth: DESIGN.md section 2.
   Raw color values live in this file only. Components use the semantic
@@ -163,6 +170,11 @@
   --dur-base: 240ms;
   --dur-slow: 420ms;
   --grain-opacity: 0.03;
+  /* The public pages' header height (the spacer in MarketingNav.tsx).
+     Sticky content pins below it. */
+  --nav-h: 5rem;
+  /* The footer wordmark: about 3.2:1 against night (DESIGN.md, "Footer"). */
+  --footer-mark-opacity: 0.8;
   /* shadow-soft as a drop-shadow() filter, for the navbar pill, whose
      shape comes from clip-path (a box-shadow would be clipped with it). */
   --drop-soft: 0 2px 16px rgb(42 36 32 / 0.06);
@@ -222,6 +234,7 @@
   --color-wa-link: #53bdeb;
 
   --grain-opacity: 0.05;
+  --footer-mark-opacity: 0.75;
   --drop-soft: 0 2px 16px rgb(8 5 2 / 0.3);
   color-scheme: dark;
 }
@@ -333,24 +346,79 @@
     mask: var(--wa-doodles) 0 0 / 132px 132px repeat;
   }
 
-  /* A new bubble in the hero phone fades in (components/marketing/PhoneDemo.tsx). */
-  /* FAQ answers open and close with height and opacity (DESIGN.md,
-     "Marketing motion"). Browsers without ::details-content just snap. */
-  .faq-item {
-    interpolate-size: allow-keywords;
-  }
-  .faq-item::details-content {
-    block-size: 0;
+  /* The page-load bar (components/ui/RouteProgress.tsx, DESIGN.md
+     "Page-load bar"). Only with script: data-motion is set by the inline
+     script. On first paint it grows by CSS; script fills and fades it. */
+  .route-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 60;
+    height: 2px;
+    background-color: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: left;
     opacity: 0;
-    overflow: hidden;
-    transition:
-      block-size var(--dur-base) var(--ease-zox),
-      opacity var(--dur-base) var(--ease-zox),
-      content-visibility var(--dur-base) allow-discrete;
+    pointer-events: none;
   }
-  .faq-item[open]::details-content {
-    block-size: auto;
+  [data-motion="ok"] .route-progress {
     opacity: 1;
+    animation: zox-progress-first 2.4s var(--ease-zox) forwards;
+  }
+  @keyframes zox-progress-first {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(0.8);
+    }
+  }
+  @media print {
+    .route-progress {
+      display: none;
+    }
+  }
+
+  /* FAQ answers open and close with height and opacity (DESIGN.md,
+     "FAQ"): the grid row goes from 0fr to 1fr. Without script every answer
+     shows, since the buttons cannot work. */
+  .faq-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows var(--dur-base) var(--ease-zox),
+      opacity var(--dur-base) var(--ease-zox);
+  }
+  .faq-panel[data-open="true"],
+  html:not([data-motion]) .faq-panel {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  /* 05 Five jobs, the sticky stack (DESIGN.md, "05 Five jobs"). Only with
+     script and motion allowed; otherwise the cards are a plain list. No
+     ancestor of .job-card may clip (overflow: hidden breaks sticky). */
+  .job-stack {
+    --job-card-h: clamp(23rem, 64svh, 27rem);
+    --job-step: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  @media (width >= 48rem) {
+    .job-stack {
+      --job-card-h: clamp(22rem, 56svh, 26rem);
+    }
+  }
+  [data-motion="ok"] .job-stack {
+    /* Each card's runway is about 75% of the screen: its height plus the gap. */
+    gap: max(1rem, calc(75svh - var(--job-card-h)));
+    padding-bottom: 10svh;
+  }
+  [data-motion="ok"] .job-card {
+    position: sticky;
+    top: calc(var(--nav-h) + env(safe-area-inset-top) + var(--job-index) * var(--job-step));
+    height: var(--job-card-h);
   }
 
   @keyframes zox-bubble-in {

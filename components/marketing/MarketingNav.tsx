@@ -302,7 +302,7 @@ export function MarketingNav() {
         </div>
       </header>
       {/* Holds the fixed header's place, at one height in both states, so nothing below moves. */}
-      <div aria-hidden="true" className="h-[calc(5rem+env(safe-area-inset-top))] print:hidden" />
+      <div aria-hidden="true" className="h-[calc(var(--nav-h)+env(safe-area-inset-top))] print:hidden" />
     </>
   );
 }

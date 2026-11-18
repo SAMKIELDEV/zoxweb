@@ -28,7 +28,7 @@ function initialRows(): Row[] {
 
 // The row reveal (DESIGN.md, "Marketing motion"): each row rises 8px as it fades in, 50ms apart.
 const rowMotion =
-  "transition-[opacity,transform] duration-(--dur-slow) ease-zox group-data-[reveal=ready]/reveal:opacity-0 group-data-[reveal=ready]/reveal:translate-y-2";
+  "transition-[opacity,transform] duration-(--dur-slow) ease-zox pre-reveal:opacity-0 pre-reveal:translate-y-2";
 
 /**
  * The pricing teaser's rows: Free, then each pack with its credits and its

@@ -1,7 +1,7 @@
 /**
  * The landing page's words, kept apart from its layout so they can be
- * edited without touching markup. Source: the landing copy brief in
- * docs/design/landing-copy.zip (00-README to 09-footer), word for word.
+ * edited without touching markup. Source: landing-copy/ at the repo root
+ * (00-README to 09-footer), word for word; change both together.
  * Its rules hold for every line: no em dashes, no banned words, no stats
  * except the one real number, and no prices typed in (they come from
  * lib/pricing.ts and the Pricing page).
@@ -43,14 +43,18 @@ export const HERO = {
   secondary: "See how it works",
 } as const;
 
-/** The composer under the hero chat, repeated in the closing section. */
+/**
+ * Every composer that sends a message to WhatsApp: the hero phone and the
+ * closing section (DESIGN.md, "Composers"). No microcopy under it before
+ * sending.
+ */
 export const COMPOSER = {
-  placeholder: "Ask Zox anything",
-  sendLabel: "Send to Zox on WhatsApp",
+  placeholder: "Type your message here",
+  /** The button's text, or the accessible name of an icon button. */
+  send: "Send",
   /** Tapping one fills the input. */
   suggestions: ["Summarize this YouTube video", "Explain this like I'm 12", "Plan my week around exams"],
-  microcopy: "Opens WhatsApp with your message ready. Press send there.",
-  handoff: "Opening WhatsApp",
+  handoff: "Opening WhatsApp with your message ready",
   /** Shown when the browser blocks the hand-off. */
   fallback: "Open WhatsApp",
 } as const;
@@ -69,8 +73,9 @@ export const COMPOSER = {
 export const TRUST = {
   count: "467+",
   line: "people already text Zox.",
-  // Owner's change, 2026-11-16: the brief's "Made by SAMKIEL in Ile-Ife, Nigeria." became this.
-  maker: "A product of SAMKIEL Studio.",
+  // Owner's changes: 2026-11-16 replaced the brief's "Made by SAMKIEL in Ile-Ife, Nigeria.";
+  // 2026-11-18 dropped any location (the brand reads as global) and linked the studio.
+  maker: { prefix: "A product of", studio: "SAMKIEL Studio", href: "https://samkiel.tech" },
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -133,11 +138,8 @@ export const PRICING_TEASER = {
 // 07 FAQ
 // ---------------------------------------------------------------------------
 
-/**
- * The brief gives the section no heading. This one is ours, kept to one
- * plain word so it adds no claim.
- */
-export const FAQ_HEADING = "Questions";
+/** The owner's heading, 2026-11-18 (the brief gave the section none). */
+export const FAQ_HEADING = "You may be wondering";
 
 export interface Faq {
   question: string;
@@ -185,9 +187,9 @@ export const FAQS: readonly Faq[] = [
 // 08 Call to action
 // ---------------------------------------------------------------------------
 
+/** Two lines and the composer (2026-11-18: the separate button went; the composer's Send is the action). */
 export const CTA = {
   heading: ["Stop switching apps.", "Just text Zox."],
-  button: "Open WhatsApp",
 } as const;
 
 // ---------------------------------------------------------------------------

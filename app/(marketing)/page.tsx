@@ -3,8 +3,8 @@ import { HERO } from "@/components/marketing/content";
 import { Cta } from "@/components/marketing/Cta";
 import { Faq } from "@/components/marketing/Faq";
 import { Hero } from "@/components/marketing/Hero";
+import { JobStack } from "@/components/marketing/JobStack";
 import { PricingTeaser } from "@/components/marketing/PricingTeaser";
-import { SolutionEditorial } from "@/components/marketing/SolutionVariants";
 import { Problem, Trust } from "@/components/marketing/Story";
 import { OPEN_GRAPH_IMAGE, SITE_NAME, TWITTER_IMAGE } from "@/lib/site";
 
@@ -25,7 +25,8 @@ export const metadata: Metadata = {
  * The public landing page, in the order of the landing copy brief
  * (docs/design/landing-copy.zip, 02 to 08; the header and footer come
  * from the layout). It is static: no session is read and nothing is
- * fetched. Only the composer runs script.
+ * fetched. The composers, the scroll reveals and the five-jobs stack run
+ * script; each still reads correctly without it.
  */
 export default function LandingPage() {
   return (
@@ -33,7 +34,7 @@ export default function LandingPage() {
       <Hero />
       <Trust />
       <Problem />
-      <SolutionEditorial />
+      <JobStack />
       <PricingTeaser />
       <Faq />
       <Cta />

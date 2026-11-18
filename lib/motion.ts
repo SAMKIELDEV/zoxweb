@@ -35,3 +35,13 @@ export const flip = {
   transition: { duration: duration.slow, ease },
   stagger: 0.06,
 } as const;
+
+/**
+ * Runs inline in <head> before first paint (app/layout.tsx). Marks <html>
+ * with data-motion="ok" or "reduce". The public pages' scroll reveals show
+ * their start pose only under "ok" (the `pre-reveal:` variant in
+ * globals.css), so a visitor without script, or who asks for reduced
+ * motion, sees the final state, and nobody sees the final state flash
+ * before the animation (DESIGN.md, "Scroll triggers").
+ */
+export const motionScript = `(function(){try{document.documentElement.dataset.motion=matchMedia("(prefers-reduced-motion: reduce)").matches?"reduce":"ok"}catch(e){}})()`;

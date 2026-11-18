@@ -45,7 +45,7 @@ export function PricingTeaser() {
           </ButtonLink>
         </div>
 
-        <Reveal threshold={0.4}>
+        <Reveal>
           <PriceRows />
           <p className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-note text-ink-2">
             {TOOL_COSTS.map((tool) => (

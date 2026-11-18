@@ -11,10 +11,10 @@ import type { JobArt as JobArtKind } from "./content";
 
 // Shared motion classes. Start pose under "ready"; transitions carry it to the final look.
 const appear =
-  "transition-[opacity,transform] duration-(--dur-slow) ease-zox group-data-[reveal=ready]/reveal:opacity-0 group-data-[reveal=ready]/reveal:translate-y-2";
+  "transition-[opacity,transform] duration-(--dur-slow) ease-zox pre-reveal:opacity-0 pre-reveal:translate-y-2";
 const sweep =
-  "origin-left [transform-box:fill-box] transition-transform duration-700 ease-zox group-data-[reveal=ready]/reveal:scale-x-0";
-const draw = "transition-[stroke-dashoffset] duration-700 ease-zox group-data-[reveal=ready]/reveal:[stroke-dashoffset:1]";
+  "origin-left [transform-box:fill-box] transition-transform duration-700 ease-zox pre-reveal:scale-x-0";
+const draw = "transition-[stroke-dashoffset] duration-700 ease-zox pre-reveal:[stroke-dashoffset:1]";
 const hover = "transition-transform duration-(--dur-base) ease-zox";
 const delay = (ms: number) => ({ transitionDelay: `${ms}ms` });
 

@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowUp } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useId, useRef, useState, type FormEvent, type RefObject } from "react";
 import { cn } from "@/lib/cn";
 import { CHAT_MESSAGE_MAX, START_CHAT, cleanChatMessage, whatsAppLinkWithText } from "@/lib/site";
@@ -78,7 +77,11 @@ export function useKeepInView(target: RefObject<HTMLElement | null>) {
   };
 }
 
-/** The line under a composer: the microcopy, then "Opening WhatsApp", then the fallback link. */
+/**
+ * The line under a composer (DESIGN.md, "Composers"): nothing before
+ * sending, "Opening WhatsApp with your message ready" once Send is tapped,
+ * then the fallback link if the hand-off is blocked.
+ */
 export function HandoffNote({
   id,
   status,
@@ -95,7 +98,6 @@ export function HandoffNote({
   return (
     // min-h holds the line's height, so swapping in the fallback button moves nothing.
     <div id={id} aria-live="polite" className={cn("min-h-11 text-note text-ink-2", centered && "text-center", className)}>
-      {status === "ready" ? <p>{COMPOSER.microcopy}</p> : null}
       {status === "handoff" ? <p>{COMPOSER.handoff}</p> : null}
       {status === "fallback" ? (
         <p className={cn("flex flex-wrap items-center gap-x-3 gap-y-2", centered && "justify-center")}>
@@ -159,10 +161,9 @@ export function Composer({ className }: { className?: string }) {
         />
         <button
           type="submit"
-          aria-label={COMPOSER.sendLabel}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent-strong text-on-accent transition-[background-color,transform] duration-(--dur-fast) ease-zox hover:bg-accent-deep active:scale-[0.96]"
+          className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-accent-strong px-5 text-sm font-medium text-on-accent transition-[background-color,transform] duration-(--dur-fast) ease-zox hover:bg-accent-deep active:scale-[0.96]"
         >
-          <ArrowUp aria-hidden="true" size={20} weight="bold" />
+          {COMPOSER.send}
         </button>
       </form>
       <HandoffNote id={noteId} status={status} href={href} className="mt-3" />

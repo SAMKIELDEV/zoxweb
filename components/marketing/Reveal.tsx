@@ -1,81 +1,99 @@
 "use client";
 
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ElementType, type ReactNode, type RefObject } from "react";
 import { cn } from "@/lib/cn";
 
+/** How much of the watched element must show: about half on desktop, about a third on phones. */
+export interface InViewAmount {
+  desktop: number;
+  phone: number;
+}
+
+export const DEFAULT_AMOUNT: InViewAmount = { desktop: 0.5, phone: 0.35 };
+
+/** The lowest fifth of the screen does not count as "in view". */
+const ROOT_MARGIN = "0px 0px -20% 0px";
+const STEPS = Array.from({ length: 21 }, (_, index) => index / 20);
+
+/** True when the visitor's browser runs the reveals: script ran the inline flag and motion is allowed. */
+export function motionAllowed(): boolean {
+  return document.documentElement.dataset.motion === "ok";
+}
+
 /**
- * Plays one section's content animation, once, when it first scrolls into
- * view (DESIGN.md, "Marketing motion"). It only sets a state attribute on
- * its element; the animation itself is CSS on the children, written against
- * the `reveal` group:
+ * Calls `onEnter` once, the first time `ref`'s element is genuinely in view
+ * (DESIGN.md, "Scroll triggers"): `amount` of it visible above the bottom
+ * 20% of the screen, or, for an element taller than the screen, that share
+ * of the screen filled by it.
+ */
+export function useInViewOnce(ref: RefObject<Element | null>, onEnter: () => void, amount: InViewAmount = DEFAULT_AMOUNT) {
+  const callback = useRef(onEnter);
+  useEffect(() => {
+    callback.current = onEnter;
+  });
+  const { desktop, phone } = amount;
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof IntersectionObserver === "undefined") return;
+    const share = window.matchMedia("(min-width: 48rem)").matches ? desktop : phone;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[entries.length - 1];
+        if (!entry?.isIntersecting) return;
+        const screen = entry.rootBounds?.height ?? window.innerHeight * 0.8;
+        const needed = Math.min(entry.boundingClientRect.height, screen) * share;
+        if (entry.intersectionRect.height + 1 < needed) return;
+        observer.disconnect();
+        callback.current();
+      },
+      { rootMargin: ROOT_MARGIN, threshold: STEPS },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref, desktop, phone]);
+}
+
+/**
+ * Plays one section's content animation, once, when it is genuinely in
+ * view. It only sets a state attribute on its element; the animation is CSS
+ * on the children, written with the `pre-reveal:` variant for the start
+ * pose (app/globals.css):
  *
- * - no state: the final look. That is what the server renders, what a
- *   visitor without script sees, and what reduced motion keeps.
- * - "ready": the starting pose, set after hydration for a section that is
- *   still below the fold (`group-data-[reveal=ready]/reveal:opacity-0`...).
- * - "shown": back to the final look, with transitions, as it scrolls in.
+ * - "pending": what the server renders. CSS shows the start pose only when
+ *   <html> is data-motion="ok" (script on, motion allowed); otherwise this
+ *   is the final look. So the final state never flashes before the
+ *   animation, and a visitor without script still sees everything.
+ * - "shown": the trigger fired; transitions carry the children to the
+ *   final look.
  *
- * A section already on screen at load is left in its final look: animating
- * something the visitor is already reading would only hide it for a moment.
+ * Watch the element that animates, not a taller wrapper: on a phone a
+ * section's text can be on screen while its illustration is still below.
  */
 export function Reveal({
   as: Tag = "div",
   className,
   children,
-  threshold = 0.3,
+  amount = DEFAULT_AMOUNT,
   ...rest
 }: {
   as?: ElementType;
   className?: string;
   children: ReactNode;
-  /** How much of the element must be visible to start. */
-  threshold?: number;
+  amount?: InViewAmount;
 } & Record<string, unknown>) {
   const ref = useRef<HTMLElement>(null);
-  const [state, setState] = useState<"ready" | "shown" | undefined>(undefined);
+  const [state, setState] = useState<"pending" | "shown">("pending");
 
+  // With reduced motion there is nothing to wait for.
   useEffect(() => {
-    const element = ref.current;
-    if (!element || typeof IntersectionObserver === "undefined") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const box = element.getBoundingClientRect();
-    if (box.top < window.innerHeight && box.bottom > 0) return; // On screen already: keep the final look.
-    setState("ready");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        // One frame in "ready" so the browser has the start pose before it transitions.
-        requestAnimationFrame(() => setState("shown"));
-      },
-      { threshold },
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [threshold]);
+    if (!motionAllowed()) setState("shown");
+  }, []);
+  useInViewOnce(ref, () => setState("shown"), amount);
 
   return (
     <Tag ref={ref} data-reveal={state} className={cn("group/reveal", className)} {...rest}>
       {children}
     </Tag>
-  );
-}
-
-/**
- * The same states, played on mount instead of on scroll: for an illustration
- * that is swapped in (the selected job in the editorial variant).
- */
-export function PlayOnMount({ className, children }: { className?: string; children: ReactNode }) {
-  const [state, setState] = useState<"ready" | "shown" | undefined>(undefined);
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setState("ready");
-    const frame = requestAnimationFrame(() => requestAnimationFrame(() => setState("shown")));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-  return (
-    <div data-reveal={state} className={cn("group/reveal", className)}>
-      {children}
-    </div>
   );
 }
