@@ -4,7 +4,10 @@
  * here touches React, so each function can be tested by itself.
  */
 
-import type { UsageTotal } from "./api/types";
+import type { UsageTotal, UsageToolTotal } from "./api/types";
+
+/** Anything with a type, a request count and a credit count: all-time totals or one period's. */
+type UsageCount = Pick<UsageTotal, "action_type"> & { requests: number | string; credits: number | string };
 import { actionLabel } from "./format";
 
 /** The two all-time figures at the top of Usage. */
@@ -39,7 +42,7 @@ function toCount(value: number | string): number {
  * Adds up the backend's per-type totals into credits used and requests
  * made. An empty list gives 0 for both.
  */
-export function sumUsage(usage: UsageTotal[]): UsageSums {
+export function sumUsage(usage: UsageCount[]): UsageSums {
   let credits = 0;
   let requests = 0;
   for (const item of usage) {
@@ -55,8 +58,8 @@ export function sumUsage(usage: UsageTotal[]): UsageSums {
  * by requests (most first), then by name. A row's share is its credits over
  * all credits used, or 0 when none were used.
  */
-export function usageRows(usage: UsageTotal[]): UsageRow[] {
-  const byLabel = new Map<string, UsageTotal[]>();
+export function usageRows(usage: (UsageTotal | UsageToolTotal)[]): UsageRow[] {
+  const byLabel = new Map<string, UsageCount[]>();
   for (const item of usage) {
     const label = actionLabel(item.action_type);
     byLabel.set(label, [...(byLabel.get(label) ?? []), item]);

@@ -48,6 +48,32 @@ export interface UsageTotal {
   credits: string;
 }
 
+/** One day of the usage charts, in the visitor's own time zone. */
+export interface UsageDay {
+  /** YYYY-MM-DD. */
+  date: string;
+  credits: number;
+  requests: number;
+}
+
+/** Totals for one action type over a chart's period. */
+export interface UsageToolTotal {
+  action_type: ActionType | (string & {});
+  requests: number;
+  credits: number;
+}
+
+/** The usage charts' data: every day of the period, oldest first, and the per-tool totals over it. */
+export interface UsageSeries {
+  days: UsagePeriod;
+  tz: string;
+  daily: UsageDay[];
+  byTool: UsageToolTotal[];
+}
+
+/** The periods the backend offers. Home shows 14 days; Usage lets the visitor pick 7, 30 or 90. */
+export type UsagePeriod = 7 | 14 | 30 | 90;
+
 export interface Activity {
   action_type: ActionType | (string & {});
   tokens_used: number;

@@ -219,17 +219,32 @@ export async function endSession(request: NextRequest): Promise<NextResponse> {
  * browser does that through /api/session/refresh (lib/api/client.ts), so
  * renewals happen in one place and one at a time.
  */
+/** The chart's period and the visitor's time zone, and nothing else from the query. */
+function usageQuery(request: NextRequest): string {
+  const from = request.nextUrl.searchParams;
+  const params = new URLSearchParams();
+  const days = from.get("days");
+  const tz = from.get("tz");
+  if (days && /^\d{1,3}$/.test(days)) params.set("days", days);
+  if (tz && tz.length <= 64) params.set("tz", tz);
+  const text = params.toString();
+  return text ? `?${text}` : "";
+}
+
 export async function proxyAccount(request: NextRequest, suffix = ""): Promise<NextResponse> {
   if (request.method !== "GET" && !validOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   const paymentGet = suffix === "/payments/packages" || /^\/payments\/transactions\/[A-Za-z0-9_-]{1,64}$/.test(suffix);
-  if (!(request.method === "GET" && (suffix === "" || paymentGet)) && !(request.method === "POST" && ["/link-code", "/unlink", "/payments/checkout"].includes(suffix))) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const usageGet = suffix === "/usage";
+  if (!(request.method === "GET" && (suffix === "" || paymentGet || usageGet)) && !(request.method === "POST" && ["/link-code", "/unlink", "/payments/checkout"].includes(suffix))) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const unauthorized = () => NextResponse.json({ error: "Please sign in again" }, { status: 401, headers: { "Cache-Control": "no-store" } });
   const accessToken = readCookie(request, ACCESS_COOKIE);
   if (!accessToken) return unauthorized();
   const body = request.method === "POST" ? await request.text() : undefined;
   if (body && body.length > 8192) return NextResponse.json({ error: "Request too large" }, { status: 413 });
   try {
-    const upstream = await fetch(`${backendBase}/api/account${suffix}`, { method: request.method, headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, body, cache: "no-store", signal: AbortSignal.timeout(suffix === "/payments/checkout" ? 45000 : 15000) });
+    // Only the usage charts take a query, and only these two keys are passed on.
+    const query = usageGet ? usageQuery(request) : "";
+    const upstream = await fetch(`${backendBase}/api/account${suffix}${query}`, { method: request.method, headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" }, body, cache: "no-store", signal: AbortSignal.timeout(suffix === "/payments/checkout" ? 45000 : 15000) });
     if (upstream.status === 401) return unauthorized();
     return NextResponse.json(await upstream.json(), { status: upstream.status, headers: { "Cache-Control": "no-store" } });
   } catch { return NextResponse.json({ error: "Account service unavailable. Try again shortly." }, { status: 503 }); }

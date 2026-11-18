@@ -1,5 +1,5 @@
 import { request } from "./client";
-import type { LinkChallenge, Snapshot } from "./types";
+import type { LinkChallenge, Snapshot, UsagePeriod, UsageSeries } from "./types";
 
 export const ACCOUNT_KEY = "/api/account";
 
@@ -19,4 +19,14 @@ export function createLinkCode(): Promise<LinkChallenge> {
  */
 export function unlinkWhatsApp(): Promise<{ linked: false }> {
   return request<{ linked: false }>("/api/account/unlink", { method: "POST" });
+}
+
+/** The usage charts' key: the period and the visitor's time zone, so "a day" is their day. */
+export function usageKey(days: UsagePeriod, timeZone: string): string {
+  return `${ACCOUNT_KEY}/usage?${new URLSearchParams({ days: String(days), tz: timeZone })}`;
+}
+
+/** Credits and requests per day, and per tool, over the period in the key. */
+export function getUsage(key: string): Promise<UsageSeries> {
+  return request<UsageSeries>(key);
 }
