@@ -15,11 +15,19 @@ Builds the dashboard to DESIGN.md, "Dashboard shell" (owner's direction, Novembe
 | 7 | `zoxweb` | Settings: one column with dividers: Profile (SAMKIEL ID), WhatsApp (number, member since, link or unlink), Plan, Sign out. | All states; no fake controls |
 | 8 | `zoxweb` | DESIGN.md section 5 brought in line with the new shell; audit marked done for these items. | |
 
+## Status (November 18, 2026)
+
+All eight steps are built. Steps 1 (`zox`, on `main`) and 2 to 8 (`zoxweb`, on `redesign/v2-landing`) are pushed. Checked in a browser with mocked account data: every page populated at 375 and 1280px (Home and Usage also at 768, Billing at 1024), Home loading and empty, Usage at 90 days, failed and not linked, Settings not linked, the phone menu sheet, and Home in the dark theme. Not yet checked against the live backend.
+
+- `DailyChart` lives in `components/account/` because Home and Usage both use it.
+- The user chip in the old top bar is gone; who is signed in shows on Settings.
+- `CreditCosts` and `UsageTotals` were removed; their information is on the Pricing page.
+
 ## Decided while planning
 
 - **Notifications** are left out of Settings: the product sends none and has no setting for them, and DESIGN.md bans fake toggles. Add the section when the feature exists.
 - **Preferred name** is left out of Profile: the column exists in the backend, but nothing sets it yet.
-- **Charts are drawn in SVG by hand**, with no chart library: bars in `accent`, direct labels, no gradients, a screen-reader table of the same numbers.
+- **Charts are drawn by hand** in HTML, with no chart library: bars in `accent`, direct labels, no gradients, a screen-reader table of the same numbers.
 - **The Usage breakdown follows the toggle** (the same period as the chart), not all time.
 - **"What a credit covers"** leaves Billing and Usage; Billing links to the Pricing page instead, as DESIGN.md asks.
 

@@ -52,7 +52,7 @@ Components use semantic names, never raw values. Each name has a light and a dar
 | `ease-zox` | `cubic-bezier(0.22, 1, 0.36, 1)` |
 | `--dur-fast` / `--dur-base` / `--dur-slow` | 140ms / 240ms / 420ms |
 
-Theme: light and dark, switched by the toggle in the top bar. The choice is stored in the browser; with no stored choice the system preference decides. Every page is checked in both themes.
+Theme: light and dark, switched by the toggle at the foot of the sidebar (in the menu sheet on phones; in the header on the public pages). The choice is stored in the browser; with no stored choice the system preference decides. Every page is checked in both themes.
 
 Rules:
 - Use tokens only. No raw hex, no arbitrary Tailwind color values. Tailwind's default palette, type sizes, radii and shadows are removed in `globals.css`, so off-system classes (`gray-*`, `text-4xl`, `rounded-3xl`) produce nothing.
@@ -76,16 +76,16 @@ Rules:
 
 ## 5. Layout and shell
 
-- Desktop: left sidebar nav (Home, Billing, Usage, Settings), 220px wide with labels from 1024px and a 64px icon rail from 768px. Content max width 1120px, left-aligned, generous left/right padding. A sticky 64px top bar holds the page title (the page's only `h1`), the theme toggle, and who is signed in.
+- Desktop: the floating sidebar panel described under "Dashboard shell" below: Home, Billing and Usage, with Settings, the theme toggle and Sign out at its foot. 220px wide with labels from 1024px, a 64px icon rail with tooltips from 768px. Content max width 1120px, left-aligned, clearing the panel (`components/shell/AppShell.tsx`).
 - Two-column pages (a main column and an 18rem side column) start their side column at 1280px. From 1024 to 1279px the sidebar has just opened to 220px, so the page stays one column, capped at 720px. The shared class lists are in `components/shell/layout.ts`.
-- Mobile: no sidebar. A 60px top bar with the logo and page title, and a four-item bottom nav. Tap targets 44px minimum.
-- The logo is the terracotta "zox" wordmark from the brand pack, with the standalone "z" where the wordmark does not fit (the 64px sidebar rail, the favicon). It sits at the top of the nav. Never redraw, recolor or rebuild it in code: render the supplied file through `components/ui/Logo.tsx`. Terracotta is used on both themes. The cream and near-black variants in `public/brand/` are for terracotta or photographic backgrounds, which the product does not have yet.
+- Mobile: no sidebar. A 56px top bar with the Z mark and a menu button that opens a modal sheet (a native `dialog`) with the same items, the theme toggle and Sign out. Tap targets 44px minimum.
+- The logo is the terracotta "zox" wordmark from the brand pack, with the standalone "z" in the dashboard's sidebar and phone bar and as the favicon. It sits at the top of the nav. Never redraw, recolor or rebuild it in code: render the supplied file through `components/ui/Logo.tsx`. Terracotta is used on both themes. The cream and near-black variants in `public/brand/` are for terracotta or photographic backgrounds, which the product does not have yet.
 - Favicon, app icons, web manifest and the Open Graph and Twitter images are the files from the pack's `web/` folder, placed in `app/` and `public/` as its README describes.
-- Page header pattern: the serif title lives in the top bar. A page may open with a one-line sans subtitle in `ink-2`, with its primary action aligned right.
+- Page header pattern: every page opens with `PageHeader` (`components/shell/PageHeader.tsx`) inside the content area: the serif title (the page's only `h1`), an optional one-line sans subtitle in `ink-2`, and at most one primary action to the right. It renders in every state of the page.
 
 ### Dashboard shell (owner's direction, November 17, 2026)
 
-This replaces the full-height sidebar and full-width top bar described above as the shell is rebuilt.
+Built November 18, 2026; the steps and the decisions made on the way are in `docs/design/dashboard-rebuild-plan.md`.
 
 - **Desktop:** a floating sidebar panel, inset from the screen edges (it does not touch the top, bottom or left edge), on `sidebar` with a hairline border and `shadow-soft`, radius `lg`. The Z mark at the top. Nav items are rows with a tinted active background (`wash`) and a small terracotta edge marker on the active row. Settings and Sign out sit at the bottom of the panel.
 - **Narrow desktop** (768 to 1023px): the panel collapses to an icon rail, each icon with a tooltip giving its name.
@@ -94,8 +94,8 @@ This replaces the full-height sidebar and full-width top bar described above as 
 - **Home:** the balance is the hero (large serif number, a quiet line for what it covers), one large usage chart for the last 14 days (flat warm palette, direct labels, no gradients), recent activity as hairline rows, one primary action ("Top up"), and a small inline notice only when WhatsApp is not linked. No row of metric cards.
 - **Dashboard motion:** page enter, list stagger, the chart drawing in once on first load, the balance changing (the digit flip), button press feedback. Nothing else.
 - **Billing:** the balance, then the packages as rows (not cards) with prices in the visitor's currency, a sticky order summary on desktop, and the transaction history as hairline rows. The success page shows "Confirming your purchase" and polls until the webhook has credited the wallet; it never trusts the redirect alone. Status colors (`positive`, `warning`, `danger`) appear on this page only, always beside words. A "How credits work" link goes to the Pricing page.
-- **Usage:** one large chart with a 7d, 30d, 90d toggle, then a breakdown by tool as horizontal bars with direct labels. No pie or donut charts.
-- **Settings:** one column with dividers: Profile (SAMKIEL ID, preferred name), WhatsApp link (status, and the code flow with polling), Notifications, Plan. Nothing the product cannot do (no fake toggles).
+- **Usage:** one large chart with a 7d, 30d, 90d toggle, then a breakdown by tool for the same period as horizontal bars with direct labels, then recent activity. No pie or donut charts. Days are the visitor's own (the backend counts them in the browser's time zone).
+- **Settings:** one column with dividers: Profile (SAMKIEL ID, preferred name), WhatsApp link (status, and the code flow with polling), Notifications, Plan. Nothing the product cannot do (no fake toggles): Notifications and the preferred name are left out until the product has them.
 - **Sign-in (owner's change, November 18, 2026):** the public pages' header and footer, no phone. On desktop (1024px and up) a quiet warm panel sits to the right of the form: `surface` with a hairline border, a soft terracotta wash from its lower right edge (the third and last gradient place on the public pages, after the hero and the CTA), the Z mark, "Zox gets to the point.", and three hairline rows on what the dashboard holds. Phones show the form only. The headline, one line on what SAMKIEL ID is for, one primary button "Continue with SAMKIEL ID", and under it a quiet line "Don't have a SAMKIEL ID? Create one." with "Create one." as the link. Zox has no password form of its own: both go to SAMKIEL ID at the accounts site. It covers the signed-out notice ("You were signed out. Sign in again to carry on.").
 
 ## 6. Components
@@ -104,7 +104,7 @@ This replaces the full-height sidebar and full-width top bar described above as 
 - **Inputs**: `paper` fill, `line` border, terracotta focus ring (2px, offset 2px). Labels above, always visible.
 - **Icons**: one icon set, one stroke weight, used sparingly: **Phosphor, regular weight** (`@phosphor-icons/react`), whose rounded joins match the buttons' rounded corners. It replaces Lucide (owner's choice, November 17, 2026); pages move over as they are rebuilt, and the hero phone keeps its WhatsApp-style glyphs, since it is a picture of another app. Never emoji as icons. No icon in a colored circle as a card header.
 - **Credit balance**: the hero. Large serif number, small sans "credits" label, plus a quiet line for what it covers. Not wrapped in a gradient card.
-- **Charts (Usage page)**: flat, warm palette (terracotta, forest, ink tints), no gradients, no glow, direct labels preferred over legends, no chart junk.
+- **Charts (Home and Usage)**: flat, warm palette (terracotta, forest, ink tints), no gradients, no glow, direct labels preferred over legends, no chart junk. Drawn by hand, with no chart library (`components/account/DailyChart.tsx`): bars in `accent`, the busiest day and today labelled, a hover readout per day, and a summary and table for screen readers.
 - **Tables / lists** (transactions, activity): rows separated by whitespace and hairlines, not boxed zebra stripes.
 
 ## 7. States (mandatory on every data view)
