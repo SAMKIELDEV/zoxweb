@@ -13,7 +13,7 @@ interface NotLinkedProps {
 export function NotLinked({ body, heading = "Connect WhatsApp first" }: NotLinkedProps) {
   return (
     <section aria-labelledby="not-linked-heading" className="max-w-160">
-      <h2 id="not-linked-heading" className="text-xl font-semibold text-ink md:text-2xl">
+      <h2 id="not-linked-heading" className="text-lg font-semibold text-ink md:text-xl">
         {heading}
       </h2>
       <p className="mt-4 max-w-[52ch] text-base text-ink-2">{body}</p>

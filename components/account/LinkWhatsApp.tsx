@@ -90,7 +90,7 @@ export function LinkWhatsApp({ identityId }: { identityId: string }) {
 
   return (
     <section ref={section} aria-labelledby="link-whatsapp-heading" className="max-w-160" onFocus={() => (used.current = true)}>
-      <h2 id="link-whatsapp-heading" ref={heading} tabIndex={-1} className="text-xl font-semibold text-ink md:text-2xl">
+      <h2 id="link-whatsapp-heading" ref={heading} tabIndex={-1} className="text-lg font-semibold text-ink md:text-xl">
         {view === "code" ? "Send this code to Zox" : view === "expired" ? "That code ran out" : "Connect your WhatsApp"}
       </h2>
 

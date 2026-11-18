@@ -83,7 +83,7 @@ export function PaymentStatus({ id, cancelled = false }: PaymentStatusProps) {
     <section aria-labelledby="purchase-heading" className="max-w-160">
       {/* A polite live region: the heading changes as the purchase settles. */}
       <div role="status">
-        <h2 id="purchase-heading" className="text-xl font-semibold text-ink md:text-2xl">
+        <h2 id="purchase-heading" className="text-lg font-semibold text-ink md:text-xl">
           {copy.heading}
         </h2>
         <p className="mt-4 max-w-[52ch] text-base text-ink-2">{copy.body}</p>

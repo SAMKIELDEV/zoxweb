@@ -1,17 +1,22 @@
 "use client";
 
-import { CreditCosts } from "@/components/account/CreditCosts";
+import { useState } from "react";
+import { DailyChart, DailyChartSkeleton } from "@/components/account/DailyChart";
 import { NotLinked } from "@/components/account/NotLinked";
-import { mainColumn, pageBlocks, pageColumns } from "@/components/shell/layout";
+import { pageBlocks } from "@/components/shell/layout";
 import { LoadingRegion, Skeleton } from "@/components/ui/Skeleton";
-import { ErrorState } from "@/components/ui/States";
+import { EmptyState, ErrorState } from "@/components/ui/States";
 import { useAccount } from "@/hooks/useAccount";
-import { sumUsage } from "@/lib/usage";
+import { useUsageSeries } from "@/hooks/useUsageSeries";
+import type { UsagePeriod } from "@/lib/api/types";
+import { creditCount, requestCount } from "@/lib/format";
+import { sumDays } from "@/lib/usage";
 import { ActivityList, ActivityListSkeleton } from "./ActivityList";
+import { PeriodToggle, USAGE_PERIODS } from "./PeriodToggle";
 import { UsageBreakdown, UsageBreakdownSkeleton } from "./UsageBreakdown";
-import { UsageTotals, UsageTotalsSkeleton } from "./UsageTotals";
 
-const opening = "flex flex-col gap-6";
+/** The period Usage opens on. */
+const DEFAULT_PERIOD: UsagePeriod = 30;
 
 /**
  * Usage, in each of its states:
@@ -19,17 +24,15 @@ const opening = "flex flex-col gap-6";
  * - failed: one line and a retry
  * - not linked: usage belongs to a WhatsApp number, so the way forward is
  *   linking one
- * - linked, nothing yet: the Activity heading over one line saying so
- * - linked: all-time totals, where the credits went, recent activity.
- *   When every request so far was free, the breakdown is left out:
- *   there are no credits to account for.
- * What each kind of request costs sits alongside in every state but the
- * failed one. Every figure is all time: the backend sends its totals with
- * no dates, so nothing here names a period.
+ * - linked: one chart of credits per day over 7, 30 or 90 days, where
+ *   those credits went by tool, then recent activity. The chart and the
+ *   breakdown have their own loading, failed and empty states, since
+ *   they come from a second request.
  * A closed account (403) renders nothing here; the shell already says why.
  */
 export function UsageContent() {
   const { snapshot, error, isValidating, refresh } = useAccount();
+  const [period, setPeriod] = useState<UsagePeriod>(DEFAULT_PERIOD);
 
   if (!snapshot) {
     if (error?.status === 403) return null;
@@ -40,63 +43,107 @@ export function UsageContent() {
           message="Couldn't load your usage. Try again."
           onRetry={() => void refresh()}
           retryLabel={isValidating ? "Trying again" : "Try again"}
+          className="border-y border-line"
         />
       );
     }
     return (
       <LoadingRegion label="Loading your usage" className={pageBlocks}>
-        <div className={opening}>
-          <Skeleton className="h-6 w-72 max-w-full" />
-          <UsageTotalsSkeleton />
-        </div>
-        <div className={pageColumns}>
-          <div className={mainColumn}>
-            <UsageBreakdownSkeleton />
-            <ActivityListSkeleton />
-          </div>
-          <CreditCosts />
-        </div>
+        <ChartSectionSkeleton />
+        <UsageBreakdownSkeleton />
+        <ActivityListSkeleton />
       </LoadingRegion>
     );
   }
 
   if (!snapshot.linked) {
-    return (
-      <div className={pageColumns}>
-        <NotLinked body="Usage belongs to a WhatsApp number. Link yours and what you do with Zox shows up here." />
-        <CreditCosts />
-      </div>
-    );
+    return <NotLinked body="Usage belongs to a WhatsApp number. Link yours and what you do with Zox shows up here." />;
   }
-
-  const { usage, recent } = snapshot;
-
-  // No totals yet. The backend reads totals and events separately, so a
-  // first event can land with no total: ActivityList covers both cases.
-  if (usage.length === 0) {
-    return (
-      <div className={pageColumns}>
-        <ActivityList items={recent} />
-        <CreditCosts />
-      </div>
-    );
-  }
-
-  const spentAnything = sumUsage(usage).credits > 0;
 
   return (
     <div className={pageBlocks}>
-      <div className={opening}>
-        <p className="text-base text-ink-2">All time, since you started with Zox.</p>
-        <UsageTotals usage={usage} />
+      <PeriodUsage period={period} onPeriod={setPeriod} />
+      <ActivityList items={snapshot.recent} />
+    </div>
+  );
+}
+
+/** The chart and the breakdown, both over the chosen period. */
+function PeriodUsage({ period, onPeriod }: { period: UsagePeriod; onPeriod: (days: UsagePeriod) => void }) {
+  const { series, error, isValidating, refresh } = useUsageSeries(period, true);
+  const label = USAGE_PERIODS.find((item) => item.days === period)?.label ?? `${period} days`;
+
+  const header = (summary: string | null) => (
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <h2 id="usage-chart-heading" className="text-lg font-semibold text-ink">
+          Credits per day
+        </h2>
+        <p className="mt-1 min-h-lh text-sm tabular-nums text-ink-2">{summary}</p>
       </div>
-      <div className={pageColumns}>
-        <div className={mainColumn}>
-          {spentAnything ? <UsageBreakdown usage={usage} /> : null}
-          <ActivityList items={recent} />
+      <PeriodToggle value={period} onChange={onPeriod} />
+    </div>
+  );
+
+  if (!series) {
+    if (error && error.status !== 401) {
+      return (
+        <section aria-labelledby="usage-chart-heading">
+          {header(null)}
+          <ErrorState
+            message="Couldn't load this period. Try again."
+            onRetry={() => void refresh()}
+            retryLabel={isValidating ? "Trying again" : "Try again"}
+            className="border-y border-line"
+          />
+        </section>
+      );
+    }
+    return (
+      <div className={pageBlocks}>
+        <section aria-labelledby="usage-chart-heading">
+          {header(null)}
+          <DailyChartSkeleton />
+        </section>
+        <UsageBreakdownSkeleton />
+      </div>
+    );
+  }
+
+  // While another period loads, the last one stays on screen; say which.
+  const shown = USAGE_PERIODS.find((item) => item.days === series.days)?.label ?? label;
+  const totals = sumDays(series.daily);
+  const summary = totals.requests > 0 ? `${creditCount(totals.credits)} over ${requestCount(totals.requests)}, last ${shown}` : null;
+
+  return (
+    <div className={pageBlocks}>
+      <section aria-labelledby="usage-chart-heading" aria-busy={series.days !== period || undefined}>
+        {header(summary)}
+        {totals.requests > 0 ? (
+          <DailyChart days={series.daily} label={`Credits used per day, last ${shown}`} />
+        ) : (
+          <EmptyState
+            message={`Nothing in the last ${shown}. Send Zox a message on WhatsApp and it shows up.`}
+            className="border-y border-line"
+          />
+        )}
+      </section>
+      {totals.credits > 0 ? <UsageBreakdown usage={series.byTool} period={shown} /> : null}
+    </div>
+  );
+}
+
+function ChartSectionSkeleton() {
+  return (
+    <div aria-hidden="true">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <Skeleton className="h-lh w-40 text-lg" />
+          <Skeleton className="mt-1 h-lh w-56 max-w-full text-sm" />
         </div>
-        <CreditCosts />
+        <Skeleton className="h-12 w-44 rounded-md" />
       </div>
+      <DailyChartSkeleton />
     </div>
   );
 }

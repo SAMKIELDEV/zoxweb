@@ -80,7 +80,11 @@ export function DailyChart({ days, label }: { days: UsageDay[]; label: string })
                 )}
                 {labelled ? (
                   <span
-                    className="absolute text-xs font-medium whitespace-nowrap text-ink tabular-nums"
+                    className={cn(
+                      "absolute text-xs font-medium whitespace-nowrap text-ink tabular-nums",
+                      // At the plot's edges, keep the number inside it.
+                      index === 0 ? "left-0" : index === lastIndex ? "right-0" : null,
+                    )}
                     style={{ bottom: `calc(${height}% + 6px)` }}
                   >
                     {formatCount(day.credits)}
