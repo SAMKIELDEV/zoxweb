@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Phone } from "@/components/marketing/Hero";
+import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingNav } from "@/components/marketing/MarketingNav";
 import { container, headingTracking } from "@/components/marketing/Section";
 import { ButtonLink } from "@/components/ui/Button";
@@ -16,8 +16,10 @@ interface LoginPageProps {
 }
 
 /**
- * The way in, dressed like the landing page: its header, a display
- * headline, pill buttons, and the live phone beside them.
+ * The way in, dressed like the landing page: its header and footer, a
+ * display headline, and one main button (owner's change, November 18, 2026:
+ * no phone, "Continue with SAMKIEL ID" as the one call to action, creating
+ * an ID as a quiet line under it).
  *
  * Zox has no sign-in form of its own: the button goes to SAMKIEL ID at the
  * accounts site, which signs the person in for every samkiel.tech site and
@@ -47,7 +49,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     <div className="flex min-h-dvh flex-col [font-variation-settings:normal]">
       <MarketingNav />
       <main className="flex-1 overflow-x-clip">
-        <div className={cn(container, "grid items-center gap-14 pt-8 pb-20 lg:grid-cols-[1.3fr_1fr] lg:pt-6")}>
+        <div className={cn(container, "py-20 md:py-28 lg:py-32")}>
           <div className="max-w-140">
             <h1 className={cn("mb-5 font-display text-hero font-semibold text-ink", headingTracking)}>
               Sign in to <em className="text-accent italic">Zox.</em>
@@ -62,26 +64,29 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </p>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-3">
-              <ButtonLink
-                href={accountsUrl("login", origin, next)}
-                variant="primary"
-                size="lg"
-                shape="pill"
-                className="shadow-cta"
+            <ButtonLink
+              href={accountsUrl("login", origin, next)}
+              variant="primary"
+              size="lg"
+              shape="pill"
+              className="w-full shadow-cta sm:w-auto"
+            >
+              Continue with SAMKIEL ID
+            </ButtonLink>
+            <p className="mt-5 text-base text-ink-2">
+              Don&rsquo;t have a SAMKIEL ID?{" "}
+              <a
+                href={accountsUrl("register", origin, next)}
+                className="inline-flex min-h-11 items-center font-medium text-accent-ink underline underline-offset-4 sm:min-h-0"
               >
-                Continue with SAMKIEL ID
-              </ButtonLink>
-              <ButtonLink href={accountsUrl("register", origin, next)} variant="secondary" size="lg" shape="pill">
-                Create a SAMKIEL ID
-              </ButtonLink>
-            </div>
-            <p className="mt-4 text-note text-ink-2">You sign in at {accountsHost} and come straight back.</p>
+                Create one.
+              </a>
+            </p>
+            <p className="mt-3 text-note text-ink-2">You sign in at {accountsHost} and come straight back.</p>
           </div>
-
-          <Phone />
         </div>
       </main>
+      <MarketingFooter />
     </div>
   );
 }

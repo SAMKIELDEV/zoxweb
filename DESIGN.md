@@ -96,7 +96,7 @@ This replaces the full-height sidebar and full-width top bar described above as 
 - **Billing:** the balance, then the packages as rows (not cards) with prices in the visitor's currency, a sticky order summary on desktop, and the transaction history as hairline rows. The success page shows "Confirming your purchase" and polls until the webhook has credited the wallet; it never trusts the redirect alone. Status colors (`positive`, `warning`, `danger`) appear on this page only, always beside words. A "How credits work" link goes to the Pricing page.
 - **Usage:** one large chart with a 7d, 30d, 90d toggle, then a breakdown by tool as horizontal bars with direct labels. No pie or donut charts.
 - **Settings:** one column with dividers: Profile (SAMKIEL ID, preferred name), WhatsApp link (status, and the code flow with polling), Notifications, Plan. Nothing the product cannot do (no fake toggles).
-- **Sign-in:** two columns on desktop: the form on the left, and on the right a quiet warm panel with the paper grain, the Z mark and "Zox gets to the point." Phones show the form only. It covers loading, wrong credentials, and the first sign-in of a migrated account that must set a password.
+- **Sign-in (owner's change, November 18, 2026):** the public pages' header and footer, one column, no phone or picture beside it. The headline, one line on what SAMKIEL ID is for, one primary button "Continue with SAMKIEL ID", and under it a quiet line "Don't have a SAMKIEL ID? Create one." with "Create one." as the link. Zox has no password form of its own: both go to SAMKIEL ID at the accounts site. It covers the signed-out notice ("You were signed out. Sign in again to carry on.").
 
 ## 6. Components
 
