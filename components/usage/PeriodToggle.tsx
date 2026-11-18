@@ -6,6 +6,7 @@ import { radioLabelFocus } from "@/components/ui/RadioInput";
 
 export const USAGE_PERIODS: { days: UsagePeriod; label: string; short: string }[] = [
   { days: 7, label: "7 days", short: "7d" },
+  { days: 14, label: "14 days", short: "14d" },
   { days: 30, label: "30 days", short: "30d" },
   { days: 90, label: "90 days", short: "90d" },
 ];

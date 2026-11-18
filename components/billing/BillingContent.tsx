@@ -2,12 +2,12 @@
 
 import { NotLinked } from "@/components/account/NotLinked";
 import { pageBlocks } from "@/components/shell/layout";
-import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
+import { nextFreeRefill, splitBalance } from "@/components/home/BalanceHero";
 import { LoadingRegion, Skeleton } from "@/components/ui/Skeleton";
 import { ErrorState } from "@/components/ui/States";
 import { useAccount } from "@/hooks/useAccount";
 import type { Account, Wallet } from "@/lib/api/types";
-import { tierLabel } from "@/lib/format";
+import { formatCount, formatWhenInline, tierLabel } from "@/lib/format";
 import { TopUp, TopUpSkeleton } from "./TopUp";
 import { TransactionList, TransactionListSkeleton } from "./TransactionList";
 
@@ -75,16 +75,20 @@ export function BillingContent() {
 
 /** The balance as type on the page, smaller than Home's hero, and the plan it sits on. */
 function Balance({ wallet, account }: { wallet: Wallet; account: Account }) {
+  const parts = splitBalance(wallet);
+  const refill = nextFreeRefill(wallet);
   return (
     <section aria-labelledby="billing-balance-heading">
-      <h2 id="billing-balance-heading" className="sr-only">
-        Balance
-      </h2>
-      <p className="flex items-baseline gap-2" data-testid="billing-balance" data-value={wallet.credits}>
-        <AnimatedNumber value={wallet.credits} className="font-display text-2xl font-semibold tracking-tight text-ink" />
-        <span className="text-base text-ink-2">{wallet.credits === 1 ? "credit" : "credits"}</span>
+      <h2 id="billing-balance-heading" className="text-sm font-medium text-ink-2">Wallet</h2>
+      <p className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink tabular-nums" data-testid="billing-balance" data-value={wallet.credits} aria-label={`${formatCount(wallet.credits)} ${wallet.credits === 1 ? "credit" : "credits"} available`}>
+        {formatCount(wallet.credits)} <span className="text-xl">{wallet.credits === 1 ? "credit" : "credits"} available</span>
       </p>
-      <p className="mt-2 text-base text-ink-2">On the {tierLabel(account.tier)} plan.</p>
+      <p className="mt-3 text-sm text-ink-2">
+        <span className="tabular-nums text-ink">{formatCount(parts.free)}</span> free {parts.free === 1 ? "credit" : "credits"} left today{refill ? ` · Refills ${formatWhenInline(refill)}` : " · Refill time unavailable"}
+      </p>
+      <p className="mt-1 text-sm text-ink-2">
+        <span className="tabular-nums text-ink">{formatCount(parts.purchased)}</span> purchased {parts.purchased === 1 ? "credit" : "credits"} that carry over · {tierLabel(account.tier)} plan
+      </p>
     </section>
   );
 }

@@ -62,7 +62,7 @@ export function ActivityRows({ items }: { items: Activity[] }) {
               {formatWhen(item.created_at)}
             </time>
           </div>
-          <span className={rowFigure}>{item.credits_charged > 0 ? creditCount(item.credits_charged) : "Free"}</span>
+          <span className={rowFigure}>{creditCount(item.credits_charged)}</span>
         </motion.li>
       ))}
     </motion.ul>

@@ -20,7 +20,7 @@ export function RecentActivity({ items }: { items: Activity[] }) {
         </h2>
         {shown.length > 0 ? (
           <TextLink href="/dashboard/usage" className="inline-flex min-h-11 items-center text-sm">
-            Go to Usage
+            View all activity
           </TextLink>
         ) : null}
       </div>

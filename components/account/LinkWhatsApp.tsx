@@ -91,7 +91,7 @@ export function LinkWhatsApp({ identityId }: { identityId: string }) {
   return (
     <section ref={section} aria-labelledby="link-whatsapp-heading" className="max-w-160" onFocus={() => (used.current = true)}>
       <h2 id="link-whatsapp-heading" ref={heading} tabIndex={-1} className="text-lg font-semibold text-ink md:text-xl">
-        {view === "code" ? "Send this code to Zox" : view === "expired" ? "That code ran out" : "Connect your WhatsApp"}
+        {view === "code" ? "Send this code to Zox" : view === "expired" ? "That code ran out" : "Link WhatsApp"}
       </h2>
 
       {view === "code" && challenge ? (
@@ -140,7 +140,7 @@ export function LinkWhatsApp({ identityId }: { identityId: string }) {
           </p>
 
           <Button variant="primary" onClick={askForCode} busy={requesting} className="mt-8 w-full sm:w-auto">
-            {requesting ? "Getting your code" : view === "expired" ? "Get a new code" : "Connect WhatsApp"}
+            {requesting ? "Getting your code" : view === "expired" ? "Get a new code" : "Link WhatsApp"}
           </Button>
 
           {failureCopy ? (

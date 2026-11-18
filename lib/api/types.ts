@@ -71,7 +71,7 @@ export interface UsageSeries {
   byTool: UsageToolTotal[];
 }
 
-/** The periods the backend offers. Home shows 14 days; Usage lets the visitor pick 7, 30 or 90. */
+/** The periods the backend offers. Usage defaults to 14 days and also offers 7, 30 and 90. */
 export type UsagePeriod = 7 | 14 | 30 | 90;
 
 export interface Activity {

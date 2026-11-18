@@ -157,15 +157,15 @@ const ACTION_LABELS: Record<string, string> = {
   chat: "Chat",
   webSearch: "Web search",
   youtubeSummary: "YouTube summary",
-  pdfReader: "PDF reading",
-  imageUnderstanding: "Image reading",
+  pdfReader: "PDF summary",
+  imageUnderstanding: "Image analysis",
   socialMediaDownload: "Media download",
 };
 
-/** Plain name for a backend action type. Unknown types read as "Other". */
+/** Plain name for a backend action type. Unknown types get an explicit fallback. */
 export function actionLabel(actionType: string): string {
   // hasOwn, so a type named like a built-in key ("constructor") is still "Other".
-  return Object.hasOwn(ACTION_LABELS, actionType) ? ACTION_LABELS[actionType] : "Other";
+  return Object.hasOwn(ACTION_LABELS, actionType) ? ACTION_LABELS[actionType] : "Other activity";
 }
 
 const TIER_LABELS: Record<Tier, string> = {

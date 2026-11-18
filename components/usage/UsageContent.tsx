@@ -16,7 +16,7 @@ import { PeriodToggle, USAGE_PERIODS } from "./PeriodToggle";
 import { UsageBreakdown, UsageBreakdownSkeleton } from "./UsageBreakdown";
 
 /** The period Usage opens on. */
-const DEFAULT_PERIOD: UsagePeriod = 30;
+const DEFAULT_PERIOD: UsagePeriod = 14;
 
 /**
  * Usage, in each of its states:
@@ -24,7 +24,7 @@ const DEFAULT_PERIOD: UsagePeriod = 30;
  * - failed: one line and a retry
  * - not linked: usage belongs to a WhatsApp number, so the way forward is
  *   linking one
- * - linked: one chart of credits per day over 7, 30 or 90 days, where
+ * - linked: one chart of credits per day over 7, 14, 30 or 90 days, where
  *   those credits went by tool, then recent activity. The chart and the
  *   breakdown have their own loading, failed and empty states, since
  *   they come from a second request.

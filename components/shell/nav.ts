@@ -10,8 +10,8 @@ export interface NavItem {
 /** The pages in the body of the nav, in order. */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: House },
-  { href: "/dashboard/billing", label: "Billing", icon: Wallet },
   { href: "/dashboard/usage", label: "Usage", icon: ChartBar },
+  { href: "/dashboard/billing", label: "Billing", icon: Wallet },
 ];
 
 /** Settings sits at the foot of the nav, with the theme and Sign out (DESIGN.md, "Dashboard shell"). */
