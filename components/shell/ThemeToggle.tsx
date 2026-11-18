@@ -1,9 +1,8 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/lib/cn";
 import { applyTheme, currentTheme } from "@/lib/theme";
-import { ICON_STROKE } from "./nav";
 
 interface ThemeToggleProps {
   /**
@@ -22,11 +21,11 @@ interface ThemeToggleProps {
  */
 export function ThemeToggle({ tone = "plain", className }: ThemeToggleProps) {
   const tinted = tone === "tinted";
-  const size = tinted ? 16 : 18;
+  const size = tinted ? 16 : 20;
   const icons = (
     <>
-      <Sun aria-hidden="true" size={size} strokeWidth={ICON_STROKE} className="dark:hidden" />
-      <Moon aria-hidden="true" size={size} strokeWidth={ICON_STROKE} className="hidden dark:block" />
+      <Sun aria-hidden="true" size={size} className="dark:hidden" />
+      <Moon aria-hidden="true" size={size} className="hidden dark:block" />
     </>
   );
 

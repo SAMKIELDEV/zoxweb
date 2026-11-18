@@ -1,18 +1,21 @@
-import { ChartNoAxesColumn, House, Settings, Wallet, type LucideIcon } from "lucide-react";
+import type { Icon } from "@phosphor-icons/react";
+import { ChartBar, GearSix, House, Wallet } from "@phosphor-icons/react/dist/ssr";
 
 export interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: Icon;
 }
 
-/** The four pages, in order. The label is also the page title. */
+/** The pages in the body of the nav, in order. */
 export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: House },
   { href: "/dashboard/billing", label: "Billing", icon: Wallet },
-  { href: "/dashboard/usage", label: "Usage", icon: ChartNoAxesColumn },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard/usage", label: "Usage", icon: ChartBar },
 ];
+
+/** Settings sits at the foot of the nav, with the theme and Sign out (DESIGN.md, "Dashboard shell"). */
+export const SETTINGS_ITEM: NavItem = { href: "/dashboard/settings", label: "Settings", icon: GearSix };
 
 /** Home matches exactly; the others also match their sub-pages. */
 export function isActive(pathname: string, href: string): boolean {
@@ -20,9 +23,8 @@ export function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function titleFor(pathname: string): string {
-  return NAV_ITEMS.find((item) => isActive(pathname, item.href))?.label ?? "Zox";
-}
+/** Icon size in the nav rows. Phosphor, regular weight (DESIGN.md section 6). */
+export const NAV_ICON_SIZE = 20;
 
-/** One icon set, one stroke weight (DESIGN.md section 6). */
+/** Stroke for the Lucide icons the public pages still use, until they move to Phosphor. */
 export const ICON_STROKE = 1.6;

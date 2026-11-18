@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PaymentStatus } from "@/components/billing/PaymentStatus";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { TRANSACTION_ID } from "@/lib/paths";
 
 export const metadata: Metadata = { title: "Purchase" };
@@ -20,5 +21,10 @@ export default async function PaymentStatusPage({ params, searchParams }: PagePr
 
   // Only "cancelled" is read, and only to soften the wording. Any other
   // parameter, such as a claimed status, is ignored.
-  return <PaymentStatus id={id} cancelled={query.cancelled === "1"} />;
+  return (
+    <>
+      <PageHeader title="Purchase" />
+      <PaymentStatus id={id} cancelled={query.cancelled === "1"} />
+    </>
+  );
 }

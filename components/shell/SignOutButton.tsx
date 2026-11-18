@@ -1,9 +1,9 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { SignOut } from "@phosphor-icons/react/dist/ssr";
 import { useSignOut } from "@/hooks/useSignOut";
 import { cn } from "@/lib/cn";
-import { ICON_STROKE } from "./nav";
+import { NAV_ICON_SIZE } from "./nav";
 
 interface SignOutButtonProps {
   className?: string;
@@ -12,14 +12,16 @@ interface SignOutButtonProps {
 }
 
 /**
- * The sidebar's sign-out row. Settings has its own, built on the same hook.
+ * The sign-out row at the foot of the sidebar and of the phone menu.
+ * Settings has its own, built on the same hook.
  *
  * While signing out, the button is marked aria-disabled and ignores
  * presses. It is not natively disabled, because that would drop keyboard
  * focus and leave nothing focused if the sign-out fails.
  *
- * A failure is always visible: under the button in the open sidebar, and
- * as a small note beside the 64px icon rail, where there is no room under it.
+ * A failure is always visible: under the button in the open sidebar and
+ * the phone menu, and as a small note beside the 64px icon rail (768 to
+ * 1023px), where there is no room under it.
  */
 export function SignOutButton({ className, labelClassName }: SignOutButtonProps) {
   const { busy, failed, signOut } = useSignOut();
@@ -39,7 +41,7 @@ export function SignOutButton({ className, labelClassName }: SignOutButtonProps)
           className,
         )}
       >
-        <LogOut aria-hidden="true" size={18} strokeWidth={ICON_STROKE} className="shrink-0" />
+        <SignOut aria-hidden="true" size={NAV_ICON_SIZE} className="shrink-0" />
         <span className={labelClassName}>{busy ? "Signing out" : "Sign out"}</span>
       </button>
       {failed ? (
@@ -47,8 +49,8 @@ export function SignOutButton({ className, labelClassName }: SignOutButtonProps)
           role="alert"
           className={
             "px-3 text-xs text-danger " +
-            "max-lg:absolute max-lg:bottom-1 max-lg:left-full max-lg:ml-3 max-lg:w-max " +
-            "max-lg:rounded-md max-lg:border max-lg:border-line max-lg:bg-surface max-lg:py-2 max-lg:shadow-soft"
+            "md:max-lg:absolute md:max-lg:bottom-1 md:max-lg:left-full md:max-lg:ml-3 md:max-lg:w-max " +
+            "md:max-lg:rounded-md md:max-lg:border md:max-lg:border-line md:max-lg:bg-surface md:max-lg:py-2 md:max-lg:shadow-soft"
           }
         >
           Couldn&apos;t sign you out. Try again.

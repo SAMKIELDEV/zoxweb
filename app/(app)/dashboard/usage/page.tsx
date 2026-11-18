@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
+import { PageHeader } from "@/components/shell/PageHeader";
 import { UsageContent } from "@/components/usage/UsageContent";
 
 export const metadata: Metadata = { title: "Usage" };
 
-/** Usage: all-time totals, where the credits went, and recent activity. */
+/** Usage: credits per day over a chosen period, where they went, and recent activity. */
 export default function UsagePage() {
-  return <UsageContent />;
+  return (
+    <>
+      <PageHeader title="Usage" />
+      <UsageContent />
+    </>
+  );
 }

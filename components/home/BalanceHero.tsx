@@ -1,5 +1,4 @@
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
-import { ButtonLink } from "@/components/ui/Button";
 import { Skeleton } from "@/components/ui/Skeleton";
 import type { Wallet } from "@/lib/api/types";
 import { formatCount, formatWhenInline, parseTimestamp } from "@/lib/format";
@@ -28,12 +27,13 @@ function breakdown(wallet: Wallet): string {
 
 /**
  * The focal point of Home: how many credits there are, in large serif
- * type on the page itself (never inside a card), with the one primary
- * action beside it.
+ * type on the page itself (never inside a card), and a quiet line on what
+ * they are made of. Home's one primary action, "Top up", is in the page
+ * header (TopUpAction).
  */
 export function BalanceHero({ wallet }: { wallet: Wallet }) {
   return (
-    <section aria-labelledby="balance-heading" className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+    <section aria-labelledby="balance-heading">
       <div>
         <h2 id="balance-heading" className="sr-only">
           Credit balance
@@ -46,21 +46,15 @@ export function BalanceHero({ wallet }: { wallet: Wallet }) {
         </p>
         <p className="mt-4 max-w-[52ch] text-base text-ink-2">{breakdown(wallet)}</p>
       </div>
-      <ButtonLink href="/dashboard/billing" variant="primary" className="w-full shrink-0 md:w-auto">
-        Top up
-      </ButtonLink>
     </section>
   );
 }
 
 export function BalanceHeroSkeleton() {
   return (
-    <div aria-hidden="true" className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-      <div>
-        <Skeleton className="h-16 w-44" />
-        <Skeleton className="mt-4 h-6 w-64 max-w-full" />
-      </div>
-      <Skeleton className="h-11 w-full rounded-md md:w-24" />
+    <div aria-hidden="true">
+      <Skeleton className="h-16 w-44" />
+      <Skeleton className="mt-4 h-6 w-64 max-w-full" />
     </div>
   );
 }
