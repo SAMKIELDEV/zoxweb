@@ -18,7 +18,7 @@ import { useSignedIn } from "./useSignedIn";
  * this many pixels. In between it is part-way, and stays there while the
  * page is still.
  */
-const FOLD_DISTANCE = 140;
+const FOLD_DISTANCE = 400;
 
 /** Pill geometry, in px. The flat bar is 80px tall; the pill sits 12px down and is 56px tall, so the row's centre line never moves. */
 const PILL_TOP = 12;
