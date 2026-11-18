@@ -431,7 +431,7 @@ export function PhoneDemo() {
         </div>
       </div>
 
-      <HandoffNote id={noteId} status={handoff} href={href} centered className="mt-4" />
+      <HandoffNote id={noteId} status={handoff} href={href} hint={COMPOSER.hint.hero} centered className="mt-4" />
     </div>
   );
 }

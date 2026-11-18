@@ -78,7 +78,7 @@ export function useKeepInView(target: RefObject<HTMLElement | null>) {
 }
 
 /**
- * The line under a composer (DESIGN.md, "Composers"): nothing before
+ * The line under a composer (DESIGN.md, "Composers"): its hint before
  * sending, "Opening WhatsApp with your message ready" once Send is tapped,
  * then the fallback link if the hand-off is blocked.
  */
@@ -86,18 +86,22 @@ export function HandoffNote({
   id,
   status,
   href,
+  hint,
   centered = false,
   className,
 }: {
   id: string;
   status: HandoffStatus;
   href: string;
+  /** Shown before sending: COMPOSER.hint.hero or .cta. */
+  hint: string;
   centered?: boolean;
   className?: string;
 }) {
   return (
     // min-h holds the line's height, so swapping in the fallback button moves nothing.
     <div id={id} aria-live="polite" className={cn("min-h-11 text-note text-ink-2", centered && "text-center", className)}>
+      {status === "ready" ? <p>{hint}</p> : null}
       {status === "handoff" ? <p>{COMPOSER.handoff}</p> : null}
       {status === "fallback" ? (
         <p className={cn("flex flex-wrap items-center gap-x-3 gap-y-2", centered && "justify-center")}>
@@ -166,7 +170,7 @@ export function Composer({ className }: { className?: string }) {
           {COMPOSER.send}
         </button>
       </form>
-      <HandoffNote id={noteId} status={status} href={href} className="mt-3" />
+      <HandoffNote id={noteId} status={status} href={href} hint={COMPOSER.hint.cta} className="mt-3" />
     </div>
   );
 }

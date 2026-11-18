@@ -45,8 +45,8 @@ export const HERO = {
 
 /**
  * Every composer that sends a message to WhatsApp: the hero phone and the
- * closing section (DESIGN.md, "Composers"). No microcopy under it before
- * sending.
+ * closing section (DESIGN.md, "Composers"). Each has its own line under it
+ * before sending, saying the same thing in different words.
  */
 export const COMPOSER = {
   placeholder: "Type your message here",
@@ -54,6 +54,11 @@ export const COMPOSER = {
   send: "Send",
   /** Tapping one fills the input. */
   suggestions: ["Summarize this YouTube video", "Explain this like I'm 12", "Plan my week around exams"],
+  /** The line under each composer before sending. */
+  hint: {
+    hero: "Type your message, tap Send, and it goes to Zox on WhatsApp.",
+    cta: "Write it here. Send takes it straight to Zox on WhatsApp.",
+  },
   handoff: "Opening WhatsApp with your message ready",
   /** Shown when the browser blocks the hand-off. */
   fallback: "Open WhatsApp",

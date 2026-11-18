@@ -348,7 +348,7 @@ The page-load bar in section 9 also runs on the public pages.
 |---|---|
 | Placeholder | Type your message here |
 | Button (visible text, or the accessible name of an icon button) | Send |
-| Under the composer before sending | Nothing. No microcopy about WhatsApp or pressing send there. |
+| Under the composer before sending (owner's change, November 18, 2026) | One short line that says typing here and tapping Send gets the message to Zox on WhatsApp, worded differently per composer. Hero phone: "Type your message, tap Send, and it goes to Zox on WhatsApp." Closing CTA: "Write it here. Send takes it straight to Zox on WhatsApp." |
 | After the visitor taps Send | Opening WhatsApp with your message ready |
 | Fallback button, if the browser blocks the hand-off | Open WhatsApp |
 

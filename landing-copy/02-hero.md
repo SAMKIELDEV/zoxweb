@@ -16,14 +16,14 @@ Ask a question, send a PDF, snap a photo of a problem. Zox answers on WhatsApp, 
 - Secondary: See how it works (scrolls to section 05)
 
 ## Phone composer
-Same words as every composer on the site (see 08-cta.md).
+Same words as every composer on the site (see 08-cta.md), except the line under it.
 - Input placeholder: Type your message here
 - Send button accessible label: Send
 - Suggestion chips (tapping one fills the input):
   - Summarize this YouTube video
   - Explain this like I'm 12
   - Plan my week around exams
-- Under the composer before sending: nothing
+- Under the composer before sending: Type your message, tap Send, and it goes to Zox on WhatsApp.
 - After tapping Send: Opening WhatsApp with your message ready
 - Fallback button if the browser blocks the redirect: Open WhatsApp
 

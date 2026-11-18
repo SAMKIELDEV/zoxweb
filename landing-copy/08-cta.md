@@ -6,9 +6,9 @@ Same background as the hero. Centred. Two lines and the composer repeated. The c
 Stop switching apps.
 Just text Zox.
 
-## Composer (the same words on every composer on the site)
+## Composer (the same words on every composer on the site, except the line under it)
 - Placeholder: Type your message here
 - Button: Send
-- Under the composer before sending: nothing
+- Under the composer before sending: Write it here. Send takes it straight to Zox on WhatsApp.
 - After tapping Send: Opening WhatsApp with your message ready
 - Fallback button if the browser blocks the redirect: Open WhatsApp
