@@ -80,7 +80,8 @@ const sections: LegalSection[] = [
         </li>
         <li>
           <strong>A PDF</strong> of up to {PDF_PAGES} pages and {MEDIA_MB} MB. Zox reads it and sends back the key points.
-          Add a caption to ask something specific. Scanned PDFs (pictures of pages) cannot be read yet.
+          Add a caption to ask something specific. Scanned PDFs (pictures of pages) work too: Zox reads up to the
+          first 5 scanned pages and tells you if there were more.
         </li>
         <li>
           <strong>A photo, screenshot or diagram.</strong> Zox tells you what it sees, reads the text in it, or works
